@@ -1005,20 +1005,7 @@ export default {
       return null
     },
     publishTargetPaths (pagePath) {
-      const slash = pagePath.lastIndexOf('/')
-      if (slash < 0) return [pagePath]
-      const stem = pagePath.slice(slash + 1)
-      const parent = pagePath.slice(0, slash)
-      if (stem.startsWith('module-')) {
-        const suffix = stem.slice('module-'.length)
-        return [
-          pagePath,
-          `${parent}/exercice-${suffix}`,
-          `${parent}/correction-${suffix}`
-        ]
-      }
-      const pair = this.pairedPagePath(pagePath)
-      return pair ? [pagePath, pair] : [pagePath]
+      return [pagePath]
     },
     async fetchPageRecord (path) {
       const resp = await this.$apollo.query({

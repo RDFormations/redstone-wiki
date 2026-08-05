@@ -604,10 +604,10 @@ components:
       properties:
         action:
           type: string
-          enum: [module, exercice, day, all_restricted]
+          enum: [module, exercice, correction, day, all_restricted]
         path:
           type: string
-          description: Requis pour action module ou exercice
+          description: Requis pour action module, exercice ou correction
         day:
           type: integer
           description: Requis pour action day (planning metadata)

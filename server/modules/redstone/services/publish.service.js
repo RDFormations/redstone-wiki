@@ -1,28 +1,18 @@
-const { publishPairPaths } = require('../domain/pair-rules')
-const { tripletStems } = require('../domain/formateur-hub')
 const { WEBHOOK_EVENTS } = require('../domain/webhook-events')
 
 const stemFromPath = path => String(path || '').replace(/\.md$/, '')
 
-/** Module → module + exercice + correction existants (aligné UI formateur). */
-const expandModulePublishStems = (stem, modules) => {
-  const stems = stem.startsWith('module-') ? tripletStems(stem) : [stem]
-  const byStem = new Set(modules.map(m => stemFromPath(m.path)))
-  return stems.filter(s => byStem.has(s))
-}
+const PATH_ACTIONS = new Set(['module', 'exercice', 'correction'])
 
-const expandPublishPaths = (paths, modules) => {
+const resolveExistingStems = (stems, modules) => {
+  const byStem = new Set(modules.map(m => stemFromPath(m.path)))
   const seen = new Set()
   const result = []
-  for (const raw of paths) {
+  for (const raw of stems) {
     const stem = stemFromPath(raw)
-    const expanded = stem.startsWith('module-') ? expandModulePublishStems(stem, modules) : [stem]
-    for (const s of expanded) {
-      if (!seen.has(s)) {
-        seen.add(s)
-        result.push(s)
-      }
-    }
+    if (!byStem.has(stem) || seen.has(stem)) continue
+    seen.add(stem)
+    result.push(stem)
   }
   return result
 }
@@ -44,18 +34,16 @@ const createPublishService = ({
     const action = payload.action || 'module'
     let paths = []
 
-    if (action === 'module' && payload.path) {
-      paths = expandModulePublishStems(stemFromPath(payload.path), modules)
-    } else if (action === 'exercice' && payload.path) {
-      paths = publishPairPaths(stemFromPath(payload.path), modules)
+    if (PATH_ACTIONS.has(action) && payload.path) {
+      paths = resolveExistingStems([payload.path], modules)
     } else if (action === 'day' && payload.day != null) {
       const planning = session.metadata?.planning || []
       const dayEntry = planning.find(d => Number(d.day) === Number(payload.day))
-      paths = expandPublishPaths(dayEntry?.modules || [], modules)
+      paths = resolveExistingStems(dayEntry?.modules || [], modules)
     } else if (action === 'all_restricted') {
       paths = modules
         .filter(m => ['module', 'exercice', 'correction'].includes(m.kind))
-        .map(m => m.path)
+        .map(m => stemFromPath(m.path))
     } else {
       return {
         ok: false,
@@ -68,19 +56,6 @@ const createPublishService = ({
     for (const path of paths) {
       const mod = modules.find(m => m.path === path || m.path === `${path}.md`)
       if (!mod) continue
-
-      if (action === 'exercice' && mod.kind === 'exercice') {
-        const pairPaths = publishPairPaths(mod.path, modules)
-        for (const pp of pairPaths) {
-          const pairMod = modules.find(m => m.path === pp)
-          if (pairMod) {
-            await contentRepo.updatePublished(pairMod.id, true)
-            await projectionService.setPagePublished(session, pairMod, true)
-            published.push(pairMod.path)
-          }
-        }
-        continue
-      }
 
       await contentRepo.updatePublished(mod.id, true)
       await projectionService.setPagePublished(session, mod, true)
@@ -108,4 +83,4 @@ const createPublishService = ({
   }
 })
 
-module.exports = { createPublishService }
+module.exports = { createPublishService, resolveExistingStems }

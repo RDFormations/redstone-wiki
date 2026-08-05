@@ -20,15 +20,8 @@ const moduleIndex = modules =>
   Object.fromEntries(modules.map(m => [stemFromPath(m.path), m]))
 
 const isModulePublished = (moduleStem, modules) => {
-  const byPath = moduleIndex(modules)
-  const stems = tripletStems(moduleStem)
-  const moduleMod = byPath[stems[0]]
-  if (!moduleMod?.published_stagiaire) return false
-  return stems.slice(1).every(stem => {
-    const mod = byPath[stem]
-    if (!mod) return true
-    return Boolean(mod.published_stagiaire)
-  })
+  const mod = moduleIndex(modules)[moduleStem]
+  return Boolean(mod?.published_stagiaire)
 }
 
 const buildModuleRow = (stem, modules, session) => {

@@ -54,12 +54,11 @@ describeE2e('LMS — formateur (lecture + publish uniquement)', () => {
     expect(res.body.published).toContain('module-01-e2e')
   })
 
-  it('publie exercice + correction en paire atomique (R2)', async () => {
+  it('publie exercice seul (correction reste brouillon)', async () => {
     const res = await publishExercice(sessionId, 'exercice-01-e2e.md')
     expect(res.status).toBe(200)
-    expect(res.body.published).toEqual(
-      expect.arrayContaining(['exercice-01-e2e', 'correction-01-e2e'])
-    )
+    expect(res.body.published).toEqual(['exercice-01-e2e'])
+    expect(res.body.published).not.toContain('correction-01-e2e')
   })
 
   it('double publish module est idempotent', async () => {

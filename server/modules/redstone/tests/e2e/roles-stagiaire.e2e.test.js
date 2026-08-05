@@ -80,18 +80,17 @@ describeE2e('LMS — stagiaire sans compte (HTTP Wiki + contrat nav)', () => {
     await expectSiteStatus(formationPath(slug, 'correction-01-e2e'), SITE.FORBIDDEN)
   })
 
-  it('publish exercice débloque exercice + correction (paire R2)', async () => {
+  it('publish exercice débloque uniquement l’exercice (correction séparée)', async () => {
     const pub = await publishExercice(sessionId, 'exercice-01-e2e.md')
     expect(pub.status).toBe(200)
 
     await expectSiteStatus(formationPath(slug, 'exercice-01-e2e'), SITE.OK)
-    await expectSiteStatus(formationPath(slug, 'correction-01-e2e'), SITE.OK)
+    await expectSiteStatus(formationPath(slug, 'correction-01-e2e'), SITE.FORBIDDEN)
 
     const nav = await stagiaireNav(sessionId)
     const paths = nav.body.items.map(i => i.path)
-    expect(paths).toEqual(
-      expect.arrayContaining(['exercice-01-e2e', 'correction-01-e2e'])
-    )
+    expect(paths).toContain('exercice-01-e2e')
+    expect(paths).not.toContain('correction-01-e2e')
   })
 
   it('publish intro : page hub stagiaire reste accessible', async () => {

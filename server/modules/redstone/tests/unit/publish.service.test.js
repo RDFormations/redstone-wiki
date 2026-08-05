@@ -43,34 +43,44 @@ describe('publish.service', () => {
     expect(result.status).toBe(404)
   })
 
-  it('publie un module unique', async () => {
+  it('publie un module seul (sans exercice ni correction)', async () => {
     const mocks = createMocks()
     const svc = createPublishService(mocks)
     const result = await svc.publish('sess-1', { action: 'module', path: 'module-01-a.md', by: 'formateur' })
     expect(result.ok).toBe(true)
-    expect(result.published).toEqual(expect.arrayContaining(['module-01-a', 'exercice-01-a', 'correction-01-a']))
-    expect(result.count).toBe(3)
-    expect(mocks.contentRepo.updatePublished).toHaveBeenCalledTimes(3)
+    expect(result.published).toEqual(['module-01-a'])
+    expect(result.count).toBe(1)
+    expect(mocks.contentRepo.updatePublished).toHaveBeenCalledTimes(1)
     expect(mocks.webhooks.emit).toHaveBeenCalledWith(
       WEBHOOK_EVENTS.MODULE_PUBLISHED,
       expect.objectContaining({ slug: 'test-slug', by: 'formateur' })
     )
   })
 
-  it('publie tous les modules du jour avec leurs triplets', async () => {
+  it('publie uniquement les stems listés pour un jour', async () => {
     const mocks = createMocks()
     const svc = createPublishService(mocks)
     const result = await svc.publish('sess-1', { action: 'day', day: 1 })
     expect(result.ok).toBe(true)
-    expect(result.published).toEqual(expect.arrayContaining(['module-01-a', 'exercice-01-a', 'correction-01-a']))
+    expect(result.published).toEqual(['module-01-a', 'exercice-01-a'])
+    expect(result.published).not.toContain('correction-01-a')
   })
 
-  it('publie exercice + correction en paire', async () => {
+  it('publie exercice seul (sans correction)', async () => {
     const mocks = createMocks()
     const svc = createPublishService(mocks)
     const result = await svc.publish('sess-1', { action: 'exercice', path: 'exercice-01-a' })
     expect(result.ok).toBe(true)
-    expect(result.published).toEqual(expect.arrayContaining(['exercice-01-a', 'correction-01-a']))
+    expect(result.published).toEqual(['exercice-01-a'])
+    expect(mocks.contentRepo.updatePublished).toHaveBeenCalledTimes(1)
+  })
+
+  it('publie correction seule', async () => {
+    const mocks = createMocks()
+    const svc = createPublishService(mocks)
+    const result = await svc.publish('sess-1', { action: 'correction', path: 'correction-01-a' })
+    expect(result.ok).toBe(true)
+    expect(result.published).toEqual(['correction-01-a'])
   })
 
   it('rejette une action invalide', async () => {

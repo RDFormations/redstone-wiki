@@ -100,7 +100,7 @@
                       v-if='canPublish && !mod.isPublished'
                       type='button'
                       :disabled='publishBusy'
-                      :title='"Publier module + exercice + correction"'
+                      :title='"Publier le module (exercice et correction séparément)"'
                       @click.prevent='publishModule(mod)'
                       )
                       v-icon(x-small) mdi-cloud-upload

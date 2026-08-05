@@ -1,7 +1,8 @@
 const { tripletSuffix } = require('./publish-policy')
 
 /**
- * R2 — paires exercice/correction atomiques
+ * R2 — triplets module/exercice/correction (contrôle santé).
+ * Publication : chaque stem est indépendant (exercice sans correction).
  */
 const buildTripletMap = modules => {
   const stems = new Set(modules.map(m => m.path.replace(/\.md$/, '')))
@@ -40,14 +41,8 @@ const checkTriplets = modules => {
   return { complete, incomplete, issues }
 }
 
-const publishPairPaths = (exercicePath, modules) => {
-  const stem = exercicePath.replace(/\.md$/, '')
-  const suffix = tripletSuffix(stem)
-  if (!suffix) return [exercicePath]
-  const correction = `correction-${suffix}`
-  const hasCorrection = modules.some(m => m.path === correction || m.path === `${correction}.md`)
-  return hasCorrection ? [exercicePath, correction] : [exercicePath]
-}
+/** @deprecated Publication unitaire — conservé pour compat tests/outils */
+const publishPairPaths = (exercicePath, _modules) => [exercicePath.replace(/\.md$/, '')]
 
 module.exports = {
   buildTripletMap,

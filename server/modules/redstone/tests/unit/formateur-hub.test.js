@@ -47,10 +47,11 @@ describe('formateur-hub domain', () => {
     expect(JSON.stringify(hub)).not.toContain('monday_item_id')
   })
 
-  it('isModulePublished exige module + paire exercice/correction', () => {
+  it('isModulePublished reflète uniquement le module', () => {
     const mods = modules().map(m => ({ ...m, published_stagiaire: true }))
-    expect(isModulePublished('module-01-a', mods)).toBe(true)
     mods.find(m => m.path === 'exercice-01-a').published_stagiaire = false
+    expect(isModulePublished('module-01-a', mods)).toBe(true)
+    mods.find(m => m.path === 'module-01-a').published_stagiaire = false
     expect(isModulePublished('module-01-a', mods)).toBe(false)
   })
 
