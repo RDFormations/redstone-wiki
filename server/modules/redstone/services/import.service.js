@@ -111,7 +111,15 @@ const createImportService = ({
 
     const patch = {
       state: nextState,
-      content_ready_at: qaGreen ? new Date().toISOString() : session.content_ready_at
+      content_ready_at: qaGreen ? new Date().toISOString() : session.content_ready_at,
+      metadata: {
+        lms: {
+          content_ready: qaGreen,
+          distributed: Boolean(session.distributed_at),
+          support_ready: false,
+          updated_at: new Date().toISOString()
+        }
+      }
     }
     const updated = await sessionRepo.update(sessionId, patch)
 

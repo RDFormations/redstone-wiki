@@ -1,6 +1,7 @@
 const crypto = require('crypto')
 const { validateCreatePayload, buildWikiPath } = require('../domain/session-validation')
 const { INITIAL_STATE } = require('../domain/session-state')
+const { enrichSessionStatus } = require('../domain/session-status')
 
 const DUPLICATE_MESSAGES = {
   slug: 'Une session avec ce slug existe déjà.',
@@ -88,7 +89,7 @@ const createSessionService = ({ repo, logger = console }) => ({
         error: { code: 'session_not_found', message: 'Session introuvable.' }
       }
     }
-    return { ok: true, status: 200, session }
+    return { ok: true, status: 200, session: { ...session, ...enrichSessionStatus(session) } }
   },
 
   async getBySlug(slug) {
@@ -101,14 +102,21 @@ const createSessionService = ({ repo, logger = console }) => ({
         error: { code: 'session_not_found', message: 'Session introuvable.' }
       }
     }
-    return { ok: true, status: 200, session }
+    return { ok: true, status: 200, session: { ...session, ...enrichSessionStatus(session) } }
   },
 
   async list(query = {}) {
     const limit = Math.min(Math.max(Number.parseInt(query.limit, 10) || 50, 1), 100)
     const offset = Math.max(Number.parseInt(query.offset, 10) || 0, 0)
     const result = await repo.list({ limit, offset, q: query.q })
-    return { ok: true, status: 200, ...result }
+    return {
+      ok: true,
+      status: 200,
+      items: result.items.map(s => ({ ...s, ...enrichSessionStatus(s) })),
+      total: result.total,
+      limit: result.limit,
+      offset: result.offset
+    }
   }
 })
 

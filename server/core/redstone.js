@@ -116,7 +116,7 @@ module.exports = {
       })
     })
 
-    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F05, S01/M01, E01/E02, M02, O02, T04')
+    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F05, S01/M01, T01, E01/E02, M02, O02/O03, T04')
   },
   validateLmsConfig
 }

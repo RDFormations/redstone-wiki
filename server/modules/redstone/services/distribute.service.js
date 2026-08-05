@@ -92,7 +92,15 @@ const createDistributeService = ({
     const nextState = transition(session.state, 'distribute_ok') || 'distributed'
     const updated = await sessionRepo.update(sessionId, {
       state: nextState,
-      distributed_at: new Date().toISOString()
+      distributed_at: new Date().toISOString(),
+      metadata: {
+        lms: {
+          content_ready: Boolean(session.content_ready_at),
+          distributed: true,
+          support_ready: true,
+          updated_at: new Date().toISOString()
+        }
+      }
     })
 
     let guest_access = null

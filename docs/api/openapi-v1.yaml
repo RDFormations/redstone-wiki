@@ -469,6 +469,9 @@ components:
         metadata: { type: object }
         content_ready_at: { type: string, format: date-time, nullable: true }
         distributed_at: { type: string, format: date-time, nullable: true }
+        content_ready: { type: boolean, description: 'O03 — QA verte (draft_ready)' }
+        distributed: { type: boolean, description: 'O03 — distribute OK' }
+        support_ready: { type: boolean, description: 'O03 — hub stagiaire live (distributed && state OK)' }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
 

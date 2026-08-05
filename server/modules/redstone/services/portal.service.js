@@ -1,4 +1,5 @@
 const { buildStagiaireHub, isPublicHubVisible } = require('../domain/portal-hub')
+const { buildFormateurHub } = require('../domain/formateur-hub')
 const { buildNavBundle } = require('../domain/nav-bundle')
 
 const createPortalService = ({
@@ -34,6 +35,16 @@ const createPortalService = ({
     const nav = navService.getNav(base.session, modules, navAudience)
     const bundle = buildNavBundle(base.session, nav)
     return { ok: true, status: 200, nav: bundle }
+  },
+
+  async getFormateurHub(slug) {
+    const session = await sessionRepo.findBySlug(slug)
+    if (!session) {
+      return { ok: false, status: 404, error: { code: 'session_not_found', message: 'Formation introuvable.' } }
+    }
+    const modules = await contentRepo.listBySession(session.id)
+    const hub = buildFormateurHub(session, modules, { siteHost: getSiteHost() })
+    return { ok: true, status: 200, hub, session }
   }
 })
 

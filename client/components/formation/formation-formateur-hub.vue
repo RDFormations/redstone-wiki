@@ -185,43 +185,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
-import _ from 'lodash'
 import { get } from 'vuex-pathify'
-
-const PAGE_BY_PATH = gql`
-  query FormateurPageByPath($path: String!, $locale: String!) {
-    pages {
-      singleByPath(path: $path, locale: $locale) {
-        id
-        path
-        title
-        content
-        isPublished
-      }
-    }
-  }
-`
-
-const PAGE_PUBLISH_UPDATE = gql`
-  mutation FormateurPagePublishUpdate($id: Int!, $title: String!, $content: String!, $isPublished: Boolean!) {
-    pages {
-      update(
-        id: $id
-        title: $title
-        content: $content
-        isPublished: $isPublished
-        editor: "markdown"
-        description: ""
-        isPrivate: false
-        tags: []
-      ) {
-        responseResult { succeeded message }
-        page { id path isPublished }
-      }
-    }
-  }
-`
 
 export default {
   props: {
@@ -234,7 +198,7 @@ export default {
       error: '',
       data: null,
       publishBusy: false,
-      publicationMap: {}
+      useLmsApi: false
     }
   },
   computed: {
@@ -304,79 +268,28 @@ export default {
       this.loading = true
       this.error = ''
       try {
-        const res = await fetch(`/_assets/formateur/${encodeURIComponent(this.slug)}.json`, { cache: 'no-store' })
-        if (!res.ok) throw new Error('Données formateur introuvables — lancer build-formation-formateur.py')
-        this.data = await res.json()
-        await this.syncPublicationFromWiki()
+        const apiRes = await fetch(`/api/formation/${encodeURIComponent(this.slug)}/formateur`, {
+          credentials: 'same-origin',
+          cache: 'no-store'
+        })
+        if (apiRes.ok) {
+          this.data = await apiRes.json()
+          this.useLmsApi = true
+          return
+        }
+        if (apiRes.status !== 404) {
+          const errBody = await apiRes.json().catch(() => ({}))
+          throw new Error(errBody.error?.message || `Erreur ${apiRes.status}`)
+        }
+        const legacy = await fetch(`/_assets/formateur/${encodeURIComponent(this.slug)}.json`, { cache: 'no-store' })
+        if (!legacy.ok) throw new Error('Formation introuvable — distribuer via LMS ou lancer build-formation-formateur.py')
+        this.data = await legacy.json()
+        this.useLmsApi = false
       } catch (e) {
         this.error = e.message || String(e)
         this.data = null
       } finally {
         this.loading = false
-      }
-    },
-    async syncPublicationFromWiki () {
-      if (!this.data || !this.slug || !this.locale) return
-      try {
-        const resp = await this.$apollo.query({
-          query: gql`
-            query ($locale: String!) {
-              pages {
-                list(limit: 500, locale: $locale, orderBy: PATH) {
-                  path
-                  isPublished
-                }
-              }
-            }
-          `,
-          fetchPolicy: 'network-only',
-          variables: { locale: this.locale }
-        })
-        const prefix = `formations/${this.slug}`
-        const map = {}
-        for (const page of _.get(resp, 'data.pages.list', [])) {
-          if (page.path === prefix || page.path.indexOf(prefix + '/') === 0) {
-            map[page.path] = page.isPublished !== false
-          }
-        }
-        this.publicationMap = map
-        this.applyPublicationMap()
-      } catch (e) {
-        // JSON statique seul
-      }
-    },
-    applyPublicationMap () {
-      if (!this.data) return
-      const isModulePublished = (moduleStem) => {
-        const modulePath = this.wikiPathFromStem(moduleStem)
-        if (this.publicationMap[modulePath] !== true) return false
-        return this.tripletStems(moduleStem).slice(1).every(stem => {
-          const path = this.wikiPathFromStem(stem)
-          if (!(path in this.publicationMap)) return true
-          return this.publicationMap[path] === true
-        })
-      }
-      const patchMod = (mod) => ({
-        ...mod,
-        isPublished: isModulePublished(mod.stem)
-      })
-      this.data = {
-        ...this.data,
-        schedule: (this.data.schedule || []).map(day => ({
-          ...day,
-          modules: (day.modules || []).map(patchMod)
-        })),
-        modules: (this.data.modules || []).map(patchMod),
-        publication: this.buildPublicationSummary()
-      }
-    },
-    buildPublicationSummary () {
-      const modules = this.data.modules || []
-      const published = modules.filter(mod => mod.isPublished).length
-      return {
-        total: modules.length,
-        published,
-        draft: modules.length - published
       }
     },
     async copyStagiaireUrl () {
@@ -413,74 +326,49 @@ export default {
         })
       }
     },
-    tripletStems (moduleStem) {
-      const suffix = moduleStem.replace(/^module-/, '')
-      return [
-        moduleStem,
-        `exercice-${suffix}`,
-        `correction-${suffix}`
-      ]
-    },
-    wikiPathFromStem (stem) {
-      return `formations/${this.slug}/${stem}`
-    },
     dayHasDraft (day) {
       return (day.modules || []).some(mod => !mod.isPublished)
     },
-    async fetchPageRecord (path) {
-      const resp = await this.$apollo.query({
-        query: PAGE_BY_PATH,
-        variables: { path, locale: this.locale },
-        fetchPolicy: 'network-only'
+    async publishViaLms (body) {
+      const res = await fetch(`/api/formation/${encodeURIComponent(this.slug)}/publish`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
       })
-      return _.get(resp, 'data.pages.singleByPath')
-    },
-    async setPagePublished (page, isPublished) {
-      if (!page) return false
-      const resp = await this.$apollo.mutate({
-        mutation: PAGE_PUBLISH_UPDATE,
-        variables: {
-          id: page.id,
-          title: page.title,
-          content: page.content,
-          isPublished
-        }
-      })
-      const result = _.get(resp, 'data.pages.update.responseResult')
-      if (!result || !result.succeeded) {
-        throw new Error(_.get(result, 'message', 'Échec publication'))
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(json.error?.message || json.message || `Publication échouée (${res.status})`)
       }
-      this.publicationMap = {
-        ...this.publicationMap,
-        [page.path]: isPublished
-      }
-      return true
-    },
-    async publishPageRecord (page) {
-      if (!page || page.isPublished) return false
-      return this.setPagePublished(page, true)
+      return json
     },
     async publishModule (mod) {
       if (!this.canPublish || this.publishBusy || !mod || mod.isPublished) return
       this.publishBusy = true
-      let count = 0
       try {
-        for (const stem of this.tripletStems(mod.stem)) {
-          const page = await this.fetchPageRecord(this.wikiPathFromStem(stem))
-          if (page && await this.publishPageRecord(page)) count += 1
+        if (this.useLmsApi) {
+          const result = await this.publishViaLms({ action: 'module', path: mod.stem })
+          await this.load()
+          this.$root.$emit('formation-nav-refresh')
+          this.$root.$emit('formation-nav-assets-refresh')
+          this.$store.commit('showNotification', {
+            style: 'green',
+            message: `Module publié (${result.count || 1})`,
+            icon: 'check'
+          })
+          return
         }
-        this.applyPublicationMap()
-        this.$root.$emit('formation-nav-refresh')
-        this.$root.$emit('formation-nav-assets-refresh')
         this.$store.commit('showNotification', {
-          style: count ? 'green' : 'orange',
-          message: count
-            ? `Module publié (${count} page${count > 1 ? 's' : ''})`
-            : 'Aucune page à publier',
-          icon: count ? 'check' : 'alert'
+          style: 'orange',
+          message: 'Publication legacy — migrer la session vers LMS',
+          icon: 'alert'
         })
       } catch (e) {
-        this.$store.commit('pushGraphError', e)
+        this.$store.commit('showNotification', {
+          style: 'red',
+          message: e.message || 'Échec publication',
+          icon: 'alert'
+        })
       } finally {
         this.publishBusy = false
       }
@@ -490,24 +378,30 @@ export default {
       const targets = (day.modules || []).filter(mod => !mod.isPublished)
       if (!targets.length) return
       this.publishBusy = true
-      let count = 0
       try {
-        for (const mod of targets) {
-          for (const stem of this.tripletStems(mod.stem)) {
-            const page = await this.fetchPageRecord(this.wikiPathFromStem(stem))
-            if (page && await this.publishPageRecord(page)) count += 1
-          }
+        if (this.useLmsApi) {
+          const result = await this.publishViaLms({ action: 'day', day: day.day })
+          await this.load()
+          this.$root.$emit('formation-nav-refresh')
+          this.$root.$emit('formation-nav-assets-refresh')
+          this.$store.commit('showNotification', {
+            style: 'green',
+            message: `Jour publié (${result.count || targets.length} module(s))`,
+            icon: 'check'
+          })
+          return
         }
-        this.applyPublicationMap()
-        this.$root.$emit('formation-nav-refresh')
-        this.$root.$emit('formation-nav-assets-refresh')
         this.$store.commit('showNotification', {
-          style: 'green',
-          message: `Jour publié (${count} page${count > 1 ? 's' : ''})`,
-          icon: 'check'
+          style: 'orange',
+          message: 'Publication legacy — migrer la session vers LMS',
+          icon: 'alert'
         })
       } catch (e) {
-        this.$store.commit('pushGraphError', e)
+        this.$store.commit('showNotification', {
+          style: 'red',
+          message: e.message || 'Échec publication',
+          icon: 'alert'
+        })
       } finally {
         this.publishBusy = false
       }

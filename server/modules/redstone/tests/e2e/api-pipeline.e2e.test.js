@@ -89,6 +89,12 @@ describeE2e('LMS API — pipeline F01→F05 (e2e)', () => {
     expect(res.body.qa.status).toBe('green')
     expect(res.body.session.state).toBe('draft_ready')
     expect(res.body.content_ready).toBe(true)
+    expect(res.body.distributed).toBe(false)
+
+    const session = await api('GET', `/sessions/${sessionId}`, { token: tokens().agent })
+    expect(session.body.session.content_ready).toBe(true)
+    expect(session.body.session.distributed).toBe(false)
+    expect(session.body.session.support_ready).toBe(false)
   })
 
   it('O11 — health checks après import', async () => {
@@ -109,6 +115,11 @@ describeE2e('LMS API — pipeline F01→F05 (e2e)', () => {
     expect(res.body.ok).toBe(true)
     expect(res.body.session.state).toBe('distributed')
     expect(res.body.session.distributed_at).toBeTruthy()
+    expect(res.body.distributed).toBe(true)
+
+    const session = await api('GET', `/sessions/${sessionId}`, { token: tokens().agent })
+    expect(session.body.session.support_ready).toBe(true)
+    expect(session.body.session.metadata.lms.support_ready).toBe(true)
   })
 
   it('F05 — expose la navigation stagiaire et formateur', async () => {
