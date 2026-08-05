@@ -61,6 +61,10 @@
                 )
                 span.rs-nav-practice-tag Exercice
                 span.rs-nav-practice-text {{ block.practice.exercice.shortTitle }}
+                span.rs-nav-pub-badge(
+                  v-if='canSeeUnpublished'
+                  :class='navPubBadgeClass(block.practice.exercice)'
+                  ) {{ navPubBadgeLabel(block.practice.exercice) }}
               a.rs-nav-practice-link(
                 v-if='block.practice.correction && linkVisible(block.practice.correction)'
                 :class='practiceLinkClass(block.practice.correction)'
@@ -70,6 +74,10 @@
                 )
                 span.rs-nav-practice-tag Correction
                 span.rs-nav-practice-text {{ block.practice.correction.shortTitle }}
+                span.rs-nav-pub-badge(
+                  v-if='canSeeUnpublished'
+                  :class='navPubBadgeClass(block.practice.correction)'
+                  ) {{ navPubBadgeLabel(block.practice.correction) }}
         ul.rs-nav-list(v-else)
           li(v-for='item in group.items', :key='item.path')
             a.rs-nav-link(
@@ -315,6 +323,17 @@ export default {
         'rs-nav-practice-link--active': this.isActive(item.href),
         ['rs-nav-practice-link--' + item.practiceKind]: true
       }
+    },
+    navPubBadgeClass (item) {
+      const kind = item.practiceKind || 'module'
+      const pub = item.isPublished !== false
+      const base = pub ? 'rs-nav-pub-badge--pub' : 'rs-nav-pub-badge--draft'
+      return `${base} rs-nav-pub-badge--${kind}`
+    },
+    navPubBadgeLabel (item) {
+      const pub = item.isPublished !== false
+      if (pub) return 'Publié'
+      return item.practiceKind === 'correction' ? 'Corr.' : 'Exo.'
     },
     isActive (href) {
       const current = '/' + this.locale + '/' + this.path

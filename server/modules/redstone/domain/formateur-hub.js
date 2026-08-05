@@ -19,21 +19,38 @@ const tripletStems = moduleStem => {
 const moduleIndex = modules =>
   Object.fromEntries(modules.map(m => [stemFromPath(m.path), m]))
 
-const isModulePublished = (moduleStem, modules) => {
-  const mod = moduleIndex(modules)[moduleStem]
+const isStemPublished = (stem, modules) => {
+  const mod = moduleIndex(modules)[stem]
   return Boolean(mod?.published_stagiaire)
 }
 
-const buildModuleRow = (stem, modules, session) => {
+const isModulePublished = (moduleStem, modules) => isStemPublished(moduleStem, modules)
+
+const buildStemRow = (stem, modules, session) => {
   const mod = moduleIndex(modules)[stem]
+  if (!mod) return null
   const slug = session.slug
   return {
     stem,
+    kind: mod.kind || pageKind(stem),
     title: mod?.title || stem.replace(/-/g, ' '),
     href: stem === '00-introduction' ? `/formations/${slug}` : `/formations/${slug}/${stem}`,
     path: `formations/${slug}/${stem}`,
-    isPublished: isModulePublished(stem, modules),
+    isPublished: isStemPublished(stem, modules),
     moduleNum: moduleNum(stem)
+  }
+}
+
+const buildModuleRow = (stem, modules, session) => {
+  const row = buildStemRow(stem, modules, session)
+  if (!row) return null
+  const suffix = stem.replace(/^module-/, '')
+  return {
+    ...row,
+    practice: {
+      exercice: buildStemRow(`exercice-${suffix}`, modules, session),
+      correction: buildStemRow(`correction-${suffix}`, modules, session)
+    }
   }
 }
 
@@ -78,10 +95,16 @@ const buildSchedule = (session, modules) => {
 const publicationSummary = modules => {
   const restricted = modules.filter(m => ['module', 'exercice', 'correction'].includes(m.kind))
   const published = restricted.filter(m => m.published_stagiaire)
+  const countKind = kind => ({
+    total: modules.filter(m => m.kind === kind).length,
+    published: modules.filter(m => m.kind === kind && m.published_stagiaire).length
+  })
   return {
-    total: modules.filter(m => m.kind === 'module').length,
-    published: modules.filter(m => m.kind === 'module' && m.published_stagiaire).length,
-    draft: modules.filter(m => m.kind === 'module' && !m.published_stagiaire).length,
+    total: countKind('module').total,
+    published: countKind('module').published,
+    draft: countKind('module').total - countKind('module').published,
+    exercice: countKind('exercice'),
+    correction: countKind('correction'),
     restricted_total: restricted.length,
     restricted_published: published.length
   }
@@ -186,6 +209,9 @@ module.exports = {
   buildFormateurHub,
   buildSchedule,
   isModulePublished,
+  isStemPublished,
+  buildStemRow,
+  buildModuleRow,
   publicationSummary,
   moduleNum,
   tripletStems

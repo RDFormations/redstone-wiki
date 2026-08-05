@@ -42,6 +42,8 @@ describe('formateur-hub domain', () => {
     expect(hub.distributed).toBe(true)
     expect(hub.schedule).toHaveLength(1)
     expect(hub.schedule[0].modules[0].stem).toBe('module-01-a')
+    expect(hub.schedule[0].modules[0].practice.exercice.stem).toBe('exercice-01-a')
+    expect(hub.schedule[0].modules[0].practice.correction.isPublished).toBe(false)
     expect(hub.monday.url).toContain('12345678')
     expect(hub.stagiaireQrSvg).toContain('<svg')
     expect(JSON.stringify(hub)).not.toContain('monday_item_id')
@@ -55,10 +57,12 @@ describe('formateur-hub domain', () => {
     expect(isModulePublished('module-01-a', mods)).toBe(false)
   })
 
-  it('publicationSummary compte les modules', () => {
+  it('publicationSummary compte modules, exercices et corrections', () => {
     const summary = publicationSummary(modules())
     expect(summary.total).toBe(1)
     expect(summary.published).toBe(0)
     expect(summary.draft).toBe(1)
+    expect(summary.exercice).toEqual({ total: 1, published: 0 })
+    expect(summary.correction).toEqual({ total: 1, published: 0 })
   })
 })

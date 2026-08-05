@@ -476,6 +476,37 @@ html[data-rs-theme='light'] .rs-sidebar-expand,
   min-width: 0;
 }
 
+.rs-nav-pub-badge {
+  flex-shrink: 0;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  margin-left: auto;
+
+  &--pub {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  &--draft {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &--exercice.rs-nav-pub-badge--pub {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &--correction.rs-nav-pub-badge--pub {
+    background: #fef3c7;
+    color: #92400e;
+  }
+}
+
 .v-main .contents h1,
 .v-main .contents h2 {
   color: $rs-primary !important;
@@ -915,6 +946,77 @@ html[data-rs-theme='light'] .rs-sidebar-expand,
   &--draft {
     background: #fee2e2;
     color: #991b1b;
+  }
+
+  &--exercice.rs-formateur-badge--pub {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &--correction.rs-formateur-badge--pub {
+    background: #fef3c7;
+    color: #92400e;
+  }
+}
+
+.rs-formateur-module-block {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+  &:last-child { border-bottom: 0; }
+}
+
+.rs-formateur-practice-list {
+  list-style: none;
+  margin: 0 0 0.35rem;
+  padding: 0 0 0 1.75rem;
+}
+
+.rs-formateur-practice-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.2rem 0;
+  font-size: 0.85rem;
+}
+
+.rs-formateur-practice-link {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 0;
+  color: inherit !important;
+  text-decoration: none !important;
+
+  &:hover { text-decoration: underline !important; }
+}
+
+.rs-formateur-practice-kind {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b7280;
+
+  .theme--dark & { color: #9ca3af; }
+}
+
+.rs-formateur-pub-block {
+  display: contents;
+}
+
+.rs-formateur-pub-item--practice {
+  padding-left: 1.25rem;
+
+  .rs-formateur-practice-kind {
+    flex-shrink: 0;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-right: 0.35rem;
+    color: #6b7280;
   }
 }
 

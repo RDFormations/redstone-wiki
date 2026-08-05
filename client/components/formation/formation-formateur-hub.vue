@@ -18,6 +18,12 @@
           .rs-formateur-stat
             strong {{ data.publication.published }}
             span / {{ data.publication.total }} modules publiés
+          .rs-formateur-stat(v-if='data.publication.exercice && data.publication.exercice.total')
+            strong {{ data.publication.exercice.published }}
+            span / {{ data.publication.exercice.total }} exercices
+          .rs-formateur-stat(v-if='data.publication.correction && data.publication.correction.total')
+            strong {{ data.publication.correction.published }}
+            span / {{ data.publication.correction.total }} corrections
           .rs-formateur-stat(v-if='data.durationDays')
             strong {{ data.durationDays }}
             span jours
@@ -89,25 +95,48 @@
                     v-icon.mr-1(x-small) mdi-cloud-upload
                     | Publier le jour
                 ul.rs-formateur-module-list
-                  li.rs-formateur-module-row(
+                  li.rs-formateur-module-block(
                     v-for='mod in day.modules'
                     :key='mod.stem'
                     )
-                    a.rs-formateur-module-link(:href='localeHref(mod.href)')
-                      span.rs-formateur-module-num {{ padNum(mod.moduleNum) }}
-                      span {{ mod.title }}
-                    button.rs-formateur-publish-btn(
-                      v-if='canPublish && !mod.isPublished'
-                      type='button'
-                      :disabled='publishBusy'
-                      :title='"Publier le module (exercice et correction séparément)"'
-                      @click.prevent='publishModule(mod)'
+                    .rs-formateur-module-row
+                      a.rs-formateur-module-link(:href='localeHref(mod.href)')
+                        span.rs-formateur-module-num {{ padNum(mod.moduleNum) }}
+                        span {{ mod.title }}
+                      button.rs-formateur-publish-btn(
+                        v-if='canPublish && !mod.isPublished'
+                        type='button'
+                        :disabled='publishBusy'
+                        title='Publier le module'
+                        @click.prevent='publishItem(mod, "module")'
+                        )
+                        v-icon(x-small) mdi-cloud-upload
+                        span Publier
+                      span.rs-formateur-badge(
+                        :class='pubBadgeClass(mod.isPublished)'
+                        ) {{ pubBadgeLabel(mod.isPublished) }}
+                    ul.rs-formateur-practice-list(
+                      v-if='practiceItems(mod).length'
                       )
-                      v-icon(x-small) mdi-cloud-upload
-                      span Publier
-                    span.rs-formateur-badge(
-                      :class='mod.isPublished ? "rs-formateur-badge--pub" : "rs-formateur-badge--draft"'
-                      ) {{ mod.isPublished ? 'Publié' : 'Brouillon' }}
+                      li.rs-formateur-practice-row(
+                        v-for='item in practiceItems(mod)'
+                        :key='item.stem'
+                        )
+                        a.rs-formateur-practice-link(:href='localeHref(item.href)')
+                          span.rs-formateur-practice-kind {{ item.kindLabel }}
+                          span {{ item.title }}
+                        button.rs-formateur-publish-btn(
+                          v-if='canPublish && !item.isPublished'
+                          type='button'
+                          :disabled='publishBusy'
+                          :title='"Publier " + item.kindLabel.toLowerCase()'
+                          @click.prevent='publishItem(item, item.publishAction)'
+                          )
+                          v-icon(x-small) mdi-cloud-upload
+                          span Publier
+                        span.rs-formateur-badge(
+                          :class='pubBadgeClass(item.isPublished, item.kind)'
+                          ) {{ pubBadgeLabel(item.isPublished, item.kind) }}
 
         v-col(cols='12', md='6')
           v-card.rs-formateur-card(flat)
@@ -165,24 +194,44 @@
               span.caption.grey--text {{ data.publication.draft }} brouillon(s)
             v-card-text.pt-0
               .rs-formateur-pub-grid
-                a.rs-formateur-pub-item(
+                .rs-formateur-pub-block(
                   v-for='mod in data.modules'
                   :key='mod.stem'
-                  :href='localeHref(mod.href)'
-                  :class='mod.isPublished ? "rs-formateur-pub-item--pub" : "rs-formateur-pub-item--draft"'
                   )
-                  span.rs-formateur-module-num {{ padNum(mod.moduleNum) }}
-                  span.rs-formateur-pub-title {{ mod.title }}
-                  button.rs-formateur-publish-btn.rs-formateur-publish-btn--inline(
-                    v-if='canPublish && !mod.isPublished'
-                    type='button'
-                    :disabled='publishBusy'
-                    @click.prevent.stop='publishModule(mod)'
+                  a.rs-formateur-pub-item(
+                    :href='localeHref(mod.href)'
+                    :class='mod.isPublished ? "rs-formateur-pub-item--pub" : "rs-formateur-pub-item--draft"'
                     )
-                    v-icon(x-small) mdi-cloud-upload
-                  span.rs-formateur-badge(
-                    :class='mod.isPublished ? "rs-formateur-badge--pub" : "rs-formateur-badge--draft"'
-                    ) {{ mod.isPublished ? 'OK' : '—' }}
+                    span.rs-formateur-module-num {{ padNum(mod.moduleNum) }}
+                    span.rs-formateur-pub-title {{ mod.title }}
+                    button.rs-formateur-publish-btn.rs-formateur-publish-btn--inline(
+                      v-if='canPublish && !mod.isPublished'
+                      type='button'
+                      :disabled='publishBusy'
+                      @click.prevent.stop='publishItem(mod, "module")'
+                      )
+                      v-icon(x-small) mdi-cloud-upload
+                    span.rs-formateur-badge(
+                      :class='pubBadgeClass(mod.isPublished)'
+                      ) {{ pubBadgeLabel(mod.isPublished) }}
+                  a.rs-formateur-pub-item.rs-formateur-pub-item--practice(
+                    v-for='item in practiceItems(mod)'
+                    :key='item.stem'
+                    :href='localeHref(item.href)'
+                    :class='item.isPublished ? "rs-formateur-pub-item--pub" : "rs-formateur-pub-item--draft"'
+                    )
+                    span.rs-formateur-practice-kind {{ item.kindLabel }}
+                    span.rs-formateur-pub-title {{ item.title }}
+                    button.rs-formateur-publish-btn.rs-formateur-publish-btn--inline(
+                      v-if='canPublish && !item.isPublished'
+                      type='button'
+                      :disabled='publishBusy'
+                      @click.prevent.stop='publishItem(item, item.publishAction)'
+                      )
+                      v-icon(x-small) mdi-cloud-upload
+                    span.rs-formateur-badge(
+                      :class='pubBadgeClass(item.isPublished, item.kind)'
+                      ) {{ pubBadgeLabel(item.isPublished, item.kind) }}
 </template>
 
 <script>
@@ -328,7 +377,44 @@ export default {
       }
     },
     dayHasDraft (day) {
-      return (day.modules || []).some(mod => !mod.isPublished)
+      return (day.modules || []).some(mod => {
+        if (!mod.isPublished) return true
+        return this.practiceItems(mod).some(item => !item.isPublished)
+      })
+    },
+    practiceItems (mod) {
+      const pr = mod && mod.practice
+      if (!pr) return []
+      const items = []
+      if (pr.exercice) {
+        items.push({
+          ...pr.exercice,
+          kind: 'exercice',
+          kindLabel: 'Exercice',
+          publishAction: 'exercice'
+        })
+      }
+      if (pr.correction) {
+        items.push({
+          ...pr.correction,
+          kind: 'correction',
+          kindLabel: 'Correction',
+          publishAction: 'correction'
+        })
+      }
+      return items
+    },
+    pubBadgeClass (isPublished, kind) {
+      const base = isPublished ? 'rs-formateur-badge--pub' : 'rs-formateur-badge--draft'
+      if (kind === 'exercice') return base + ' rs-formateur-badge--exercice'
+      if (kind === 'correction') return base + ' rs-formateur-badge--correction'
+      return base
+    },
+    pubBadgeLabel (isPublished, kind) {
+      if (isPublished) return 'Publié'
+      if (kind === 'exercice') return 'Exo brouillon'
+      if (kind === 'correction') return 'Corr. brouillon'
+      return 'Brouillon'
     },
     async publishViaLms (body) {
       const res = await fetch(`/api/formation/${encodeURIComponent(this.slug)}/publish`, {
@@ -343,18 +429,19 @@ export default {
       }
       return json
     },
-    async publishModule (mod) {
-      if (!this.canPublish || this.publishBusy || !mod || mod.isPublished) return
+    async publishItem (item, action) {
+      if (!this.canPublish || this.publishBusy || !item || item.isPublished) return
       this.publishBusy = true
       try {
         if (this.useLmsApi) {
-          const result = await this.publishViaLms({ action: 'module', path: mod.stem })
+          const result = await this.publishViaLms({ action, path: item.stem })
           await this.load()
           this.$root.$emit('formation-nav-refresh')
           this.$root.$emit('formation-nav-assets-refresh')
+          const label = action === 'module' ? 'Module' : (action === 'exercice' ? 'Exercice' : 'Correction')
           this.$store.commit('showNotification', {
             style: 'green',
-            message: `Module publié (${result.count || 1})`,
+            message: `${label} publié (${result.count || 1})`,
             icon: 'check'
           })
           return
@@ -373,6 +460,9 @@ export default {
       } finally {
         this.publishBusy = false
       }
+    },
+    async publishModule (mod) {
+      return this.publishItem(mod, 'module')
     },
     async publishDay (day) {
       if (!this.canPublish || this.publishBusy || !day) return
