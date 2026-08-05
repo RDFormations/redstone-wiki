@@ -8,6 +8,7 @@ const createDistributeService = ({
   contentRepo,
   healthRepo,
   projectionService,
+  guestAccess,
   webhooks,
   logger = console
 }) => ({
@@ -91,6 +92,11 @@ const createDistributeService = ({
       distributed_at: new Date().toISOString()
     })
 
+    let guest_access = null
+    if (guestAccess) {
+      guest_access = await guestAccess.ensureGuestFormationAccess(updated.slug)
+    }
+
     logger.info(`(REDSTONE/LMS) Distribute OK: ${session.slug}`)
 
     if (webhooks) {
@@ -112,6 +118,7 @@ const createDistributeService = ({
       projection,
       content_ready: Boolean(updated.content_ready_at),
       distributed: true,
+      guest_access,
       stagiaire_url: `https://formation.redstoneformations.fr/formations/${session.slug}/stagiaire`
     }
   }

@@ -13,6 +13,7 @@ export LMS_E2E_BASE_URL="${LMS_E2E_BASE_URL:-http://127.0.0.1:3000/api/v1}"
 export LMS_E2E_SITE_URL="${LMS_E2E_SITE_URL:-${WIKI_URL:-http://127.0.0.1:3000}}"
 export REDSTONE_LMS_AGENT_TOKEN="${REDSTONE_LMS_AGENT_TOKEN:-dev-local-test-token}"
 export REDSTONE_LMS_FORMATEUR_TOKEN="${REDSTONE_LMS_FORMATEUR_TOKEN:-dev-formateur-token}"
+export REDSTONE_LMS_OPS_TOKEN="${REDSTONE_LMS_OPS_TOKEN:-dev-ops-token}"
 
 code="$(curl -s -o /dev/null -w '%{http_code}' \
   -H "Authorization: Bearer ${REDSTONE_LMS_AGENT_TOKEN}" \
