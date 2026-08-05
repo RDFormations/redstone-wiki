@@ -404,8 +404,6 @@ export default {
           } catch (e) {
             if (!this.items.length) throw e
           }
-        } finally {
-          this.navLoading = false
         }
 
         if (!this.items.length) return

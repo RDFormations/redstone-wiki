@@ -40,6 +40,13 @@ for _ in $(seq 1 30); do
   sleep 2
 done
 
+if [[ -x "$CURSOR_RDF/scripts/configure-wiki-redstone.py" ]]; then
+  echo "==> Activation renderers Wiki (markdownCore, Mermaid…)…"
+  WIKI_URL="${WIKI_URL:-http://127.0.0.1:3000}" \
+  WIKI_SITE_HOST="${WIKI_SITE_HOST:-http://127.0.0.1:3000}" \
+    python3 "$CURSOR_RDF/scripts/configure-wiki-redstone.py" || echo "WARN: configure-wiki-redstone (wiki pas prêt ?)"
+fi
+
 echo ""
 echo "Mode DEV API — modifier server/ → redémarrage auto (node --watch)"
 echo "  Wiki   : http://127.0.0.1:3000"

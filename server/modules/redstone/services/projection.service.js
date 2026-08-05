@@ -1,14 +1,31 @@
 /* global WIKI */
 
 const _ = require('lodash')
+const { DEFAULT_EDITOR_KEY, resolveContentType, resolveFromWikiEditors } = require('../domain/wiki-editor')
+const { isStaleMarkdownRender } = require('../domain/wiki-render')
 
 /**
  * F02 — projection rs_content_modules → table Wiki pages
+ * Utilise le contrat Wiki.js (editorKey + contentType) pour déclencher le pipeline markdownCore.
  */
 const createProjectionService = ({ knex, logger = console }) => {
   const getAdminUserId = async () => {
     const admin = await knex('users').where({ providerKey: 'local' }).orderBy('id', 'asc').first()
     return admin?.id || 1
+  }
+
+  const renderAndInvalidate = async page => {
+    if (!page) return
+    await WIKI.models.pages.renderPage(page)
+    await WIKI.models.pages.deletePageFromCache(page.hash)
+    WIKI.events.outbound.emit('deletePageFromCache', page.hash)
+  }
+
+  const contentTypeForEditor = editorKey => {
+    if (WIKI?.data?.editors?.length) {
+      return resolveFromWikiEditors(editorKey, WIKI.data.editors)
+    }
+    return resolveContentType(editorKey)
   }
 
   const upsertWikiPage = async ({ session, mod }) => {
@@ -19,6 +36,8 @@ const createProjectionService = ({ knex, logger = console }) => {
     const title = mod.title || stem
     const content = mod.body_md || ''
     const isPublished = Boolean(mod.published_stagiaire)
+    const editorKey = mod.editor_key || DEFAULT_EDITOR_KEY
+    const contentType = contentTypeForEditor(editorKey)
 
     const existing = await knex('pages')
       .where({ path: pagePath, localeCode: locale })
@@ -31,6 +50,8 @@ const createProjectionService = ({ knex, logger = console }) => {
       await knex('pages').where({ id: existing.id }).update({
         title,
         content,
+        editorKey,
+        contentType,
         isPublished: effectivePublish ? 1 : 0,
         updatedAt: new Date().toISOString()
       })
@@ -41,7 +62,7 @@ const createProjectionService = ({ knex, logger = console }) => {
         isPrivate: false
       })
       if (page) {
-        await WIKI.models.pages.renderPage(page)
+        await renderAndInvalidate(page)
       }
       return existing.id
     }
@@ -54,8 +75,8 @@ const createProjectionService = ({ knex, logger = console }) => {
       title,
       content,
       description: '',
-      contentType: 'text',
-      editorKey: 'markdown',
+      contentType,
+      editorKey,
       isPublished: isPublished ? 1 : 0,
       isPrivate: 0,
       hash: `${pagePath}:${locale}`,
@@ -75,10 +96,66 @@ const createProjectionService = ({ knex, logger = console }) => {
       isPrivate: false
     })
     if (page) {
-      await WIKI.models.pages.renderPage(page)
+      await renderAndInvalidate(page)
       await WIKI.models.pages.rebuildTree()
     }
     return created?.id || null
+  }
+
+  const reRenderRow = async (row, authorId) => {
+    const editorKey = row.editorKey || DEFAULT_EDITOR_KEY
+    const contentType = contentTypeForEditor(editorKey)
+    if (row.contentType !== contentType || row.editorKey !== editorKey) {
+      await knex('pages').where({ id: row.id }).update({
+        editorKey,
+        contentType,
+        updatedAt: new Date().toISOString()
+      })
+    }
+    const page = await WIKI.models.pages.getPageFromDb({
+      path: row.path,
+      locale: row.localeCode,
+      userId: authorId,
+      isPrivate: false
+    })
+    if (!page) return false
+    await renderAndInvalidate(page)
+    logger.info(`(REDSTONE/LMS) Re-render ${row.path}`)
+    return true
+  }
+
+  const repairStaleRenders = async session => {
+    const prefix = `formations/${session.slug}`
+    const rows = await knex('pages').where('path', 'like', `${prefix}%`)
+    let repaired = 0
+    const authorId = await getAdminUserId()
+
+    for (const row of rows) {
+      if (!isStaleMarkdownRender(row)) continue
+      if (await reRenderRow(row, authorId)) repaired += 1
+    }
+    return repaired
+  }
+
+  const repairAllStaleFormationRenders = async ({ limit } = {}) => {
+    const authorId = await getAdminUserId()
+    let query = knex('pages')
+      .where('path', 'like', 'formations/%')
+      .where('contentType', 'markdown')
+      .whereNotNull('content')
+      .where('content', '!=', '')
+    if (limit) query = query.limit(limit)
+
+    const rows = await query.select('*')
+    const stale = rows.filter(isStaleMarkdownRender)
+    let repaired = 0
+    for (const row of stale) {
+      if (await reRenderRow(row, authorId)) repaired += 1
+    }
+    if (repaired) {
+      logger.info(`(REDSTONE/LMS) ${repaired} page(s) formation re-rendues (total stale: ${stale.length})`)
+    }
+    return { repaired, stale: stale.length }
   }
 
   return {
@@ -95,6 +172,9 @@ const createProjectionService = ({ knex, logger = console }) => {
       }
       return results
     },
+
+    repairStaleRenders,
+    repairAllStaleFormationRenders,
 
     async setPagePublished(session, mod, published) {
       const stem = mod.path.replace(/\.md$/, '')

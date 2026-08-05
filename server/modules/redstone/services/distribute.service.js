@@ -92,6 +92,11 @@ const createDistributeService = ({
       return outcome
     }
 
+    if (projectionService.repairStaleRenders) {
+      const repaired = await projectionService.repairStaleRenders(session)
+      if (repaired) logger.info(`(REDSTONE/LMS) ${repaired} page(s) re-rendues pour ${session.slug}`)
+    }
+
     const healthRows = toHealthRows(health.checks)
     await healthRepo.replaceForSession(sessionId, healthRows)
 
