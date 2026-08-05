@@ -126,6 +126,13 @@
         v-card-actions
           v-spacer
           v-btn(
+            v-if='detail.session.actions && detail.session.actions.can_distribute'
+            color='green'
+            depressed
+            :loading='distributing'
+            @click='distributeSession'
+            ) Distribuer (F02)
+          v-btn(
             v-if='detail.session.monday_item_id'
             color='primary'
             text
@@ -158,6 +165,7 @@ export default {
       detailOpen: false,
       detail: null,
       pushingMonday: false,
+      distributing: false,
       headers: [
         { text: 'Titre', value: 'title' },
         { text: 'Client', value: 'client' },
@@ -282,6 +290,31 @@ export default {
         this.detailOpen = true
       } catch (e) {
         this.$store.commit('showNotification', { style: 'red', message: e.message, icon: 'alert' })
+      }
+    },
+    async distributeSession () {
+      if (!this.detail?.session?.id) return
+      this.distributing = true
+      try {
+        const res = await fetch(`/api/admin/sessions/${this.detail.session.id}/distribute`, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        })
+        const body = await res.json()
+        if (!res.ok) throw new Error(body.error?.message || body.error?.code || `HTTP ${res.status}`)
+        this.$store.commit('showNotification', {
+          style: 'green',
+          message: `Session distribuée (${body.session?.state || 'ok'})`,
+          icon: 'check'
+        })
+        await this.openDetail({ id: this.detail.session.id })
+        await this.load()
+      } catch (e) {
+        this.$store.commit('showNotification', { style: 'red', message: e.message, icon: 'alert' })
+      } finally {
+        this.distributing = false
       }
     },
     async pushMonday () {

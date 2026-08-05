@@ -1,6 +1,7 @@
 const { parseSessionListFilters } = require('../domain/session-filters')
 const { enrichSessionStatus } = require('../domain/session-status')
 const { SESSION_STATES } = require('../domain/session-state')
+const { canDistribute } = require('../domain/session-actions')
 
 const MONDAY_BOARD_ID = process.env.MONDAY_MISSIONS_BOARD_ID || '18420737449'
 
@@ -63,10 +64,14 @@ const createAdminSessionsService = ({ sessionRepo, contentRepo, healthRepo }) =>
     }
     const stats = await contentRepo.moduleStatsBySessions([sessionId])
     const storedChecks = await healthRepo.listBySession(sessionId)
+    const row = toListRow(session, stats[sessionId])
     return {
       ok: true,
       status: 200,
-      session: toListRow(session, stats[sessionId]),
+      session: {
+        ...row,
+        actions: { can_distribute: canDistribute(row) }
+      },
       health_checks: storedChecks
     }
   }

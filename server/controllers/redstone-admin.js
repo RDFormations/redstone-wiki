@@ -42,4 +42,20 @@ router.post('/sessions/:id/push-monday', async (req, res) => {
   return res.status(200).json({ ok: true, ...result })
 })
 
+router.post('/sessions/:id/distribute', async (req, res) => {
+  if (!isOps(req)) return deny(res, 403, 'Accès OPS requis.')
+  if (!WIKI.redstone?.distribute) return res.status(503).json({ ok: false, error: { message: 'LMS indisponible.' } })
+
+  const result = await WIKI.redstone.distribute.distribute(req.params.id, req.body || {})
+  if (!result.ok) {
+    return res.status(result.status).json({
+      ok: false,
+      error: result.error,
+      state: result.state,
+      checks: result.checks
+    })
+  }
+  return res.status(200).json({ ok: true, ...result })
+})
+
 module.exports = router

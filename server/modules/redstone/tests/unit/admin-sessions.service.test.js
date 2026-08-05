@@ -38,4 +38,18 @@ describe('admin-sessions.service F13', () => {
     expect(result.sessions[0].support_ready).toBe(true)
     expect(result.sessions[0].links.stagiaire).toContain('/stagiaire')
   })
+
+  it('getDetail expose actions.can_distribute', async () => {
+    const draftReady = { ...mockSession, state: 'draft_ready', distributed_at: null }
+    const svc = createAdminSessionsService({
+      sessionRepo: { findById: jest.fn().mockResolvedValue(draftReady) },
+      contentRepo: {
+        moduleStatsBySessions: jest.fn().mockResolvedValue({ s1: { total_modules: 1, published_modules: 0 } })
+      },
+      healthRepo: { listBySession: jest.fn().mockResolvedValue([]) }
+    })
+    const result = await svc.getDetail('s1')
+    expect(result.ok).toBe(true)
+    expect(result.session.actions.can_distribute).toBe(true)
+  })
 })

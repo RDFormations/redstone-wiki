@@ -1,6 +1,7 @@
 const { describeE2e } = require('./helpers/e2e-suite')
 const { api, tokens } = require('./helpers/lms-client')
 const { provisionDistributedSession, publishModule } = require('./helpers/session-factory')
+const { minimalCourseModules, uniqueSlug, uniqueMondayId } = require('./helpers/fixtures')
 
 describeE2e('LMS — F13 admin sessions API (OPS token)', () => {
   let slug
@@ -41,4 +42,32 @@ describeE2e('LMS — F13 admin sessions API (OPS token)', () => {
       expect(list.body.sessions[0].state).toBe('incomplete')
     }
   })
+
+  it('OPS peut distribuer via API LMS (parité admin F02)', async () => {
+    const created = await api('POST', '/sessions', {
+      token: tokens().ops,
+      body: {
+        slug: uniqueSlug('e2e-f13-dist'),
+        monday_item_id: uniqueMondayId(),
+        client: 'RDF',
+        title: 'F13 distribute OPS'
+      }
+    })
+    expect(created.status).toBe(201)
+    const sessionId = created.body.session.id
+
+    const imported = await api('POST', `/sessions/${sessionId}/content/import`, {
+      token: tokens().ops,
+      body: { modules: minimalCourseModules(), source: 'e2e-f13' }
+    })
+    expect(imported.status).toBe(200)
+    expect(imported.body.session.state).toBe('draft_ready')
+
+    const distributed = await api('POST', `/sessions/${sessionId}/distribute`, {
+      token: tokens().ops,
+      body: {}
+    })
+    expect(distributed.status).toBe(200)
+    expect(distributed.body.session.state).toBe('distributed')
+  }, 120000)
 })
