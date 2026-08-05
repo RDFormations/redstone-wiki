@@ -1,0 +1,207 @@
+{
+  "slug": "en-quiris-admin-m365",
+  "lang": "en",
+  "base_slug": "quiris-admin-m365",
+  "title": "Administration Microsoft 365 (English)",
+  "wiki_path": "/formations/en-quiris-admin-m365",
+  "items": [
+    {
+      "path": "formations/en-quiris-admin-m365",
+      "href": "/formations/en-quiris-admin-m365",
+      "title": "[EN] Introduction",
+      "isPublished": true
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/formateur",
+      "href": "/formations/en-quiris-admin-m365/formateur",
+      "title": "[EN] Espace formateur",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/stagiaire",
+      "href": "/formations/en-quiris-admin-m365/stagiaire",
+      "title": "[EN] Liens session",
+      "isPublished": true
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/module-01-introduction-m365",
+      "href": "/formations/en-quiris-admin-m365/module-01-introduction-m365",
+      "title": "[EN] Module 1 — Introduction Microsoft 365",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/module-02-identites-acces",
+      "href": "/formations/en-quiris-admin-m365/module-02-identites-acces",
+      "title": "[EN] Module 2 — Identités et accès",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/exercice-02-identites-acces",
+      "href": "/formations/en-quiris-admin-m365/exercice-02-identites-acces",
+      "title": "[EN] Exercices — Utilisateur, groupe et licence",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/correction-02-identites-acces",
+      "href": "/formations/en-quiris-admin-m365/correction-02-identites-acces",
+      "title": "[EN] Correction — Utilisateur, groupe et licence",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/module-03-securite-auth",
+      "href": "/formations/en-quiris-admin-m365/module-03-securite-auth",
+      "title": "[EN] Module 3 — Sécurité et authentification",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/exercice-03-securite-auth",
+      "href": "/formations/en-quiris-admin-m365/exercice-03-securite-auth",
+      "title": "[EN] Exercices — MFA pilote",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/correction-03-securite-auth",
+      "href": "/formations/en-quiris-admin-m365/correction-03-securite-auth",
+      "title": "[EN] Correction — MFA pilote",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/module-04-exchange",
+      "href": "/formations/en-quiris-admin-m365/module-04-exchange",
+      "title": "[EN] Module 4 — Exchange Online",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/exercice-04-exchange",
+      "href": "/formations/en-quiris-admin-m365/exercice-04-exchange",
+      "title": "[EN] Exercices — Exchange Online",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/correction-04-exchange",
+      "href": "/formations/en-quiris-admin-m365/correction-04-exchange",
+      "title": "[EN] Correction — Exchange Online",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/module-05-sharepoint",
+      "href": "/formations/en-quiris-admin-m365/module-05-sharepoint",
+      "title": "[EN] Module 5 — SharePoint Online",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/module-06-teams",
+      "href": "/formations/en-quiris-admin-m365/module-06-teams",
+      "title": "[EN] Module 6 — Microsoft Teams",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/exercice-06-teams",
+      "href": "/formations/en-quiris-admin-m365/exercice-06-teams",
+      "title": "[EN] Exercices — Équipe Teams et SharePoint",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/correction-06-teams",
+      "href": "/formations/en-quiris-admin-m365/correction-06-teams",
+      "title": "[EN] Correction — Équipe Teams et SharePoint",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/module-07-copilot",
+      "href": "/formations/en-quiris-admin-m365/module-07-copilot",
+      "title": "[EN] Module 7 — Copilot",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/module-08-powershell",
+      "href": "/formations/en-quiris-admin-m365/module-08-powershell",
+      "title": "[EN] Module 8 — PowerShell et administration",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/exercice-08-powershell",
+      "href": "/formations/en-quiris-admin-m365/exercice-08-powershell",
+      "title": "[EN] Exercices — PowerShell et administration",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/correction-08-powershell",
+      "href": "/formations/en-quiris-admin-m365/correction-08-powershell",
+      "title": "[EN] Correction — PowerShell",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/module-09-migration",
+      "href": "/formations/en-quiris-admin-m365/module-09-migration",
+      "title": "[EN] Module 9 — Migration cloud",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/exercice-09-migration",
+      "href": "/formations/en-quiris-admin-m365/exercice-09-migration",
+      "title": "[EN] Exercices — Migration",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/correction-09-migration",
+      "href": "/formations/en-quiris-admin-m365/correction-09-migration",
+      "title": "[EN] Correction — Migration",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/module-10-gouvernance",
+      "href": "/formations/en-quiris-admin-m365/module-10-gouvernance",
+      "title": "[EN] Module 10 — Gouvernance et adoption",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/module-11-intune",
+      "href": "/formations/en-quiris-admin-m365/module-11-intune",
+      "title": "[EN] Module 11 — Microsoft Intune",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/exercice-11-intune",
+      "href": "/formations/en-quiris-admin-m365/exercice-11-intune",
+      "title": "[EN] Exercices — Intune",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/correction-11-intune",
+      "href": "/formations/en-quiris-admin-m365/correction-11-intune",
+      "title": "[EN] Correction — Intune",
+      "isPublished": false
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/annexe-glossaire",
+      "href": "/formations/en-quiris-admin-m365/annexe-glossaire",
+      "title": "[EN] Glossaire",
+      "isPublished": true
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/annexe-index-figures",
+      "href": "/formations/en-quiris-admin-m365/annexe-index-figures",
+      "title": "[EN] Index des figures",
+      "isPublished": true
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/annexe-mise-en-pratique",
+      "href": "/formations/en-quiris-admin-m365/annexe-mise-en-pratique",
+      "title": "[EN] Mise en pratique Vertis",
+      "isPublished": true
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/annexe-references",
+      "href": "/formations/en-quiris-admin-m365/annexe-references",
+      "title": "[EN] Références Microsoft",
+      "isPublished": true
+    },
+    {
+      "path": "formations/en-quiris-admin-m365/annexe-tips",
+      "href": "/formations/en-quiris-admin-m365/annexe-tips",
+      "title": "[EN] Tips & tricks",
+      "isPublished": true
+    }
+  ]
+}

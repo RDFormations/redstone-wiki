@@ -1,0 +1,319 @@
+{
+  "slug": "fr-darija-marocain",
+  "lang": "fr",
+  "base_slug": "darija-marocain",
+  "title": "Darija de Rabat — parler sans connaître l'arabe",
+  "client": "Personnel",
+  "portalUrl": "https://formation.redstoneformations.fr/formations/fr-darija-marocain",
+  "stagiaireUrl": "https://formation.redstoneformations.fr/fr/formations/fr-darija-marocain/stagiaire",
+  "stagiaireQrSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"205\" height=\"205\" class=\"rs-qr-svg\"><path transform=\"scale(5)\" class=\"qrline\" stroke=\"#000\" d=\"M2 2.5h7m3 0h1m1 0h1m4 0h4m2 0h1m1 0h1m2 0h1m1 0h7m-37 1h1m5 0h1m3 0h4m1 0h1m1 0h1m2 0h1m1 0h1m1 0h4m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m2 0h2m6 0h1m1 0h2m1 0h3m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h2m2 0h1m4 0h1m1 0h4m2 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h3m1 0h3m2 0h1m4 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h1m3 0h2m1 0h1m1 0h1m2 0h1m1 0h1m4 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h6m1 0h1m5 0h3m2 0h2m-28 1h1m1 0h5m2 0h2m1 0h4m1 0h1m1 0h1m2 0h2m1 0h2m3 0h5m-32 1h1m1 0h1m2 0h2m1 0h1m2 0h8m1 0h1m1 0h2m1 0h1m2 0h1m2 0h2m-36 1h4m1 0h3m4 0h2m3 0h1m3 0h2m2 0h8m1 0h3m-36 1h1m1 0h1m1 0h1m5 0h3m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m2 0h2m3 0h1m-36 1h1m4 0h3m2 0h1m1 0h1m2 0h2m4 0h1m1 0h2m3 0h2m1 0h1m1 0h3m-35 1h2m3 0h3m1 0h2m1 0h1m1 0h2m1 0h3m1 0h1m4 0h1m2 0h1m-32 1h3m1 0h3m2 0h2m1 0h1m1 0h2m2 0h1m5 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-36 1h2m4 0h2m1 0h5m1 0h1m3 0h3m4 0h2m2 0h2m-33 1h1m4 0h3m3 0h5m1 0h1m2 0h1m1 0h1m1 0h4m1 0h2m1 0h1m1 0h3m-37 1h3m1 0h2m1 0h3m1 0h2m1 0h2m2 0h4m1 0h1m1 0h1m3 0h1m1 0h1m1 0h1m1 0h1m-34 1h2m1 0h3m2 0h2m3 0h1m1 0h2m1 0h1m1 0h1m2 0h3m1 0h1m1 0h1m1 0h4m-37 1h6m2 0h1m1 0h1m3 0h2m3 0h1m1 0h1m7 0h1m2 0h1m3 0h1m-36 1h3m2 0h1m1 0h1m1 0h6m1 0h2m1 0h1m1 0h2m1 0h6m1 0h3m-33 1h3m3 0h2m1 0h1m2 0h1m1 0h1m1 0h4m1 0h1m1 0h2m1 0h2m3 0h1m-34 1h1m4 0h2m2 0h4m2 0h2m1 0h1m1 0h2m5 0h2m1 0h4m1 0h2m-37 1h2m6 0h2m2 0h2m2 0h1m4 0h4m1 0h2m1 0h1m1 0h2m2 0h1m-36 1h1m2 0h5m1 0h3m1 0h1m3 0h1m2 0h1m1 0h1m1 0h5m1 0h1m1 0h1m1 0h2m-36 1h5m2 0h1m4 0h1m2 0h1m1 0h4m2 0h1m4 0h1m2 0h1m2 0h1m-35 1h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h5m2 0h1m1 0h1m2 0h1m1 0h1m2 0h1m4 0h2m-37 1h1m1 0h1m1 0h2m1 0h1m1 0h2m4 0h2m1 0h5m5 0h1m2 0h1m-32 1h1m3 0h1m1 0h1m1 0h2m1 0h1m3 0h1m1 0h1m1 0h1m2 0h2m1 0h10m1 0h1m-29 1h2m1 0h4m2 0h4m1 0h2m1 0h1m1 0h2m3 0h2m-34 1h7m8 0h1m2 0h1m1 0h2m2 0h2m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1m-37 1h1m5 0h1m1 0h2m1 0h2m7 0h3m5 0h1m3 0h2m-34 1h1m1 0h3m1 0h1m1 0h1m1 0h2m2 0h2m1 0h1m1 0h1m2 0h1m1 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h3m3 0h1m2 0h1m1 0h1m1 0h2m4 0h2m1 0h2m1 0h2m-37 1h1m1 0h3m1 0h1m1 0h3m4 0h1m1 0h1m8 0h1m1 0h1m6 0h2m-37 1h1m5 0h1m4 0h1m1 0h1m4 0h4m2 0h1m1 0h4m2 0h1m3 0h1m-37 1h7m1 0h1m2 0h1m3 0h3m1 0h1m2 0h1m1 0h3m2 0h1m2 0h1m1 0h3\"/></svg>\n",
+  "formateurHref": "/formations/fr-darija-marocain/formateur",
+  "durationDays": 0,
+  "reference": "Darija-Rabat",
+  "location": "",
+  "modality": "Présentiel ou distanciel",
+  "dates": {
+    "start": "",
+    "end": ""
+  },
+  "participants": null,
+  "trainer": "Rayan Mechety — RedStone Formations",
+  "schedule": [
+    {
+      "day": 1,
+      "label": "Jour 1 — M01-alphabet-lettres → M04-pronoms-etre",
+      "modules": [
+        {
+          "stem": "module-01-alphabet-lettres",
+          "title": "Module 1 — Sons du darija et écriture chat (sans savoir l'arabe)",
+          "href": "/formations/fr-darija-marocain/module-01-alphabet-lettres",
+          "path": "formations/fr-darija-marocain/module-01-alphabet-lettres",
+          "isPublished": true,
+          "moduleNum": 1
+        },
+        {
+          "stem": "module-02-prononciation",
+          "title": "Module 2 — Prononciation du darija de Rabat",
+          "href": "/formations/fr-darija-marocain/module-02-prononciation",
+          "path": "formations/fr-darija-marocain/module-02-prononciation",
+          "isPublished": true,
+          "moduleNum": 2
+        },
+        {
+          "stem": "module-03-salutations",
+          "title": "Module 3 — Salutations et politesse",
+          "href": "/formations/fr-darija-marocain/module-03-salutations",
+          "path": "formations/fr-darija-marocain/module-03-salutations",
+          "isPublished": true,
+          "moduleNum": 3
+        },
+        {
+          "stem": "module-04-pronoms-etre",
+          "title": "Module 4 — Pronoms, « être » et phrases simples",
+          "href": "/formations/fr-darija-marocain/module-04-pronoms-etre",
+          "path": "formations/fr-darija-marocain/module-04-pronoms-etre",
+          "isPublished": true,
+          "moduleNum": 4
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "label": "Jour 2 — M05-negation-questions → M08-famille",
+      "modules": [
+        {
+          "stem": "module-05-negation-questions",
+          "title": "Module 5 — Négation, questions et démonstratifs",
+          "href": "/formations/fr-darija-marocain/module-05-negation-questions",
+          "path": "formations/fr-darija-marocain/module-05-negation-questions",
+          "isPublished": true,
+          "moduleNum": 5
+        },
+        {
+          "stem": "module-06-verbes-essentiels",
+          "title": "Module 6 — Verbes essentiels et conjugaison",
+          "href": "/formations/fr-darija-marocain/module-06-verbes-essentiels",
+          "path": "formations/fr-darija-marocain/module-06-verbes-essentiels",
+          "isPublished": true,
+          "moduleNum": 6
+        },
+        {
+          "stem": "module-07-nombres-temps-argent",
+          "title": "Module 7 — Nombres, heure, dates et argent",
+          "href": "/formations/fr-darija-marocain/module-07-nombres-temps-argent",
+          "path": "formations/fr-darija-marocain/module-07-nombres-temps-argent",
+          "isPublished": true,
+          "moduleNum": 7
+        },
+        {
+          "stem": "module-08-famille",
+          "title": "Module 8 — Famille et relations",
+          "href": "/formations/fr-darija-marocain/module-08-famille",
+          "path": "formations/fr-darija-marocain/module-08-famille",
+          "isPublished": true,
+          "moduleNum": 8
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "label": "Jour 3 — M09-corps-sante-emotions → M12-ville-transports",
+      "modules": [
+        {
+          "stem": "module-09-corps-sante-emotions",
+          "title": "Module 09 — Corps, santé et émotions",
+          "href": "/formations/fr-darija-marocain/module-09-corps-sante-emotions",
+          "path": "formations/fr-darija-marocain/module-09-corps-sante-emotions",
+          "isPublished": true,
+          "moduleNum": 9
+        },
+        {
+          "stem": "module-10-maison-quotidien",
+          "title": "Module 10 — Maison et vie quotidienne",
+          "href": "/formations/fr-darija-marocain/module-10-maison-quotidien",
+          "path": "formations/fr-darija-marocain/module-10-maison-quotidien",
+          "isPublished": true,
+          "moduleNum": 10
+        },
+        {
+          "stem": "module-11-nourriture-restaurant",
+          "title": "Module 11 — Nourriture et restaurant",
+          "href": "/formations/fr-darija-marocain/module-11-nourriture-restaurant",
+          "path": "formations/fr-darija-marocain/module-11-nourriture-restaurant",
+          "isPublished": true,
+          "moduleNum": 11
+        },
+        {
+          "stem": "module-12-ville-transports",
+          "title": "Module 12 — Ville, directions et transports",
+          "href": "/formations/fr-darija-marocain/module-12-ville-transports",
+          "path": "formations/fr-darija-marocain/module-12-ville-transports",
+          "isPublished": true,
+          "moduleNum": 12
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "label": "Jour 4 — M13-shopping-vetements → M16-expressions-culture",
+      "modules": [
+        {
+          "stem": "module-13-shopping-vetements",
+          "title": "Module 13 — Shopping, marché et vêtements",
+          "href": "/formations/fr-darija-marocain/module-13-shopping-vetements",
+          "path": "formations/fr-darija-marocain/module-13-shopping-vetements",
+          "isPublished": true,
+          "moduleNum": 13
+        },
+        {
+          "stem": "module-14-travail-etudes",
+          "title": "Module 14 — Travail, études et numérique",
+          "href": "/formations/fr-darija-marocain/module-14-travail-etudes",
+          "path": "formations/fr-darija-marocain/module-14-travail-etudes",
+          "isPublished": true,
+          "moduleNum": 14
+        },
+        {
+          "stem": "module-15-situations-pratiques",
+          "title": "Module 15 — Situations pratiques",
+          "href": "/formations/fr-darija-marocain/module-15-situations-pratiques",
+          "path": "formations/fr-darija-marocain/module-15-situations-pratiques",
+          "isPublished": true,
+          "moduleNum": 15
+        },
+        {
+          "stem": "module-16-expressions-culture",
+          "title": "Module 16 — Expressions et culture de Rabat",
+          "href": "/formations/fr-darija-marocain/module-16-expressions-culture",
+          "path": "formations/fr-darija-marocain/module-16-expressions-culture",
+          "isPublished": true,
+          "moduleNum": 16
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "portail-stagiaires",
+      "label": "Portail stagiaires",
+      "url": "https://formation.redstoneformations.fr/formations/fr-darija-marocain",
+      "icon": "mdi-school",
+      "external": true
+    }
+  ],
+  "contacts": [
+    {
+      "name": "RedStone Formations",
+      "role": "Support formateur",
+      "email": "contact@redstoneformations.fr"
+    }
+  ],
+  "checklist": [
+    "Renseigner formateur.yaml (dates, lieu, lien Teams, émargement)",
+    "Publier le module du jour avant 8h",
+    "Tester le portail en navigation privée",
+    "Afficher le QR code stagiaires en salle"
+  ],
+  "notes": "Variété : darija urbain de Rabat. Pédagogie chat-first. Compléter dates/Teams si session.",
+  "monday": {},
+  "labs": [],
+  "publication": {
+    "total": 48,
+    "published": 48,
+    "draft": 0
+  },
+  "modules": [
+    {
+      "stem": "module-01-alphabet-lettres",
+      "title": "Module 1 — Sons du darija et écriture chat (sans savoir l'arabe)",
+      "href": "/formations/fr-darija-marocain/module-01-alphabet-lettres",
+      "isPublished": true,
+      "moduleNum": 1
+    },
+    {
+      "stem": "module-02-prononciation",
+      "title": "Module 2 — Prononciation du darija de Rabat",
+      "href": "/formations/fr-darija-marocain/module-02-prononciation",
+      "isPublished": true,
+      "moduleNum": 2
+    },
+    {
+      "stem": "module-03-salutations",
+      "title": "Module 3 — Salutations et politesse",
+      "href": "/formations/fr-darija-marocain/module-03-salutations",
+      "isPublished": true,
+      "moduleNum": 3
+    },
+    {
+      "stem": "module-04-pronoms-etre",
+      "title": "Module 4 — Pronoms, « être » et phrases simples",
+      "href": "/formations/fr-darija-marocain/module-04-pronoms-etre",
+      "isPublished": true,
+      "moduleNum": 4
+    },
+    {
+      "stem": "module-05-negation-questions",
+      "title": "Module 5 — Négation, questions et démonstratifs",
+      "href": "/formations/fr-darija-marocain/module-05-negation-questions",
+      "isPublished": true,
+      "moduleNum": 5
+    },
+    {
+      "stem": "module-06-verbes-essentiels",
+      "title": "Module 6 — Verbes essentiels et conjugaison",
+      "href": "/formations/fr-darija-marocain/module-06-verbes-essentiels",
+      "isPublished": true,
+      "moduleNum": 6
+    },
+    {
+      "stem": "module-07-nombres-temps-argent",
+      "title": "Module 7 — Nombres, heure, dates et argent",
+      "href": "/formations/fr-darija-marocain/module-07-nombres-temps-argent",
+      "isPublished": true,
+      "moduleNum": 7
+    },
+    {
+      "stem": "module-08-famille",
+      "title": "Module 8 — Famille et relations",
+      "href": "/formations/fr-darija-marocain/module-08-famille",
+      "isPublished": true,
+      "moduleNum": 8
+    },
+    {
+      "stem": "module-09-corps-sante-emotions",
+      "title": "Module 09 — Corps, santé et émotions",
+      "href": "/formations/fr-darija-marocain/module-09-corps-sante-emotions",
+      "isPublished": true,
+      "moduleNum": 9
+    },
+    {
+      "stem": "module-10-maison-quotidien",
+      "title": "Module 10 — Maison et vie quotidienne",
+      "href": "/formations/fr-darija-marocain/module-10-maison-quotidien",
+      "isPublished": true,
+      "moduleNum": 10
+    },
+    {
+      "stem": "module-11-nourriture-restaurant",
+      "title": "Module 11 — Nourriture et restaurant",
+      "href": "/formations/fr-darija-marocain/module-11-nourriture-restaurant",
+      "isPublished": true,
+      "moduleNum": 11
+    },
+    {
+      "stem": "module-12-ville-transports",
+      "title": "Module 12 — Ville, directions et transports",
+      "href": "/formations/fr-darija-marocain/module-12-ville-transports",
+      "isPublished": true,
+      "moduleNum": 12
+    },
+    {
+      "stem": "module-13-shopping-vetements",
+      "title": "Module 13 — Shopping, marché et vêtements",
+      "href": "/formations/fr-darija-marocain/module-13-shopping-vetements",
+      "isPublished": true,
+      "moduleNum": 13
+    },
+    {
+      "stem": "module-14-travail-etudes",
+      "title": "Module 14 — Travail, études et numérique",
+      "href": "/formations/fr-darija-marocain/module-14-travail-etudes",
+      "isPublished": true,
+      "moduleNum": 14
+    },
+    {
+      "stem": "module-15-situations-pratiques",
+      "title": "Module 15 — Situations pratiques",
+      "href": "/formations/fr-darija-marocain/module-15-situations-pratiques",
+      "isPublished": true,
+      "moduleNum": 15
+    },
+    {
+      "stem": "module-16-expressions-culture",
+      "title": "Module 16 — Expressions et culture de Rabat",
+      "href": "/formations/fr-darija-marocain/module-16-expressions-culture",
+      "isPublished": true,
+      "moduleNum": 16
+    }
+  ]
+}

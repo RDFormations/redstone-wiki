@@ -1,0 +1,253 @@
+{
+  "slug": "fr-histoire-islamique",
+  "lang": "fr",
+  "base_slug": "histoire-islamique",
+  "title": "Histoire islamique — double regard",
+  "client": "Personnel",
+  "portalUrl": "https://formation.redstoneformations.fr/formations/fr-histoire-islamique",
+  "stagiaireUrl": "https://formation.redstoneformations.fr/fr/formations/fr-histoire-islamique/stagiaire",
+  "stagiaireQrSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"225\" height=\"225\" class=\"rs-qr-svg\"><path transform=\"scale(5)\" class=\"qrline\" stroke=\"#000\" d=\"M2 2.5h7m2 0h1m3 0h1m5 0h2m1 0h2m2 0h1m1 0h5m1 0h7m-41 1h1m5 0h1m2 0h4m1 0h3m1 0h1m1 0h1m1 0h1m4 0h3m2 0h1m1 0h1m5 0h1m-41 1h1m1 0h3m1 0h1m1 0h1m1 0h1m2 0h1m2 0h1m2 0h1m4 0h1m1 0h2m1 0h4m1 0h1m1 0h3m1 0h1m-41 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h2m3 0h1m2 0h3m7 0h2m1 0h1m1 0h3m1 0h1m-41 1h1m1 0h3m1 0h1m1 0h2m1 0h4m1 0h2m1 0h3m1 0h1m2 0h1m1 0h1m1 0h3m1 0h1m1 0h3m1 0h1m-41 1h1m5 0h1m1 0h1m1 0h3m1 0h1m1 0h2m2 0h1m5 0h4m4 0h1m5 0h1m-41 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-33 1h1m4 0h4m4 0h1m1 0h1m4 0h1m1 0h3m-33 1h1m1 0h5m3 0h1m3 0h2m1 0h1m1 0h1m2 0h2m1 0h2m1 0h2m1 0h1m2 0h5m-38 1h2m1 0h1m2 0h3m1 0h1m1 0h2m1 0h6m1 0h1m4 0h1m1 0h7m1 0h3m-40 1h1m3 0h2m1 0h1m3 0h1m1 0h1m1 0h2m6 0h7m1 0h1m3 0h1m-37 1h2m2 0h2m3 0h2m1 0h2m1 0h1m4 0h2m1 0h1m3 0h1m3 0h2m4 0h1m-36 1h5m1 0h4m3 0h3m4 0h2m1 0h3m1 0h5m1 0h1m1 0h4m-40 1h1m2 0h2m3 0h3m1 0h2m3 0h1m1 0h2m2 0h1m1 0h5m2 0h1m1 0h6m-41 1h1m1 0h1m3 0h1m1 0h1m2 0h2m2 0h2m2 0h1m1 0h1m3 0h1m4 0h1m1 0h2m1 0h4m-38 1h1m5 0h3m2 0h3m3 0h5m1 0h1m1 0h1m1 0h1m5 0h1m1 0h2m2 0h1m-40 1h1m2 0h1m1 0h1m1 0h2m1 0h2m3 0h2m1 0h2m1 0h1m1 0h3m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m-39 1h2m1 0h1m1 0h4m1 0h1m1 0h1m1 0h8m1 0h1m2 0h1m2 0h2m1 0h4m1 0h2m-41 1h1m1 0h6m1 0h1m1 0h1m2 0h1m2 0h1m2 0h2m3 0h4m1 0h1m5 0h1m1 0h1m-38 1h1m2 0h1m3 0h1m1 0h3m1 0h1m1 0h7m2 0h1m1 0h2m3 0h2m2 0h2m1 0h2m-41 1h2m1 0h1m2 0h1m7 0h1m4 0h1m1 0h1m1 0h2m1 0h1m3 0h1m6 0h2m-38 1h3m3 0h3m1 0h1m1 0h2m2 0h7m1 0h1m3 0h1m1 0h6m2 0h2m-40 1h1m1 0h1m1 0h5m4 0h1m1 0h2m3 0h2m1 0h1m2 0h1m1 0h1m2 0h3m2 0h1m-35 1h3m1 0h1m2 0h1m1 0h3m3 0h1m1 0h4m2 0h1m4 0h2m3 0h2m-37 1h1m2 0h3m1 0h2m2 0h2m1 0h1m1 0h1m2 0h1m1 0h1m1 0h4m1 0h1m1 0h1m6 0h1m-36 1h1m3 0h1m5 0h1m1 0h1m1 0h4m2 0h2m3 0h2m1 0h1m2 0h4m1 0h2m-39 1h1m2 0h3m2 0h1m2 0h1m3 0h1m2 0h3m1 0h2m1 0h3m2 0h2m1 0h2m-36 1h1m1 0h2m2 0h1m2 0h1m1 0h2m1 0h1m2 0h2m1 0h3m3 0h2m1 0h4m1 0h1m1 0h1m2 0h1m-40 1h1m1 0h1m1 0h2m1 0h2m5 0h3m2 0h1m1 0h4m2 0h2m1 0h1m1 0h1m3 0h2m-39 1h5m3 0h1m2 0h1m1 0h2m6 0h1m3 0h1m1 0h1m2 0h1m1 0h2m1 0h2m2 0h2m-41 1h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h5m1 0h6m1 0h4m1 0h2m-40 1h1m1 0h1m5 0h1m1 0h1m3 0h3m4 0h3m3 0h1m2 0h6m1 0h1m2 0h1m-41 1h1m2 0h9m2 0h1m2 0h1m4 0h6m1 0h1m1 0h6m1 0h2m-32 1h1m1 0h5m1 0h1m1 0h2m3 0h1m5 0h4m3 0h1m2 0h2m-41 1h7m6 0h1m4 0h1m1 0h1m1 0h1m4 0h3m1 0h2m1 0h1m1 0h1m1 0h1m-39 1h1m5 0h1m1 0h2m2 0h2m2 0h1m3 0h1m3 0h1m1 0h7m3 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h2m1 0h1m1 0h1m1 0h3m1 0h1m2 0h2m3 0h5m1 0h1m-39 1h1m1 0h3m1 0h1m1 0h4m1 0h2m1 0h2m1 0h3m1 0h1m1 0h2m1 0h1m1 0h4m1 0h1m2 0h1m-39 1h1m1 0h3m1 0h1m1 0h2m2 0h2m1 0h1m2 0h1m1 0h3m2 0h3m1 0h2m2 0h5m-38 1h1m5 0h1m3 0h1m1 0h1m3 0h1m4 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h2m1 0h1m-40 1h7m1 0h1m5 0h2m2 0h1m1 0h1m1 0h6m1 0h1m1 0h1m3 0h4\"/></svg>\n",
+  "formateurHref": "/formations/fr-histoire-islamique/formateur",
+  "durationDays": 0,
+  "reference": "Personnel",
+  "location": "",
+  "modality": "Présentiel ou distanciel",
+  "dates": {
+    "start": "",
+    "end": ""
+  },
+  "participants": null,
+  "trainer": "Rayan Mechety — RedStone Formations",
+  "schedule": [
+    {
+      "day": 1,
+      "label": "Jour 1 — M01-arabie-preislamique → M04-expansion",
+      "modules": [
+        {
+          "stem": "module-01-arabie-preislamique",
+          "title": "Module 1 — L'Arabie préislamique : désert, commerce et jāhiliyya",
+          "href": "/formations/fr-histoire-islamique/module-01-arabie-preislamique",
+          "path": "formations/fr-histoire-islamique/module-01-arabie-preislamique",
+          "isPublished": true,
+          "moduleNum": 1
+        },
+        {
+          "stem": "module-02-muhammad-coran",
+          "title": "Module 2 — Muhammad, le Coran et la naissance de la communauté",
+          "href": "/formations/fr-histoire-islamique/module-02-muhammad-coran",
+          "path": "formations/fr-histoire-islamique/module-02-muhammad-coran",
+          "isPublished": true,
+          "moduleNum": 2
+        },
+        {
+          "stem": "module-03-califat-rashidun",
+          "title": "Module 3 — Le califat rashidun et les fitna (632–661)",
+          "href": "/formations/fr-histoire-islamique/module-03-califat-rashidun",
+          "path": "formations/fr-histoire-islamique/module-03-califat-rashidun",
+          "isPublished": true,
+          "moduleNum": 3
+        },
+        {
+          "stem": "module-04-expansion",
+          "title": "Module 4 — L'expansion : conquêtes, conversion et sociétés conquises (634–750)",
+          "href": "/formations/fr-histoire-islamique/module-04-expansion",
+          "path": "formations/fr-histoire-islamique/module-04-expansion",
+          "isPublished": true,
+          "moduleNum": 4
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "label": "Jour 2 — M05-omeyyades → M08-croisades",
+      "modules": [
+        {
+          "stem": "module-05-omeyyades",
+          "title": "Module 5 — Le califat omeyyade (661–750)",
+          "href": "/formations/fr-histoire-islamique/module-05-omeyyades",
+          "path": "formations/fr-histoire-islamique/module-05-omeyyades",
+          "isPublished": true,
+          "moduleNum": 5
+        },
+        {
+          "stem": "module-06-abbassides",
+          "title": "Module 6 — Le califat abbasside et l'« âge d'or » (750–1258)",
+          "href": "/formations/fr-histoire-islamique/module-06-abbassides",
+          "path": "formations/fr-histoire-islamique/module-06-abbassides",
+          "isPublished": true,
+          "moduleNum": 6
+        },
+        {
+          "stem": "module-07-mondes-fragmentes",
+          "title": "Module 7 — Mondes islamiques fragmentés : Fatimides, Almoravides, Ayyoubides",
+          "href": "/formations/fr-histoire-islamique/module-07-mondes-fragmentes",
+          "path": "formations/fr-histoire-islamique/module-07-mondes-fragmentes",
+          "isPublished": true,
+          "moduleNum": 7
+        },
+        {
+          "stem": "module-08-croisades",
+          "title": "Module 8 — Croisades et interactions latino-islamiques (1095–1291)",
+          "href": "/formations/fr-histoire-islamique/module-08-croisades",
+          "path": "formations/fr-histoire-islamique/module-08-croisades",
+          "isPublished": true,
+          "moduleNum": 8
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "label": "Jour 3 — M09-mongols → M12-modernite-historiographie",
+      "modules": [
+        {
+          "stem": "module-09-mongols",
+          "title": "Module 9 — Mongols, Ilkhanides et recompositions post-1258",
+          "href": "/formations/fr-histoire-islamique/module-09-mongols",
+          "path": "formations/fr-histoire-islamique/module-09-mongols",
+          "isPublished": true,
+          "moduleNum": 9
+        },
+        {
+          "stem": "module-10-empires-poudre",
+          "title": "Module 10 — Empires ottomans, safavides et moghols (XVe–XVIIIe s.)",
+          "href": "/formations/fr-histoire-islamique/module-10-empires-poudre",
+          "path": "formations/fr-histoire-islamique/module-10-empires-poudre",
+          "isPublished": true,
+          "moduleNum": 10
+        },
+        {
+          "stem": "module-11-colonisation-nationalismes",
+          "title": "Module 11 — Colonisation, réformisme et nationalismes (XIXe–début XXe s.)",
+          "href": "/formations/fr-histoire-islamique/module-11-colonisation-nationalismes",
+          "path": "formations/fr-histoire-islamique/module-11-colonisation-nationalismes",
+          "isPublished": true,
+          "moduleNum": 11
+        },
+        {
+          "stem": "module-12-modernite-historiographie",
+          "title": "Module 12 — Modernité, islam politique et historiographie contemporaine",
+          "href": "/formations/fr-histoire-islamique/module-12-modernite-historiographie",
+          "path": "formations/fr-histoire-islamique/module-12-modernite-historiographie",
+          "isPublished": true,
+          "moduleNum": 12
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "portail-stagiaires",
+      "label": "Portail stagiaires",
+      "url": "https://formation.redstoneformations.fr/formations/fr-histoire-islamique",
+      "icon": "mdi-school",
+      "external": true
+    }
+  ],
+  "contacts": [
+    {
+      "name": "RedStone Formations",
+      "role": "Support formateur",
+      "email": "contact@redstoneformations.fr"
+    }
+  ],
+  "checklist": [
+    "Renseigner formateur.yaml (dates, lieu, lien Teams, émargement)",
+    "Publier le module du jour avant 8h",
+    "Tester le portail en navigation privée",
+    "Afficher le QR code stagiaires en salle"
+  ],
+  "notes": "Généré automatiquement pour fr-histoire-islamique. Compléter dates / Teams / émargement avant la session.",
+  "monday": {},
+  "labs": [],
+  "publication": {
+    "total": 12,
+    "published": 12,
+    "draft": 0
+  },
+  "modules": [
+    {
+      "stem": "module-01-arabie-preislamique",
+      "title": "Module 1 — L'Arabie préislamique : désert, commerce et jāhiliyya",
+      "href": "/formations/fr-histoire-islamique/module-01-arabie-preislamique",
+      "isPublished": true,
+      "moduleNum": 1
+    },
+    {
+      "stem": "module-02-muhammad-coran",
+      "title": "Module 2 — Muhammad, le Coran et la naissance de la communauté",
+      "href": "/formations/fr-histoire-islamique/module-02-muhammad-coran",
+      "isPublished": true,
+      "moduleNum": 2
+    },
+    {
+      "stem": "module-03-califat-rashidun",
+      "title": "Module 3 — Le califat rashidun et les fitna (632–661)",
+      "href": "/formations/fr-histoire-islamique/module-03-califat-rashidun",
+      "isPublished": true,
+      "moduleNum": 3
+    },
+    {
+      "stem": "module-04-expansion",
+      "title": "Module 4 — L'expansion : conquêtes, conversion et sociétés conquises (634–750)",
+      "href": "/formations/fr-histoire-islamique/module-04-expansion",
+      "isPublished": true,
+      "moduleNum": 4
+    },
+    {
+      "stem": "module-05-omeyyades",
+      "title": "Module 5 — Le califat omeyyade (661–750)",
+      "href": "/formations/fr-histoire-islamique/module-05-omeyyades",
+      "isPublished": true,
+      "moduleNum": 5
+    },
+    {
+      "stem": "module-06-abbassides",
+      "title": "Module 6 — Le califat abbasside et l'« âge d'or » (750–1258)",
+      "href": "/formations/fr-histoire-islamique/module-06-abbassides",
+      "isPublished": true,
+      "moduleNum": 6
+    },
+    {
+      "stem": "module-07-mondes-fragmentes",
+      "title": "Module 7 — Mondes islamiques fragmentés : Fatimides, Almoravides, Ayyoubides",
+      "href": "/formations/fr-histoire-islamique/module-07-mondes-fragmentes",
+      "isPublished": true,
+      "moduleNum": 7
+    },
+    {
+      "stem": "module-08-croisades",
+      "title": "Module 8 — Croisades et interactions latino-islamiques (1095–1291)",
+      "href": "/formations/fr-histoire-islamique/module-08-croisades",
+      "isPublished": true,
+      "moduleNum": 8
+    },
+    {
+      "stem": "module-09-mongols",
+      "title": "Module 9 — Mongols, Ilkhanides et recompositions post-1258",
+      "href": "/formations/fr-histoire-islamique/module-09-mongols",
+      "isPublished": true,
+      "moduleNum": 9
+    },
+    {
+      "stem": "module-10-empires-poudre",
+      "title": "Module 10 — Empires ottomans, safavides et moghols (XVe–XVIIIe s.)",
+      "href": "/formations/fr-histoire-islamique/module-10-empires-poudre",
+      "isPublished": true,
+      "moduleNum": 10
+    },
+    {
+      "stem": "module-11-colonisation-nationalismes",
+      "title": "Module 11 — Colonisation, réformisme et nationalismes (XIXe–début XXe s.)",
+      "href": "/formations/fr-histoire-islamique/module-11-colonisation-nationalismes",
+      "isPublished": true,
+      "moduleNum": 11
+    },
+    {
+      "stem": "module-12-modernite-historiographie",
+      "title": "Module 12 — Modernité, islam politique et historiographie contemporaine",
+      "href": "/formations/fr-histoire-islamique/module-12-modernite-historiographie",
+      "isPublished": true,
+      "moduleNum": 12
+    }
+  ]
+}

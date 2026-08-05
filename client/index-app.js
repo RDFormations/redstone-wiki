@@ -18,6 +18,7 @@ require('modernizr')
 
 require('./scss/app.scss')
 import(/* webpackChunkName: "theme" */ './themes/' + siteConfig.theme + '/scss/app.scss')
+import(/* webpackChunkName: "theme-redstone" */ './themes/default/scss/redstone.scss')
 
 import(/* webpackChunkName: "mdi" */ '@mdi/font/css/materialdesignicons.css')
 

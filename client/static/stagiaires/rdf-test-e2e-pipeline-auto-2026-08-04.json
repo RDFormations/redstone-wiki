@@ -1,0 +1,53 @@
+{
+  "slug": "rdf-test-e2e-pipeline-auto-2026-08-04",
+  "lang": "fr",
+  "base_slug": "rdf-test-e2e-pipeline-auto-2026-08-04",
+  "title": "TEST E2E pipeline auto 2026-08-04",
+  "client": "RDF",
+  "portalUrl": "https://formation.redstoneformations.fr/formations/rdf-test-e2e-pipeline-auto-2026-08-04",
+  "stagiaireUrl": "https://formation.redstoneformations.fr/fr/formations/rdf-test-e2e-pipeline-auto-2026-08-04/stagiaire",
+  "welcome": "Retrouvez ici tous les liens utiles pour votre formation.",
+  "dates": {
+    "start": "2026-08-05",
+    "end": "2026-08-05"
+  },
+  "location": "",
+  "modality": "Présentiel",
+  "reference": "TEMPLATE",
+  "trainer": "Rayan Mechety — RedStone Formations",
+  "links": [
+    {
+      "id": "support",
+      "label": "Support de cours",
+      "description": "Modules, exercices et annexes",
+      "url": "https://formation.redstoneformations.fr/formations/rdf-test-e2e-pipeline-auto-2026-08-04",
+      "icon": "mdi-book-open-page-variant",
+      "primary": true
+    },
+    {
+      "id": "emargement",
+      "label": "Émargement",
+      "description": "Signature obligatoire — à compléter avant la session",
+      "url": "",
+      "icon": "mdi-clipboard-check-outline",
+      "primary": true
+    },
+    {
+      "id": "teams",
+      "label": "Rejoindre la classe Teams",
+      "description": "Lien communiqué par le formateur",
+      "url": "",
+      "icon": "mdi-microsoft-teams",
+      "primary": true
+    },
+    {
+      "id": "contact",
+      "label": "Contacter RedStone",
+      "description": "Question sur la formation",
+      "url": "mailto:contact@redstoneformations.fr",
+      "icon": "mdi-email-outline"
+    }
+  ],
+  "labs": [],
+  "qrSvg": ""
+}

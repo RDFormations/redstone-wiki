@@ -1,0 +1,38 @@
+# Smoke test local — copier .env.example → .env
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: wiki
+      POSTGRES_USER: wikijs
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wikijs-local-test}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wikijs -d wiki"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  wiki:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: release
+    image: redstone-wiki:2.5-redstone
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: wikijs
+      DB_PASS: ${POSTGRES_PASSWORD:-wikijs-local-test}
+      DB_NAME: wiki
+    volumes:
+      - ./data/wiki:/wiki/data

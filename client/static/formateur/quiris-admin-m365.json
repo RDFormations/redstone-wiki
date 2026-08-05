@@ -1,0 +1,277 @@
+{
+  "slug": "quiris-admin-m365",
+  "lang": "fr",
+  "base_slug": "quiris-admin-m365",
+  "title": "Administration Microsoft 365",
+  "client": "Quiris",
+  "portalUrl": "https://formation.redstoneformations.fr/formations/quiris-admin-m365",
+  "stagiaireUrl": "https://formation.redstoneformations.fr/fr/formations/quiris-admin-m365/stagiaire",
+  "stagiaireQrSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"205\" height=\"205\" class=\"rs-qr-svg\"><path transform=\"scale(5)\" class=\"qrline\" stroke=\"#000\" d=\"M2 2.5h7m5 0h4m1 0h4m2 0h1m1 0h1m2 0h1m1 0h7m-37 1h1m5 0h1m2 0h1m4 0h1m1 0h2m2 0h1m1 0h1m2 0h3m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h3m4 0h2m2 0h3m4 0h1m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h3m2 0h5m4 0h6m2 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h2m3 0h8m2 0h1m1 0h1m2 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m4 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h2m2 0h1m2 0h2m4 0h3m2 0h2m-28 1h1m1 0h5m5 0h1m3 0h2m1 0h1m3 0h4m1 0h1m1 0h5m-35 1h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m1 0h10m1 0h1m2 0h1m2 0h2m-36 1h1m4 0h2m1 0h1m3 0h1m2 0h3m2 0h3m1 0h9m1 0h3m-36 1h1m11 0h1m1 0h1m2 0h1m2 0h3m3 0h1m3 0h2m3 0h1m-37 1h1m1 0h3m1 0h1m2 0h3m3 0h3m4 0h4m3 0h2m1 0h1m1 0h3m-37 1h1m3 0h1m2 0h4m2 0h2m1 0h1m2 0h3m1 0h1m4 0h1m2 0h1m-29 1h2m1 0h1m4 0h1m2 0h2m2 0h1m5 0h2m1 0h1m1 0h1m1 0h3m1 0h2m-34 1h1m4 0h1m1 0h1m2 0h1m2 0h1m3 0h3m3 0h3m2 0h2m-33 1h1m5 0h3m1 0h1m1 0h1m1 0h2m1 0h1m6 0h2m1 0h1m1 0h2m1 0h1m1 0h3m-37 1h2m1 0h3m1 0h1m4 0h2m1 0h2m1 0h6m1 0h1m2 0h2m1 0h1m1 0h1m1 0h1m-35 1h1m4 0h7m1 0h1m2 0h2m3 0h1m2 0h5m1 0h1m1 0h4m-36 1h1m1 0h2m2 0h1m2 0h2m2 0h1m1 0h1m3 0h2m2 0h1m2 0h3m2 0h1m3 0h1m-37 1h4m1 0h3m4 0h2m3 0h2m1 0h1m1 0h2m1 0h6m1 0h3m-34 1h1m1 0h2m2 0h2m2 0h2m1 0h1m1 0h6m1 0h1m1 0h2m1 0h2m3 0h1m-33 1h2m1 0h3m2 0h1m1 0h6m1 0h1m1 0h1m1 0h1m3 0h3m1 0h4m1 0h2m-37 1h2m1 0h1m1 0h1m1 0h2m1 0h2m1 0h2m1 0h1m4 0h1m1 0h2m1 0h2m1 0h1m1 0h2m2 0h1m-35 1h3m1 0h2m1 0h5m4 0h1m2 0h1m3 0h5m1 0h1m1 0h1m1 0h2m-36 1h1m3 0h1m2 0h2m1 0h1m1 0h2m1 0h1m1 0h1m1 0h2m1 0h2m4 0h1m2 0h1m2 0h1m-35 1h1m1 0h1m3 0h3m1 0h1m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h1m1 0h2m1 0h1m4 0h2m-37 1h1m1 0h1m6 0h5m1 0h1m2 0h2m1 0h2m4 0h1m3 0h1m3 0h2m-37 1h1m2 0h2m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m4 0h2m1 0h10m1 0h1m-29 1h1m1 0h1m1 0h2m4 0h6m3 0h2m3 0h2m-34 1h7m6 0h3m1 0h2m1 0h3m1 0h1m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m-37 1h1m5 0h1m1 0h2m4 0h1m3 0h1m1 0h3m3 0h1m1 0h1m3 0h2m-34 1h1m1 0h3m1 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h2m3 0h9m1 0h1m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h4m3 0h1m2 0h4m1 0h1m5 0h2m1 0h2m1 0h2m-37 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1m6 0h2m-37 1h1m5 0h1m2 0h1m2 0h1m2 0h2m1 0h4m4 0h1m1 0h2m2 0h1m3 0h1m-37 1h7m1 0h1m3 0h1m1 0h4m1 0h1m2 0h1m1 0h3m2 0h1m2 0h1m1 0h3\"/></svg>\n",
+  "formateurHref": "/formations/quiris-admin-m365/formateur",
+  "durationDays": 3,
+  "reference": "93223",
+  "location": "Saint-Herblain",
+  "modality": "Présentiel",
+  "dates": {
+    "start": "2026-04-14",
+    "end": "2026-04-16"
+  },
+  "participants": 1,
+  "trainer": "Rayan Mechety — RedStone Formations",
+  "schedule": [
+    {
+      "day": 1,
+      "label": "Jour 1 — Fondamentaux M365",
+      "modules": [
+        {
+          "stem": "module-01-introduction-m365",
+          "title": "Module 1 — Introduction Microsoft 365",
+          "href": "/formations/quiris-admin-m365/module-01-introduction-m365",
+          "path": "formations/quiris-admin-m365/module-01-introduction-m365",
+          "isPublished": false,
+          "moduleNum": 1
+        },
+        {
+          "stem": "module-02-identites-acces",
+          "title": "Module 2 — Identités et accès",
+          "href": "/formations/quiris-admin-m365/module-02-identites-acces",
+          "path": "formations/quiris-admin-m365/module-02-identites-acces",
+          "isPublished": false,
+          "moduleNum": 2
+        },
+        {
+          "stem": "module-03-securite-auth",
+          "title": "Module 3 — Sécurité et authentification",
+          "href": "/formations/quiris-admin-m365/module-03-securite-auth",
+          "path": "formations/quiris-admin-m365/module-03-securite-auth",
+          "isPublished": false,
+          "moduleNum": 3
+        },
+        {
+          "stem": "module-04-exchange",
+          "title": "Module 4 — Exchange Online",
+          "href": "/formations/quiris-admin-m365/module-04-exchange",
+          "path": "formations/quiris-admin-m365/module-04-exchange",
+          "isPublished": false,
+          "moduleNum": 4
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "label": "Jour 2 — Collaboration & automatisation",
+      "modules": [
+        {
+          "stem": "module-05-sharepoint",
+          "title": "Module 5 — SharePoint Online",
+          "href": "/formations/quiris-admin-m365/module-05-sharepoint",
+          "path": "formations/quiris-admin-m365/module-05-sharepoint",
+          "isPublished": false,
+          "moduleNum": 5
+        },
+        {
+          "stem": "module-06-teams",
+          "title": "Module 6 — Microsoft Teams",
+          "href": "/formations/quiris-admin-m365/module-06-teams",
+          "path": "formations/quiris-admin-m365/module-06-teams",
+          "isPublished": false,
+          "moduleNum": 6
+        },
+        {
+          "stem": "module-07-copilot",
+          "title": "Module 7 — Copilot",
+          "href": "/formations/quiris-admin-m365/module-07-copilot",
+          "path": "formations/quiris-admin-m365/module-07-copilot",
+          "isPublished": false,
+          "moduleNum": 7
+        },
+        {
+          "stem": "module-08-powershell",
+          "title": "Module 8 — PowerShell et administration",
+          "href": "/formations/quiris-admin-m365/module-08-powershell",
+          "path": "formations/quiris-admin-m365/module-08-powershell",
+          "isPublished": false,
+          "moduleNum": 8
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "label": "Jour 3 — Migration & gouvernance",
+      "modules": [
+        {
+          "stem": "module-09-migration",
+          "title": "Module 9 — Migration cloud",
+          "href": "/formations/quiris-admin-m365/module-09-migration",
+          "path": "formations/quiris-admin-m365/module-09-migration",
+          "isPublished": false,
+          "moduleNum": 9
+        },
+        {
+          "stem": "module-10-gouvernance",
+          "title": "Module 10 — Gouvernance et adoption",
+          "href": "/formations/quiris-admin-m365/module-10-gouvernance",
+          "path": "formations/quiris-admin-m365/module-10-gouvernance",
+          "isPublished": false,
+          "moduleNum": 10
+        },
+        {
+          "stem": "module-11-intune",
+          "title": "Module 11 — Microsoft Intune",
+          "href": "/formations/quiris-admin-m365/module-11-intune",
+          "path": "formations/quiris-admin-m365/module-11-intune",
+          "isPublished": false,
+          "moduleNum": 11
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "id": "portail-stagiaires",
+      "label": "Portail stagiaires (lien à partager)",
+      "url": "https://formation.redstoneformations.fr/formations/quiris-admin-m365",
+      "icon": "mdi-school",
+      "external": true
+    },
+    {
+      "id": "teams",
+      "label": "Réunion Teams (session)",
+      "url": "",
+      "icon": "mdi-microsoft-teams",
+      "external": true,
+      "hint": "Coller le lien Teams du jour avant la session"
+    },
+    {
+      "id": "monday",
+      "label": "Fiche mission Monday",
+      "url": "",
+      "icon": "mdi-calendar-check",
+      "external": true,
+      "hint": "Mission Quiris Admin M365 — Missions V2"
+    },
+    {
+      "id": "redstone-contact",
+      "label": "RedStone — contact@",
+      "url": "mailto:contact@redstoneformations.fr",
+      "icon": "mdi-email"
+    }
+  ],
+  "contacts": [
+    {
+      "name": "Comptabilité Quiris / G2SI",
+      "role": "Facturation & administratif",
+      "email": "compta@g2si.fr"
+    },
+    {
+      "name": "RedStone Formations",
+      "role": "Support formateur",
+      "email": "contact@redstoneformations.fr"
+    }
+  ],
+  "checklist": [
+    "Vérifier l'accès administrateur au tenant de lab",
+    "Tester le portail stagiaires en navigation privée",
+    "Publier le module du jour (cours + exercice + correction)",
+    "Télécharger / vérifier les zips lab sur le serveur",
+    "Partager le lien portail (pas les fichiers Monday legacy)"
+  ],
+  "notes": "Publication progressive : utiliser le bandeau « Non publié » sur chaque page\nou `publish-formation-pages.py --module NN` en CLI.\n\nLes exercices et corrections sont toujours publiés/dépubliés en paire.",
+  "monday": {},
+  "labs": [
+    {
+      "id": "lab-complet",
+      "label": "Télécharger le lab complet",
+      "url": "https://formation.redstoneformations.fr/labs/quiris-admin-m365-lab-complet.zip"
+    },
+    {
+      "id": "lab-jour-01",
+      "label": "Lab Jour 1",
+      "url": "https://formation.redstoneformations.fr/labs/quiris-admin-m365-lab-jour-01.zip"
+    }
+  ],
+  "publication": {
+    "total": 25,
+    "published": 0,
+    "draft": 25
+  },
+  "modules": [
+    {
+      "stem": "module-01-introduction-m365",
+      "title": "Module 1 — Introduction Microsoft 365",
+      "href": "/formations/quiris-admin-m365/module-01-introduction-m365",
+      "isPublished": false,
+      "moduleNum": 1
+    },
+    {
+      "stem": "module-02-identites-acces",
+      "title": "Module 2 — Identités et accès",
+      "href": "/formations/quiris-admin-m365/module-02-identites-acces",
+      "isPublished": false,
+      "moduleNum": 2
+    },
+    {
+      "stem": "module-03-securite-auth",
+      "title": "Module 3 — Sécurité et authentification",
+      "href": "/formations/quiris-admin-m365/module-03-securite-auth",
+      "isPublished": false,
+      "moduleNum": 3
+    },
+    {
+      "stem": "module-04-exchange",
+      "title": "Module 4 — Exchange Online",
+      "href": "/formations/quiris-admin-m365/module-04-exchange",
+      "isPublished": false,
+      "moduleNum": 4
+    },
+    {
+      "stem": "module-05-sharepoint",
+      "title": "Module 5 — SharePoint Online",
+      "href": "/formations/quiris-admin-m365/module-05-sharepoint",
+      "isPublished": false,
+      "moduleNum": 5
+    },
+    {
+      "stem": "module-06-teams",
+      "title": "Module 6 — Microsoft Teams",
+      "href": "/formations/quiris-admin-m365/module-06-teams",
+      "isPublished": false,
+      "moduleNum": 6
+    },
+    {
+      "stem": "module-07-copilot",
+      "title": "Module 7 — Copilot",
+      "href": "/formations/quiris-admin-m365/module-07-copilot",
+      "isPublished": false,
+      "moduleNum": 7
+    },
+    {
+      "stem": "module-08-powershell",
+      "title": "Module 8 — PowerShell et administration",
+      "href": "/formations/quiris-admin-m365/module-08-powershell",
+      "isPublished": false,
+      "moduleNum": 8
+    },
+    {
+      "stem": "module-09-migration",
+      "title": "Module 9 — Migration cloud",
+      "href": "/formations/quiris-admin-m365/module-09-migration",
+      "isPublished": false,
+      "moduleNum": 9
+    },
+    {
+      "stem": "module-10-gouvernance",
+      "title": "Module 10 — Gouvernance et adoption",
+      "href": "/formations/quiris-admin-m365/module-10-gouvernance",
+      "isPublished": false,
+      "moduleNum": 10
+    },
+    {
+      "stem": "module-11-intune",
+      "title": "Module 11 — Microsoft Intune",
+      "href": "/formations/quiris-admin-m365/module-11-intune",
+      "isPublished": false,
+      "moduleNum": 11
+    }
+  ]
+}

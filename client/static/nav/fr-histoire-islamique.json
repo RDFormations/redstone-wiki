@@ -1,0 +1,117 @@
+{
+  "slug": "fr-histoire-islamique",
+  "lang": "fr",
+  "base_slug": "histoire-islamique",
+  "title": "Histoire islamique — double regard",
+  "wiki_path": "/formations/fr-histoire-islamique",
+  "items": [
+    {
+      "path": "formations/fr-histoire-islamique",
+      "href": "/formations/fr-histoire-islamique",
+      "title": "Introduction — Méthodologie du double regard",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/formateur",
+      "href": "/formations/fr-histoire-islamique/formateur",
+      "title": "Espace formateur",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-histoire-islamique/stagiaire",
+      "href": "/formations/fr-histoire-islamique/stagiaire",
+      "title": "Espace stagiaires — Histoire islamique — double regard",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-01-arabie-preislamique",
+      "href": "/formations/fr-histoire-islamique/module-01-arabie-preislamique",
+      "title": "Module 1 — L'Arabie préislamique : désert, commerce et jāhiliyya",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-02-muhammad-coran",
+      "href": "/formations/fr-histoire-islamique/module-02-muhammad-coran",
+      "title": "Module 2 — Muhammad, le Coran et la naissance de la communauté",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-03-califat-rashidun",
+      "href": "/formations/fr-histoire-islamique/module-03-califat-rashidun",
+      "title": "Module 3 — Le califat rashidun et les fitna (632–661)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-04-expansion",
+      "href": "/formations/fr-histoire-islamique/module-04-expansion",
+      "title": "Module 4 — L'expansion : conquêtes, conversion et sociétés conquises (634–750)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-05-omeyyades",
+      "href": "/formations/fr-histoire-islamique/module-05-omeyyades",
+      "title": "Module 5 — Le califat omeyyade (661–750)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-06-abbassides",
+      "href": "/formations/fr-histoire-islamique/module-06-abbassides",
+      "title": "Module 6 — Le califat abbasside et l'« âge d'or » (750–1258)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-07-mondes-fragmentes",
+      "href": "/formations/fr-histoire-islamique/module-07-mondes-fragmentes",
+      "title": "Module 7 — Mondes islamiques fragmentés : Fatimides, Almoravides, Ayyoubides",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-08-croisades",
+      "href": "/formations/fr-histoire-islamique/module-08-croisades",
+      "title": "Module 8 — Croisades et interactions latino-islamiques (1095–1291)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-09-mongols",
+      "href": "/formations/fr-histoire-islamique/module-09-mongols",
+      "title": "Module 9 — Mongols, Ilkhanides et recompositions post-1258",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-10-empires-poudre",
+      "href": "/formations/fr-histoire-islamique/module-10-empires-poudre",
+      "title": "Module 10 — Empires ottomans, safavides et moghols (XVe–XVIIIe s.)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-11-colonisation-nationalismes",
+      "href": "/formations/fr-histoire-islamique/module-11-colonisation-nationalismes",
+      "title": "Module 11 — Colonisation, réformisme et nationalismes (XIXe–début XXe s.)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/module-12-modernite-historiographie",
+      "href": "/formations/fr-histoire-islamique/module-12-modernite-historiographie",
+      "title": "Module 12 — Modernité, islam politique et historiographie contemporaine",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/annexe-bibliographie",
+      "href": "/formations/fr-histoire-islamique/annexe-bibliographie",
+      "title": "Annexe — Bibliographie structurée",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/annexe-chronologie",
+      "href": "/formations/fr-histoire-islamique/annexe-chronologie",
+      "title": "Annexe — Chronologie comparée",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-histoire-islamique/annexe-glossaire",
+      "href": "/formations/fr-histoire-islamique/annexe-glossaire",
+      "title": "Annexe — Glossaire",
+      "isPublished": true
+    }
+  ]
+}

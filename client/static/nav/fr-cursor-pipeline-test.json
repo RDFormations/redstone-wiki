@@ -1,0 +1,45 @@
+{
+  "slug": "fr-cursor-pipeline-test",
+  "lang": "fr",
+  "base_slug": "cursor-pipeline-test",
+  "title": "Test pipeline portail Cursor",
+  "wiki_path": "/formations/fr-cursor-pipeline-test",
+  "items": [
+    {
+      "path": "formations/fr-cursor-pipeline-test",
+      "href": "/formations/fr-cursor-pipeline-test",
+      "title": "Introduction",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-cursor-pipeline-test/formateur",
+      "href": "/formations/fr-cursor-pipeline-test/formateur",
+      "title": "Espace formateur",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-cursor-pipeline-test/stagiaire",
+      "href": "/formations/fr-cursor-pipeline-test/stagiaire",
+      "title": "Liens session",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-cursor-pipeline-test/module-01-exemple",
+      "href": "/formations/fr-cursor-pipeline-test/module-01-exemple",
+      "title": "Module 1 — Portail formation",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-cursor-pipeline-test/exercice-01-exemple",
+      "href": "/formations/fr-cursor-pipeline-test/exercice-01-exemple",
+      "title": "Exercice — Vérifier le portail",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-cursor-pipeline-test/correction-01-exemple",
+      "href": "/formations/fr-cursor-pipeline-test/correction-01-exemple",
+      "title": "Correction — Vérifier le portail",
+      "isPublished": false
+    }
+  ]
+}

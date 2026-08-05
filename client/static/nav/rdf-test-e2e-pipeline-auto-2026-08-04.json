@@ -1,0 +1,57 @@
+{
+  "slug": "rdf-test-e2e-pipeline-auto-2026-08-04",
+  "lang": "fr",
+  "base_slug": "rdf-test-e2e-pipeline-auto-2026-08-04",
+  "title": "TEST E2E pipeline auto 2026-08-04",
+  "wiki_path": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04",
+  "items": [
+    {
+      "path": "formations/rdf-test-e2e-pipeline-auto-2026-08-04/formateur",
+      "href": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04/formateur",
+      "title": "Espace formateur.md",
+      "isPublished": false
+    },
+    {
+      "path": "formations/rdf-test-e2e-pipeline-auto-2026-08-04/stagiaire",
+      "href": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04/stagiaire",
+      "title": "Espace stagiaire.md",
+      "isPublished": true
+    },
+    {
+      "path": "formations/rdf-test-e2e-pipeline-auto-2026-08-04/module-01-pipeline-lancement",
+      "href": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04/module-01-pipeline-lancement",
+      "title": "Module 1 — Architecture et lancement du pipeline",
+      "isPublished": false
+    },
+    {
+      "path": "formations/rdf-test-e2e-pipeline-auto-2026-08-04/exercice-01-pipeline-lancement",
+      "href": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04/exercice-01-pipeline-lancement",
+      "title": "Exercices — Lancement pipeline",
+      "isPublished": false
+    },
+    {
+      "path": "formations/rdf-test-e2e-pipeline-auto-2026-08-04/correction-01-pipeline-lancement",
+      "href": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04/correction-01-pipeline-lancement",
+      "title": "Correction — Lancement pipeline",
+      "isPublished": false
+    },
+    {
+      "path": "formations/rdf-test-e2e-pipeline-auto-2026-08-04/module-02-portail-monday",
+      "href": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04/module-02-portail-monday",
+      "title": "Module 2 — QA, sync portail et lien Monday",
+      "isPublished": false
+    },
+    {
+      "path": "formations/rdf-test-e2e-pipeline-auto-2026-08-04/exercice-02-portail-monday",
+      "href": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04/exercice-02-portail-monday",
+      "title": "Exercices — Portail et Monday",
+      "isPublished": false
+    },
+    {
+      "path": "formations/rdf-test-e2e-pipeline-auto-2026-08-04/correction-02-portail-monday",
+      "href": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04/correction-02-portail-monday",
+      "title": "Correction — Portail et Monday",
+      "isPublished": false
+    }
+  ]
+}

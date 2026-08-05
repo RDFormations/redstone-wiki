@@ -1,0 +1,31 @@
+{
+  "slug": "fr-mongodb-python",
+  "paths": [
+    "formations/fr-mongodb-python",
+    "formations/fr-mongodb-python/correction-01-introduction-bdd",
+    "formations/fr-mongodb-python/correction-02-modele-document",
+    "formations/fr-mongodb-python/correction-03-pymongo-crud",
+    "formations/fr-mongodb-python/correction-04-requetes-operateurs",
+    "formations/fr-mongodb-python/correction-05-modelisation",
+    "formations/fr-mongodb-python/correction-06-aggregation",
+    "formations/fr-mongodb-python/correction-07-indexation",
+    "formations/fr-mongodb-python/correction-08-projet-integrateur",
+    "formations/fr-mongodb-python/exercice-01-introduction-bdd",
+    "formations/fr-mongodb-python/exercice-02-modele-document",
+    "formations/fr-mongodb-python/exercice-03-pymongo-crud",
+    "formations/fr-mongodb-python/exercice-04-requetes-operateurs",
+    "formations/fr-mongodb-python/exercice-05-modelisation",
+    "formations/fr-mongodb-python/exercice-06-aggregation",
+    "formations/fr-mongodb-python/exercice-07-indexation",
+    "formations/fr-mongodb-python/exercice-08-projet-integrateur",
+    "formations/fr-mongodb-python/module-01-introduction-bdd",
+    "formations/fr-mongodb-python/module-02-modele-document",
+    "formations/fr-mongodb-python/module-03-pymongo-crud",
+    "formations/fr-mongodb-python/module-04-requetes-operateurs",
+    "formations/fr-mongodb-python/module-05-modelisation",
+    "formations/fr-mongodb-python/module-06-aggregation",
+    "formations/fr-mongodb-python/module-07-indexation",
+    "formations/fr-mongodb-python/module-08-projet-integrateur",
+    "formations/fr-mongodb-python/stagiaire"
+  ]
+}

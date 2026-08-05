@@ -1,0 +1,27 @@
+{
+  "slug": "quiris-admin-m365",
+  "paths": [
+    "formations/quiris-admin-m365",
+    "formations/quiris-admin-m365/annexe-glossaire",
+    "formations/quiris-admin-m365/annexe-index-figures",
+    "formations/quiris-admin-m365/annexe-mise-en-pratique",
+    "formations/quiris-admin-m365/annexe-references",
+    "formations/quiris-admin-m365/annexe-tips",
+    "formations/quiris-admin-m365/correction-01-introduction-m365",
+    "formations/quiris-admin-m365/correction-02-identites-acces",
+    "formations/quiris-admin-m365/correction-03-securite-auth",
+    "formations/quiris-admin-m365/correction-04-exchange",
+    "formations/quiris-admin-m365/correction-05-sharepoint",
+    "formations/quiris-admin-m365/exercice-01-introduction-m365",
+    "formations/quiris-admin-m365/exercice-02-identites-acces",
+    "formations/quiris-admin-m365/exercice-03-securite-auth",
+    "formations/quiris-admin-m365/exercice-04-exchange",
+    "formations/quiris-admin-m365/exercice-05-sharepoint",
+    "formations/quiris-admin-m365/module-01-introduction-m365",
+    "formations/quiris-admin-m365/module-02-identites-acces",
+    "formations/quiris-admin-m365/module-03-securite-auth",
+    "formations/quiris-admin-m365/module-04-exchange",
+    "formations/quiris-admin-m365/module-05-sharepoint",
+    "formations/quiris-admin-m365/stagiaire"
+  ]
+}

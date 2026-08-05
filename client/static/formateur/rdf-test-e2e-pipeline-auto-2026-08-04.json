@@ -1,0 +1,71 @@
+{
+  "slug": "rdf-test-e2e-pipeline-auto-2026-08-04",
+  "lang": "fr",
+  "base_slug": "rdf-test-e2e-pipeline-auto-2026-08-04",
+  "title": "TEST E2E pipeline auto 2026-08-04",
+  "client": "RDF",
+  "portalUrl": "https://formation.redstoneformations.fr/formations/rdf-test-e2e-pipeline-auto-2026-08-04",
+  "stagiaireUrl": "https://formation.redstoneformations.fr/fr/formations/rdf-test-e2e-pipeline-auto-2026-08-04/stagiaire",
+  "stagiaireQrSvg": "",
+  "formateurHref": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04/formateur",
+  "durationDays": 1,
+  "reference": "TEMPLATE",
+  "location": "",
+  "modality": "Présentiel",
+  "dates": {
+    "start": "2026-08-05",
+    "end": "2026-08-05"
+  },
+  "participants": 1,
+  "trainer": "Rayan Mechety — RedStone Formations",
+  "schedule": [],
+  "links": [
+    {
+      "id": "portail-stagiaires",
+      "label": "Portail stagiaires",
+      "url": "https://formation.redstoneformations.fr/formations/rdf-test-e2e-pipeline-auto-2026-08-04",
+      "icon": "mdi-school",
+      "external": true
+    },
+    {
+      "id": "monday",
+      "label": "monday",
+      "url": "https://rdformations.monday.com/boards/18420737449/pulses/12718272029",
+      "external": true
+    }
+  ],
+  "contacts": [],
+  "checklist": [],
+  "notes": "",
+  "monday": {
+    "item_id": 12718272029,
+    "board_id": 18420737449,
+    "url": "https://rdformations.monday.com/boards/18420737449/pulses/12718272029",
+    "name": "TEST E2E pipeline auto 2026-08-04",
+    "client": "RDF",
+    "formateur": "",
+    "etat": "Confirmé"
+  },
+  "labs": [],
+  "publication": {
+    "total": 6,
+    "published": 0,
+    "draft": 6
+  },
+  "modules": [
+    {
+      "stem": "module-01-pipeline-lancement",
+      "title": "Module 1 — Architecture et lancement du pipeline",
+      "href": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04/module-01-pipeline-lancement",
+      "isPublished": false,
+      "moduleNum": 1
+    },
+    {
+      "stem": "module-02-portail-monday",
+      "title": "Module 2 — QA, sync portail et lien Monday",
+      "href": "/formations/rdf-test-e2e-pipeline-auto-2026-08-04/module-02-portail-monday",
+      "isPublished": false,
+      "moduleNum": 2
+    }
+  ]
+}

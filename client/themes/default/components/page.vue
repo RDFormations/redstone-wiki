@@ -1,9 +1,9 @@
 <template lang="pug">
-  v-app(v-scroll='upBtnScroll', :dark='$vuetify.theme.dark', :class='$vuetify.rtl ? `is-rtl` : `is-ltr`')
+  v-app(v-scroll='upBtnScroll', :dark='$vuetify.theme.dark', :class='appRootClasses')
     nav-header(v-if='!printView')
     v-navigation-drawer(
       v-if='navMode !== `NONE` && !printView'
-      :class='$vuetify.theme.dark ? `grey darken-4-d4` : `primary`'
+      :class='formationDrawerClass'
       dark
       app
       clipped
@@ -12,10 +12,29 @@
       v-model='navShown'
       :right='$vuetify.rtl'
       )
-      vue-scroll(:ops='scrollStyle')
+      .rs-drawer-scroll(v-if='isFormationPage && isMobile')
+        formation-nav-sidebar(:slug='formationSlug', @navigate='closeMobileNav')
+      vue-scroll(v-else-if='isFormationPage', :ops='scrollStyle')
+        formation-nav-sidebar(:slug='formationSlug', @navigate='closeMobileNav')
+      vue-scroll(v-else, :ops='scrollStyle')
         nav-sidebar(:color='$vuetify.theme.dark ? `grey darken-4-d4` : `primary`', :items='sidebarDecoded', :nav-mode='navMode')
+    button.rs-sidebar-collapse#rs-sidebar-collapse(
+      v-if='isFormationPage && isDesktop && !sidebarCollapsed'
+      type='button'
+      title='Réduire le menu'
+      @click='setSidebarCollapsed(true)'
+      )
+      span(aria-hidden='true') ‹
+    button.rs-sidebar-expand#rs-sidebar-expand(
+      v-if='isFormationPage && isDesktop && sidebarCollapsed'
+      type='button'
+      title='Ouvrir le menu'
+      @click='setSidebarCollapsed(false)'
+      )
+      span(aria-hidden='true') ☰
+      span Menu cours
 
-    v-fab-transition(v-if='navMode !== `NONE`')
+    v-fab-transition(v-if='navMode !== `NONE` && showDefaultMobileFab')
       v-btn(
         fab
         color='primary'
@@ -25,10 +44,26 @@
         :left='!$vuetify.rtl'
         small
         @click='navShown = !navShown'
-        v-if='$vuetify.breakpoint.mdAndDown'
+        v-if='isMobile'
         v-show='!navShown'
         )
         v-icon mdi-menu
+
+    v-fab-transition(v-if='isFormationPage && isMobile')
+      v-btn.rs-mobile-nav-btn(
+        fixed
+        bottom
+        :left='!$vuetify.rtl'
+        :right='$vuetify.rtl'
+        depressed
+        rounded
+        color='#210051'
+        dark
+        @click='openMobileNav'
+        v-show='!navShown'
+        )
+        v-icon(left, small) mdi-menu
+        span Menu cours
 
     v-main(ref='content')
       template(v-if='path !== `home`')
@@ -43,7 +78,22 @@
             template(slot='item', slot-scope='props')
               v-icon(v-if='props.item.path === "/"', small, @click='goHome') mdi-home
               v-btn.ma-0(v-else, :href='props.item.path', small, text) {{props.item.name}}
-          template(v-if='!isPublished')
+          template(v-if='canTogglePublish && isFormationPage')
+            v-spacer
+            button.rs-publish-toggle(
+              type='button'
+              :disabled='publishBusy'
+              :title='displayPublished ? "Dépublier la page" : "Publier la page"'
+              @click='togglePublish'
+              )
+              span.caption(:class='displayPublished ? "green--text" : "red--text"')
+                | {{ displayPublished ? 'Publié' : $t('common:page.unpublished') }}
+              status-indicator.ml-3(
+                :positive='displayPublished'
+                :negative='!displayPublished'
+                :pulse='!displayPublished'
+                )
+          template(v-else-if='!displayPublished')
             v-spacer
             .caption.red--text {{$t('common:page.unpublished')}}
             status-indicator.ml-3(negative, pulse)
@@ -324,9 +374,29 @@
                         v-icon(size='20') mdi-trash-can-outline
                     span {{$t('common:header.delete')}}
               span {{$t('common:page.editPage')}}
-            v-alert.mb-5(v-if='!isPublished', color='red', outlined, icon='mdi-minus-circle', dense)
-              .caption {{$t('common:page.unpublishedWarning')}}
-            .contents(ref='container')
+            v-alert.mb-5(
+              v-if='!displayPublished && !showFormateurHub && !showStagiaireHub'
+              color='red'
+              outlined
+              icon='mdi-minus-circle'
+              dense
+              :class='{ "rs-publish-alert": canTogglePublish && isFormationPage }'
+              @click='canTogglePublish && isFormationPage ? togglePublish() : null'
+              )
+              .caption
+                | {{ $t('common:page.unpublishedWarning') }}
+                span.ml-1(v-if='canTogglePublish && isFormationPage') — Cliquer pour publier
+            formation-formateur-hub(
+              v-if='showFormateurHub'
+              :slug='formationSlug'
+              :locale='locale'
+              )
+            formation-stagiaire-hub(
+              v-if='showStagiaireHub'
+              :slug='formationSlug'
+              :locale='locale'
+              )
+            .contents(ref='container', v-show='!showFormateurHub && !showStagiaireHub')
               slot(name='contents')
             .comments-container#discussion(v-if='commentsEnabled && commentsPerms.read && !printView')
               .comments-header
@@ -357,17 +427,57 @@
 </template>
 
 <script>
+import gql from 'graphql-tag'
 import { StatusIndicator } from 'vue-status-indicator'
 import Tabset from './tabset.vue'
 import NavSidebar from './nav-sidebar.vue'
+import FormationNavSidebar from '../../../components/formation/formation-nav-sidebar.vue'
+import FormationFormateurHub from '../../../components/formation/formation-formateur-hub.vue'
+import FormationStagiaireHub from '../../../components/formation/formation-stagiaire-hub.vue'
 import Prism from 'prismjs'
 import mermaid from 'mermaid'
 import { get, sync } from 'vuex-pathify'
 import _ from 'lodash'
 import ClipboardJS from 'clipboard'
 import Vue from 'vue'
+import { enhanceCallouts } from '../../../helpers/callouts.js'
 
 /* global siteLangs */
+
+const PAGE_BY_PATH = gql`
+  query PageByPath($path: String!, $locale: String!) {
+    pages {
+      singleByPath(path: $path, locale: $locale) {
+        id
+        path
+        title
+        content
+        isPublished
+        tags { tag }
+      }
+    }
+  }
+`
+
+const PAGE_PUBLISH_UPDATE = gql`
+  mutation PagePublishUpdate($id: Int!, $title: String!, $content: String!, $isPublished: Boolean!) {
+    pages {
+      update(
+        id: $id
+        title: $title
+        content: $content
+        isPublished: $isPublished
+        editor: "markdown"
+        description: ""
+        isPrivate: false
+        tags: []
+      ) {
+        responseResult { succeeded message }
+        page { id path isPublished }
+      }
+    }
+  }
+`
 
 Vue.component('Tabset', Tabset)
 
@@ -409,6 +519,9 @@ Prism.plugins.toolbar.registerButton('copy-to-clipboard', (env) => {
 export default {
   components: {
     NavSidebar,
+    FormationNavSidebar,
+    FormationFormateurHub,
+    FormationStagiaireHub,
     StatusIndicator
   },
   props: {
@@ -523,11 +636,76 @@ export default {
           }
         }
       },
-      winWidth: 0
+      winWidth: 0,
+      sidebarCollapsed: false,
+      localPublished: null,
+      publishBusy: false
     }
   },
   computed: {
+    isFormationPage () {
+      return /^formations\/[^/]+/.test(this.path)
+    },
+    formationSlug () {
+      const m = this.path.match(/^formations\/([^/]+)/)
+      return m ? m[1] : ''
+    },
+    formationDrawerClass () {
+      const classes = []
+      if (this.isFormationPage) {
+        classes.push('rs-formation-drawer', 'theme--dark')
+        if (this.isDesktop && this.sidebarCollapsed) classes.push('rs-drawer-collapsed')
+      } else {
+        classes.push(this.$vuetify.theme.dark ? 'grey darken-4-d4' : 'primary')
+      }
+      return classes.join(' ')
+    },
+    appRootClasses () {
+      const classes = [this.$vuetify.rtl ? 'is-rtl' : 'is-ltr']
+      if (this.isFormationPage) {
+        classes.push('rs-formation-page', 'rs-has-sidebar')
+        if (this.isDesktop && this.sidebarCollapsed) classes.push('rs-sidebar-collapsed')
+      }
+      return classes.join(' ')
+    },
+    formationMainCollapsed () {
+      return this.isFormationPage && this.isDesktop && this.sidebarCollapsed
+    },
+    isDesktop () {
+      return this.$vuetify.breakpoint.mdAndUp
+    },
+    isMobile () {
+      return !this.isDesktop
+    },
+    showDefaultMobileFab () {
+      return this.isMobile && !this.isFormationPage
+    },
     isAuthenticated: get('user/authenticated'),
+    permissions: get('user/permissions'),
+    isFormateurHubPath () {
+      return /\/formateur$/i.test(this.path)
+    },
+    isStagiaireHubPath () {
+      return /\/stagiaire$/i.test(this.path)
+    },
+    canTogglePublish () {
+      if (!this.isAuthenticated || !this.isFormationPage) return false
+      const elevated = ['manage:system', 'write:pages', 'manage:pages']
+      return (this.permissions || []).some(p => elevated.includes(p))
+    },
+    canSeeFormateur () {
+      return this.canTogglePublish
+    },
+    showFormateurHub () {
+      return this.isFormationPage && this.isFormateurHubPath && this.canSeeFormateur
+    },
+    showStagiaireHub () {
+      return this.isFormationPage && this.isStagiaireHubPath
+    },
+    displayPublished () {
+      if (this.localPublished !== null) return this.localPublished
+      return this.isPublished
+    },
     commentsCount: get('page/commentsCount'),
     commentsPerms: get('page/effectivePermissions@comments'),
     editShortcutsObj: get('page/editShortcuts'),
@@ -552,10 +730,15 @@ export default {
     pageUrl () { return window.location.href },
     upBtnPosition () {
       if (this.$vuetify.breakpoint.mdAndUp) {
-        return this.$vuetify.rtl ? `right: 235px;` : `left: 235px;`
-      } else {
-        return this.$vuetify.rtl ? `right: 65px;` : `left: 65px;`
+        if (this.formationMainCollapsed) {
+          return this.$vuetify.rtl ? 'right: 16px;' : 'left: 16px;'
+        }
+        return this.$vuetify.rtl ? 'right: 235px;' : 'left: 235px;'
       }
+      if (this.isFormationPage) {
+        return this.$vuetify.rtl ? `right: 16px;` : `left: 16px; bottom: 72px;`
+      }
+      return this.$vuetify.rtl ? `right: 65px;` : `left: 65px;`
     },
     sidebarDecoded () {
       return JSON.parse(Buffer.from(this.sidebar, 'base64').toString())
@@ -583,6 +766,18 @@ export default {
       }
     }
   },
+  watch: {
+    path () {
+      this.localPublished = null
+      this.$nextTick(() => this.applySidebarLayoutState())
+    },
+    sidebarCollapsed () {
+      this.applySidebarLayoutState()
+    },
+    isFormationPage () {
+      this.applySidebarLayoutState()
+    }
+  },
   created() {
     this.$store.set('page/authorId', this.authorId)
     this.$store.set('page/authorName', this.authorName)
@@ -605,7 +800,20 @@ export default {
 
     this.$store.set('page/mode', 'view')
   },
+  updated () {
+    this.$nextTick(() => this.enhancePageCallouts())
+  },
   mounted () {
+    try {
+      if (this.isDesktop) {
+        this.sidebarCollapsed = localStorage.getItem('rs-sidebar-collapsed') === '1'
+      }
+    } catch (e) {}
+
+    this.applySidebarLayoutState()
+
+    this.$root.$on('close-formation-nav', this.closeMobileNav)
+
     if (this.$vuetify.theme.dark) {
       this.scrollStyle.bar.background = '#424242'
     }
@@ -618,6 +826,13 @@ export default {
 
     // -> Highlight Code Blocks
     Prism.highlightAllUnder(this.$refs.container)
+
+    // -> Callouts Obsidian [!note] [!tip] …
+    this.enhancePageCallouts()
+    if (this.$refs.container && typeof MutationObserver !== 'undefined') {
+      this._calloutObserver = new MutationObserver(() => this.enhancePageCallouts())
+      this._calloutObserver.observe(this.$refs.container, { childList: true, subtree: true })
+    }
 
     // -> Render Mermaid diagrams
     mermaid.mermaidAPI.initialize({
@@ -651,7 +866,69 @@ export default {
       window.boot.notify('page-ready')
     })
   },
+  beforeDestroy () {
+    this.$root.$off('close-formation-nav', this.closeMobileNav)
+    if (this._sidebarLayoutTimer) window.clearInterval(this._sidebarLayoutTimer)
+    if (this._calloutObserver) this._calloutObserver.disconnect()
+  },
   methods: {
+    enhancePageCallouts () {
+      if (this.$refs.container) enhanceCallouts(this.$refs.container)
+    },
+    applySidebarLayoutState () {
+      const collapsed = this.formationMainCollapsed
+      document.documentElement.classList.toggle('rs-formation-page', this.isFormationPage)
+      document.documentElement.classList.toggle('rs-has-sidebar', this.isFormationPage)
+      document.documentElement.classList.toggle('rs-sidebar-collapsed', collapsed)
+
+      if (this.isFormationPage && this.isDesktop) {
+        this.navShown = !this.sidebarCollapsed
+      }
+
+      this.$nextTick(() => {
+        this.syncFormationMainLayout(collapsed)
+        if (this._sidebarLayoutTimer) {
+          window.clearInterval(this._sidebarLayoutTimer)
+          this._sidebarLayoutTimer = null
+        }
+        if (collapsed) {
+          this._sidebarLayoutTimer = window.setInterval(() => {
+            if (this.formationMainCollapsed) this.syncFormationMainLayout(true)
+          }, 500)
+        }
+      })
+    },
+    syncFormationMainLayout (collapsed) {
+      document.querySelectorAll('.v-main, .v-main__wrap').forEach(el => {
+        if (collapsed) {
+          el.style.setProperty('padding-left', '0', 'important')
+          el.style.setProperty('padding-right', '0', 'important')
+          el.style.setProperty('margin-left', '0', 'important')
+          el.style.setProperty('width', '100%', 'important')
+          el.style.setProperty('max-width', '100%', 'important')
+        } else if (this.isFormationPage && this.isDesktop) {
+          ['padding-left', 'padding-right', 'margin-left', 'width', 'max-width'].forEach(prop => {
+            el.style.removeProperty(prop)
+          })
+        }
+      })
+    },
+    setSidebarCollapsed (collapsed) {
+      if (!this.isDesktop) return
+      this.sidebarCollapsed = collapsed
+      try {
+        localStorage.setItem('rs-sidebar-collapsed', collapsed ? '1' : '0')
+      } catch (e) {}
+      this.applySidebarLayoutState()
+    },
+    openMobileNav () {
+      this.sidebarCollapsed = false
+      this.navShown = true
+      this.$root.$emit('formation-nav-refresh')
+    },
+    closeMobileNav () {
+      if (this.isMobile) this.navShown = false
+    },
     goHome () {
       if (this.locales && this.locales.length > 0) {
         window.location.assign(`/${this.locale}/home`)
@@ -701,15 +978,105 @@ export default {
       if (window.innerWidth === this.winWidth) { return }
       this.winWidth = window.innerWidth
       if (this.$vuetify.breakpoint.mdAndUp) {
-        this.navShown = true
+        if (this.isFormationPage && this.sidebarCollapsed) {
+          this.navShown = false
+        } else {
+          this.navShown = true
+        }
       } else {
         this.navShown = false
+        this.sidebarCollapsed = false
       }
+      this.applySidebarLayoutState()
     },
     goToComments (focusNewComment = false) {
       this.$vuetify.goTo('#discussion', this.scrollOpts)
       if (focusNewComment) {
         document.querySelector('#discussion-new').focus()
+      }
+    },
+    pairedPagePath (pagePath) {
+      const slash = pagePath.lastIndexOf('/')
+      if (slash < 0) return null
+      const stem = pagePath.slice(slash + 1)
+      const parent = pagePath.slice(0, slash)
+      if (stem.startsWith('exercice-')) return `${parent}/correction-${stem.slice(9)}`
+      if (stem.startsWith('correction-')) return `${parent}/exercice-${stem.slice(11)}`
+      return null
+    },
+    publishTargetPaths (pagePath) {
+      const slash = pagePath.lastIndexOf('/')
+      if (slash < 0) return [pagePath]
+      const stem = pagePath.slice(slash + 1)
+      const parent = pagePath.slice(0, slash)
+      if (stem.startsWith('module-')) {
+        const suffix = stem.slice('module-'.length)
+        return [
+          pagePath,
+          `${parent}/exercice-${suffix}`,
+          `${parent}/correction-${suffix}`
+        ]
+      }
+      const pair = this.pairedPagePath(pagePath)
+      return pair ? [pagePath, pair] : [pagePath]
+    },
+    async fetchPageRecord (path) {
+      const resp = await this.$apollo.query({
+        query: PAGE_BY_PATH,
+        variables: { path, locale: this.locale },
+        fetchPolicy: 'network-only'
+      })
+      return _.get(resp, 'data.pages.singleByPath')
+    },
+    async updatePagePublished (page, isPublished) {
+      const resp = await this.$apollo.mutate({
+        mutation: PAGE_PUBLISH_UPDATE,
+        variables: {
+          id: page.id,
+          title: page.title,
+          content: page.content,
+          isPublished
+        }
+      })
+      const result = _.get(resp, 'data.pages.update.responseResult')
+      if (!result || !result.succeeded) {
+        throw new Error(_.get(result, 'message', 'Échec de la mise à jour'))
+      }
+      return _.get(resp, 'data.pages.update.page')
+    },
+    async togglePublish () {
+      if (!this.canTogglePublish || this.publishBusy || !this.isFormationPage) return
+      const next = !this.displayPublished
+      this.publishBusy = true
+      try {
+        const targets = []
+        const seen = new Set()
+        for (const targetPath of this.publishTargetPaths(this.path)) {
+          if (seen.has(targetPath)) continue
+          seen.add(targetPath)
+          const page = await this.fetchPageRecord(targetPath)
+          if (page) targets.push(page)
+        }
+        if (!targets.length) throw new Error('Page introuvable')
+        for (const page of targets) {
+          await this.updatePagePublished(page, next)
+        }
+        this.localPublished = next
+        this.$store.set('page/isPublished', next)
+        this.$root.$emit('formation-nav-refresh')
+        this.$root.$emit('formation-nav-assets-refresh')
+        const count = targets.length
+        this.$store.commit('showNotification', {
+          style: next ? 'green' : 'orange',
+          message: next
+            ? (count > 1 ? `Module publié (${count} pages)` : 'Page publiée')
+            : (count > 1 ? `Module dépublié (${count} pages)` : 'Page dépubliée'),
+          icon: next ? 'check' : 'minus-circle'
+        })
+      } catch (err) {
+        this.$store.commit('pushGraphError', err)
+      } finally {
+        this.publishBusy = false
       }
     }
   }

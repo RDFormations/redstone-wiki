@@ -20,8 +20,8 @@
     v-layout(row)
       v-flex(xs5, md4)
         v-toolbar.nav-header-inner(color='black', dark, flat, :class='$vuetify.rtl ? `pr-3` : `pl-3`')
-          v-avatar(tile, size='34', @click='goHome')
-            v-img.org-logo(:src='logoUrl')
+          v-avatar.rs-logo(tile, :size='38', @click='goHome')
+            v-img.org-logo(:src='effectiveLogoUrl', contain)
           //- v-menu(open-on-hover, offset-y, bottom, left, min-width='250', transition='slide-y-transition')
           //-   template(v-slot:activator='{ on }')
           //-     v-app-bar-nav-icon.btn-animate-app(v-on='on', :class='$vuetify.rtl ? `mx-0` : ``')
@@ -82,6 +82,8 @@
             v-progress-circular(indeterminate, color='blue', :size='22', :width='2' v-show='isLoading')
 
           slot(name='actions')
+
+          theme-toggle.mr-2
 
           //- (mobile) SEARCH TOGGLE
 
@@ -242,11 +244,6 @@
     page-delete(v-model='deletePageModal', v-if='path && path.length')
     page-convert(v-model='convertPageModal', v-if='path && path.length')
 
-    .nav-header-dev(v-if='isDevMode')
-      v-icon mdi-alert
-      div
-        .overline DEVELOPMENT VERSION
-        .overline This code base is NOT for production use!
 </template>
 
 <script>
@@ -260,7 +257,8 @@ import movePageMutation from 'gql/common/common-pages-mutation-move.gql'
 export default {
   components: {
     PageDelete: () => import('./page-delete.vue'),
-    PageConvert: () => import('./page-convert.vue')
+    PageConvert: () => import('./page-convert.vue'),
+    ThemeToggle: () => import('../formation/theme-toggle.vue')
   },
   props: {
     dense: {
@@ -282,7 +280,6 @@ export default {
       convertPageModal: false,
       deletePageModal: false,
       locales: siteLangs,
-      isDevMode: false,
       duplicateOpts: {
         locale: 'en',
         path: 'new-page',
@@ -299,6 +296,10 @@ export default {
     isLoading: get('isLoading'),
     title: get('site/title'),
     logoUrl: get('site/logoUrl'),
+    effectiveLogoUrl () {
+      // Toujours le logo RedStone — ignore toute marque tierce (Wiki.js, Cursor…).
+      return '/_assets/svg/redstone-logo.svg'
+    },
     path: get('page/path'),
     locale: get('page/locale'),
     mode: get('page/mode'),
@@ -369,7 +370,6 @@ export default {
     this.$root.$on('pageDelete', () => {
       this.pageDelete()
     })
-    this.isDevMode = siteConfig.devMode === true
   },
   methods: {
     searchFocus () {
@@ -505,6 +505,14 @@ export default {
 
   .org-logo {
     cursor: pointer;
+  }
+
+  .rs-logo {
+    width: 196px !important;
+    min-width: 160px !important;
+    max-width: min(44vw, 220px) !important;
+    height: 38px !important;
+    border-radius: 0 !important;
   }
 
   &-inner {

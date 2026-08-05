@@ -1,0 +1,345 @@
+{
+  "slug": "fr-darija-marocain",
+  "lang": "fr",
+  "base_slug": "darija-marocain",
+  "title": "Darija de Rabat — parler sans connaître l'arabe",
+  "wiki_path": "/formations/fr-darija-marocain",
+  "items": [
+    {
+      "path": "formations/fr-darija-marocain",
+      "href": "/formations/fr-darija-marocain",
+      "title": "Introduction — Darija de Rabat (sans arabe)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/formateur",
+      "href": "/formations/fr-darija-marocain/formateur",
+      "title": "Espace formateur",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-darija-marocain/stagiaire",
+      "href": "/formations/fr-darija-marocain/stagiaire",
+      "title": "Espace stagiaires — Darija de Rabat",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-01-alphabet-lettres",
+      "href": "/formations/fr-darija-marocain/module-01-alphabet-lettres",
+      "title": "Module 1 — Sons du darija et écriture chat (sans savoir l'arabe)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-01-alphabet-lettres",
+      "href": "/formations/fr-darija-marocain/exercice-01-alphabet-lettres",
+      "title": "Exercices — Sons et écriture chat (Rabat)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-01-alphabet-lettres",
+      "href": "/formations/fr-darija-marocain/correction-01-alphabet-lettres",
+      "title": "Correction — Sons et écriture chat (Rabat)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-02-prononciation",
+      "href": "/formations/fr-darija-marocain/module-02-prononciation",
+      "title": "Module 2 — Prononciation du darija de Rabat",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-02-prononciation",
+      "href": "/formations/fr-darija-marocain/exercice-02-prononciation",
+      "title": "Exercices — Prononciation du darija de Rabat",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-02-prononciation",
+      "href": "/formations/fr-darija-marocain/correction-02-prononciation",
+      "title": "Correction — Prononciation du darija de Rabat",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-03-salutations",
+      "href": "/formations/fr-darija-marocain/module-03-salutations",
+      "title": "Module 3 — Salutations et politesse",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-03-salutations",
+      "href": "/formations/fr-darija-marocain/exercice-03-salutations",
+      "title": "Exercices — Module 3 : Salutations et politesse",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-03-salutations",
+      "href": "/formations/fr-darija-marocain/correction-03-salutations",
+      "title": "Correction — Module 3 : Salutations et politesse",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-04-pronoms-etre",
+      "href": "/formations/fr-darija-marocain/module-04-pronoms-etre",
+      "title": "Module 4 — Pronoms, « être » et phrases simples",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-04-pronoms-etre",
+      "href": "/formations/fr-darija-marocain/exercice-04-pronoms-etre",
+      "title": "Exercices — Module 4 : Pronoms, être et phrases simples",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-04-pronoms-etre",
+      "href": "/formations/fr-darija-marocain/correction-04-pronoms-etre",
+      "title": "Correction — Module 4 : Pronoms, être et phrases simples",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-05-negation-questions",
+      "href": "/formations/fr-darija-marocain/module-05-negation-questions",
+      "title": "Module 5 — Négation, questions et démonstratifs",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-05-negation-questions",
+      "href": "/formations/fr-darija-marocain/exercice-05-negation-questions",
+      "title": "Exercices — Module 5 : négation, questions et démonstratifs",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-05-negation-questions",
+      "href": "/formations/fr-darija-marocain/correction-05-negation-questions",
+      "title": "Correction — Module 5 : négation, questions et démonstratifs",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-06-verbes-essentiels",
+      "href": "/formations/fr-darija-marocain/module-06-verbes-essentiels",
+      "title": "Module 6 — Verbes essentiels et conjugaison",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-06-verbes-essentiels",
+      "href": "/formations/fr-darija-marocain/exercice-06-verbes-essentiels",
+      "title": "Exercices — Module 6 : verbes essentiels et conjugaison",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-06-verbes-essentiels",
+      "href": "/formations/fr-darija-marocain/correction-06-verbes-essentiels",
+      "title": "Correction — Module 6 : verbes essentiels et conjugaison",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-07-nombres-temps-argent",
+      "href": "/formations/fr-darija-marocain/module-07-nombres-temps-argent",
+      "title": "Module 7 — Nombres, heure, dates et argent",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-07-nombres-temps-argent",
+      "href": "/formations/fr-darija-marocain/exercice-07-nombres-temps-argent",
+      "title": "Exercices — Module 7 : nombres, heure, dates et argent",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-07-nombres-temps-argent",
+      "href": "/formations/fr-darija-marocain/correction-07-nombres-temps-argent",
+      "title": "Correction — Module 7 : nombres, heure, dates et argent",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-08-famille",
+      "href": "/formations/fr-darija-marocain/module-08-famille",
+      "title": "Module 8 — Famille et relations",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-08-famille",
+      "href": "/formations/fr-darija-marocain/exercice-08-famille",
+      "title": "Exercices — Module 8 : famille et relations",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-08-famille",
+      "href": "/formations/fr-darija-marocain/correction-08-famille",
+      "title": "Correction — Module 8 : famille et relations",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-09-corps-sante-emotions",
+      "href": "/formations/fr-darija-marocain/module-09-corps-sante-emotions",
+      "title": "Module 09 — Corps, santé et émotions",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-09-corps-sante-emotions",
+      "href": "/formations/fr-darija-marocain/exercice-09-corps-sante-emotions",
+      "title": "Exercices — Corps, santé et émotions",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-09-corps-sante-emotions",
+      "href": "/formations/fr-darija-marocain/correction-09-corps-sante-emotions",
+      "title": "Correction — Corps, santé et émotions",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-10-maison-quotidien",
+      "href": "/formations/fr-darija-marocain/module-10-maison-quotidien",
+      "title": "Module 10 — Maison et vie quotidienne",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-10-maison-quotidien",
+      "href": "/formations/fr-darija-marocain/exercice-10-maison-quotidien",
+      "title": "Exercices — Maison et vie quotidienne",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-10-maison-quotidien",
+      "href": "/formations/fr-darija-marocain/correction-10-maison-quotidien",
+      "title": "Correction — Maison et vie quotidienne",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-11-nourriture-restaurant",
+      "href": "/formations/fr-darija-marocain/module-11-nourriture-restaurant",
+      "title": "Module 11 — Nourriture et restaurant",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-11-nourriture-restaurant",
+      "href": "/formations/fr-darija-marocain/exercice-11-nourriture-restaurant",
+      "title": "Exercices — Nourriture et restaurant",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-11-nourriture-restaurant",
+      "href": "/formations/fr-darija-marocain/correction-11-nourriture-restaurant",
+      "title": "Correction — Nourriture et restaurant",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-12-ville-transports",
+      "href": "/formations/fr-darija-marocain/module-12-ville-transports",
+      "title": "Module 12 — Ville, directions et transports",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-12-ville-transports",
+      "href": "/formations/fr-darija-marocain/exercice-12-ville-transports",
+      "title": "Exercices — Ville, directions et transports",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-12-ville-transports",
+      "href": "/formations/fr-darija-marocain/correction-12-ville-transports",
+      "title": "Correction — Ville, directions et transports",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-13-shopping-vetements",
+      "href": "/formations/fr-darija-marocain/module-13-shopping-vetements",
+      "title": "Module 13 — Shopping, marché et vêtements",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-13-shopping-vetements",
+      "href": "/formations/fr-darija-marocain/exercice-13-shopping-vetements",
+      "title": "Exercices — Shopping, marché et vêtements",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-13-shopping-vetements",
+      "href": "/formations/fr-darija-marocain/correction-13-shopping-vetements",
+      "title": "Correction — Shopping, marché et vêtements",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-14-travail-etudes",
+      "href": "/formations/fr-darija-marocain/module-14-travail-etudes",
+      "title": "Module 14 — Travail, études et numérique",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-14-travail-etudes",
+      "href": "/formations/fr-darija-marocain/exercice-14-travail-etudes",
+      "title": "Exercices — Travail, études et numérique",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-14-travail-etudes",
+      "href": "/formations/fr-darija-marocain/correction-14-travail-etudes",
+      "title": "Correction — Travail, études et numérique",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-15-situations-pratiques",
+      "href": "/formations/fr-darija-marocain/module-15-situations-pratiques",
+      "title": "Module 15 — Situations pratiques",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-15-situations-pratiques",
+      "href": "/formations/fr-darija-marocain/exercice-15-situations-pratiques",
+      "title": "Exercices — Situations pratiques",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-15-situations-pratiques",
+      "href": "/formations/fr-darija-marocain/correction-15-situations-pratiques",
+      "title": "Correction — Situations pratiques",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/module-16-expressions-culture",
+      "href": "/formations/fr-darija-marocain/module-16-expressions-culture",
+      "title": "Module 16 — Expressions et culture de Rabat",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/exercice-16-expressions-culture",
+      "href": "/formations/fr-darija-marocain/exercice-16-expressions-culture",
+      "title": "Exercices — Expressions, niveaux de langue et culture",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/correction-16-expressions-culture",
+      "href": "/formations/fr-darija-marocain/correction-16-expressions-culture",
+      "title": "Correction — Expressions, niveaux de langue et culture",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/annexe-alphabet-chat",
+      "href": "/formations/fr-darija-marocain/annexe-alphabet-chat",
+      "title": "Annexe — Référence chat (3arabizi) du darija de Rabat",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/annexe-culture",
+      "href": "/formations/fr-darija-marocain/annexe-culture",
+      "title": "Annexe — Notes culturelles",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/annexe-dialogues",
+      "href": "/formations/fr-darija-marocain/annexe-dialogues",
+      "title": "Annexe — 12 dialogues modèles",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/annexe-glossaire",
+      "href": "/formations/fr-darija-marocain/annexe-glossaire",
+      "title": "Annexe — Glossaire darija (400+ entrées)",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-darija-marocain/annexe-verbes",
+      "href": "/formations/fr-darija-marocain/annexe-verbes",
+      "title": "Annexe — Conjugaison des 30 verbes essentiels",
+      "isPublished": true
+    }
+  ]
+}

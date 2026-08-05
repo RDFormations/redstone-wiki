@@ -1,0 +1,171 @@
+{
+  "slug": "fr-mongodb-python",
+  "lang": "fr",
+  "base_slug": "mongodb-python",
+  "title": "Bases de données NoSQL — MongoDB et Python",
+  "wiki_path": "/formations/fr-mongodb-python",
+  "items": [
+    {
+      "path": "formations/fr-mongodb-python",
+      "href": "/formations/fr-mongodb-python",
+      "title": "Introduction — MongoDB et Python pour StreamCart",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/formateur",
+      "href": "/formations/fr-mongodb-python/formateur",
+      "title": "Espace formateur",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-mongodb-python/stagiaire",
+      "href": "/formations/fr-mongodb-python/stagiaire",
+      "title": "Espace stagiaires — MongoDB et Python",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/module-01-introduction-bdd",
+      "href": "/formations/fr-mongodb-python/module-01-introduction-bdd",
+      "title": "Module 1 — Introduction aux bases de données et au NoSQL",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/exercice-01-introduction-bdd",
+      "href": "/formations/fr-mongodb-python/exercice-01-introduction-bdd",
+      "title": "Exercices — Introduction aux BDD et NoSQL",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/correction-01-introduction-bdd",
+      "href": "/formations/fr-mongodb-python/correction-01-introduction-bdd",
+      "title": "Correction — Introduction aux BDD et NoSQL",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/module-02-modele-document",
+      "href": "/formations/fr-mongodb-python/module-02-modele-document",
+      "title": "Module 2 — MongoDB : architecture et modèle document",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/exercice-02-modele-document",
+      "href": "/formations/fr-mongodb-python/exercice-02-modele-document",
+      "title": "Exercices — Architecture et modèle document MongoDB",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/correction-02-modele-document",
+      "href": "/formations/fr-mongodb-python/correction-02-modele-document",
+      "title": "Correction — Architecture et modèle document MongoDB",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/module-03-pymongo-crud",
+      "href": "/formations/fr-mongodb-python/module-03-pymongo-crud",
+      "title": "Module 3 — PyMongo : connexion et opérations CRUD",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/exercice-03-pymongo-crud",
+      "href": "/formations/fr-mongodb-python/exercice-03-pymongo-crud",
+      "title": "Exercices — PyMongo CRUD",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/correction-03-pymongo-crud",
+      "href": "/formations/fr-mongodb-python/correction-03-pymongo-crud",
+      "title": "Correction — PyMongo CRUD",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/module-04-requetes-operateurs",
+      "href": "/formations/fr-mongodb-python/module-04-requetes-operateurs",
+      "title": "Module 4 — Requêtes avancées et opérateurs",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/exercice-04-requetes-operateurs",
+      "href": "/formations/fr-mongodb-python/exercice-04-requetes-operateurs",
+      "title": "Exercices — Requêtes avancées",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/correction-04-requetes-operateurs",
+      "href": "/formations/fr-mongodb-python/correction-04-requetes-operateurs",
+      "title": "Correction — Requêtes avancées",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/module-05-modelisation",
+      "href": "/formations/fr-mongodb-python/module-05-modelisation",
+      "title": "Module 5 — Modélisation de données MongoDB",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/exercice-05-modelisation",
+      "href": "/formations/fr-mongodb-python/exercice-05-modelisation",
+      "title": "Exercices — Modélisation MongoDB",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/correction-05-modelisation",
+      "href": "/formations/fr-mongodb-python/correction-05-modelisation",
+      "title": "Correction — Modélisation MongoDB",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/module-06-aggregation",
+      "href": "/formations/fr-mongodb-python/module-06-aggregation",
+      "title": "Module 6 — Pipeline d'agrégation",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/exercice-06-aggregation",
+      "href": "/formations/fr-mongodb-python/exercice-06-aggregation",
+      "title": "Exercices — Pipeline d'agrégation",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/correction-06-aggregation",
+      "href": "/formations/fr-mongodb-python/correction-06-aggregation",
+      "title": "Correction — Pipeline d'agrégation",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/module-07-indexation",
+      "href": "/formations/fr-mongodb-python/module-07-indexation",
+      "title": "Module 7 — Indexation, performances et bonnes pratiques",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/exercice-07-indexation",
+      "href": "/formations/fr-mongodb-python/exercice-07-indexation",
+      "title": "Exercices — Indexation et performances",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/correction-07-indexation",
+      "href": "/formations/fr-mongodb-python/correction-07-indexation",
+      "title": "Correction — Indexation et performances",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/module-08-projet-integrateur",
+      "href": "/formations/fr-mongodb-python/module-08-projet-integrateur",
+      "title": "Module 8 — Projet intégrateur StreamCart",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/exercice-08-projet-integrateur",
+      "href": "/formations/fr-mongodb-python/exercice-08-projet-integrateur",
+      "title": "Exercices — Projet intégrateur StreamCart",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-mongodb-python/correction-08-projet-integrateur",
+      "href": "/formations/fr-mongodb-python/correction-08-projet-integrateur",
+      "title": "Correction — Projet intégrateur StreamCart",
+      "isPublished": true
+    }
+  ]
+}

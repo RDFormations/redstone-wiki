@@ -1,0 +1,72 @@
+{
+  "slug": "en-quiris-admin-m365",
+  "lang": "en",
+  "base_slug": "quiris-admin-m365",
+  "title": "Administration Microsoft 365 (English)",
+  "client": "Quiris",
+  "portalUrl": "https://formation.redstoneformations.fr/formations/en-quiris-admin-m365",
+  "stagiaireUrl": "https://formation.redstoneformations.fr/en/formations/en-quiris-admin-m365/stagiaire",
+  "welcome": "Welcome! Find course materials, attendance and useful links here.",
+  "dates": {
+    "start": "2026-04-14",
+    "end": "2026-04-16"
+  },
+  "location": "Saint-Herblain",
+  "modality": "Présentiel",
+  "reference": "93223",
+  "trainer": "Rayan Mechety — RedStone Formations",
+  "links": [
+    {
+      "id": "support",
+      "label": "Support de cours",
+      "description": "Modules, exercices, corrections et annexes",
+      "url": "https://formation.redstoneformations.fr/formations/en-quiris-admin-m365",
+      "icon": "mdi-book-open-page-variant",
+      "primary": true
+    },
+    {
+      "id": "emargement",
+      "label": "Émargement",
+      "description": "Signature obligatoire — une fois par demi-journée",
+      "url": "",
+      "icon": "mdi-clipboard-check-outline",
+      "primary": true
+    },
+    {
+      "id": "teams",
+      "label": "Rejoindre la classe Teams",
+      "description": "Visioconférence de la session",
+      "url": "",
+      "icon": "mdi-microsoft-teams",
+      "primary": true
+    },
+    {
+      "id": "lab-complet",
+      "label": "Télécharger le lab complet",
+      "description": "Exercices PowerShell et données",
+      "url": "https://formation.redstoneformations.fr/labs/quiris-admin-m365-lab-complet.zip",
+      "icon": "mdi-folder-zip-outline",
+      "external": true
+    },
+    {
+      "id": "contact",
+      "label": "Contacter RedStone",
+      "description": "Une question sur la formation ?",
+      "url": "mailto:contact@redstoneformations.fr",
+      "icon": "mdi-email-outline"
+    }
+  ],
+  "labs": [
+    {
+      "id": "lab-complet",
+      "label": "Télécharger le lab complet",
+      "url": "https://formation.redstoneformations.fr/labs/quiris-admin-m365-lab-complet.zip"
+    },
+    {
+      "id": "lab-jour-01",
+      "label": "Lab Jour 1",
+      "url": "https://formation.redstoneformations.fr/labs/quiris-admin-m365-lab-jour-01.zip"
+    }
+  ],
+  "qrSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"205\" height=\"205\" class=\"rs-qr-svg\"><path transform=\"scale(5)\" class=\"qrline\" stroke=\"#000\" d=\"M2 2.5h7m3 0h5m1 0h2m1 0h2m2 0h1m1 0h2m1 0h1m1 0h7m-37 1h1m5 0h1m2 0h2m1 0h3m2 0h1m2 0h1m1 0h1m2 0h4m1 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h2m3 0h1m1 0h1m4 0h2m2 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m2 0h1m4 0h2m4 0h6m2 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h4m2 0h3m2 0h1m4 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h1m1 0h1m2 0h2m5 0h2m4 0h3m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-29 1h1m2 0h1m4 0h1m1 0h1m2 0h3m2 0h2m-28 1h1m1 0h5m5 0h1m4 0h1m1 0h2m1 0h5m1 0h1m1 0h5m-33 1h2m5 0h4m1 0h2m1 0h5m1 0h1m1 0h1m2 0h1m2 0h1m2 0h2m-36 1h2m3 0h3m1 0h2m4 0h3m2 0h3m1 0h9m1 0h3m-36 1h1m1 0h1m6 0h2m1 0h4m1 0h5m4 0h2m2 0h2m3 0h1m-37 1h3m2 0h2m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m2 0h1m1 0h2m3 0h2m1 0h1m1 0h3m-37 1h3m2 0h1m1 0h3m4 0h1m1 0h1m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m-30 1h2m2 0h2m5 0h4m1 0h1m3 0h1m1 0h1m2 0h1m1 0h1m1 0h3m1 0h2m-36 1h2m1 0h1m2 0h4m1 0h1m1 0h3m3 0h2m4 0h3m2 0h2m-30 1h1m1 0h4m2 0h2m1 0h2m1 0h1m6 0h4m1 0h2m1 0h1m1 0h3m-36 1h1m1 0h1m1 0h1m1 0h2m1 0h2m1 0h2m1 0h1m1 0h2m1 0h1m1 0h1m1 0h2m2 0h1m1 0h1m1 0h1m1 0h1m-36 1h2m4 0h1m1 0h1m1 0h6m1 0h2m1 0h1m1 0h1m2 0h3m1 0h1m1 0h1m1 0h4m-37 1h2m1 0h1m4 0h1m3 0h3m5 0h2m2 0h1m3 0h2m2 0h1m3 0h1m-37 1h1m1 0h5m2 0h4m2 0h1m1 0h2m1 0h1m1 0h1m2 0h2m1 0h3m1 0h3m-30 1h1m1 0h2m2 0h3m2 0h1m1 0h3m2 0h1m2 0h1m1 0h2m3 0h1m-33 1h2m1 0h1m1 0h1m1 0h1m6 0h3m2 0h3m2 0h1m1 0h2m1 0h4m1 0h2m-37 1h2m3 0h1m1 0h1m2 0h1m2 0h2m1 0h1m4 0h4m2 0h1m1 0h1m1 0h2m2 0h1m-36 1h1m3 0h3m1 0h3m5 0h2m2 0h1m1 0h1m1 0h4m2 0h1m1 0h1m1 0h2m-36 1h2m14 0h4m3 0h1m4 0h1m2 0h1m2 0h1m-35 1h1m2 0h4m5 0h6m4 0h1m2 0h1m1 0h2m1 0h1m4 0h2m-37 1h1m2 0h3m3 0h2m3 0h2m2 0h5m4 0h2m2 0h1m4 0h1m-37 1h1m2 0h4m1 0h1m1 0h2m5 0h1m4 0h2m1 0h12m-29 1h1m1 0h4m3 0h4m1 0h2m1 0h1m1 0h2m3 0h2m-34 1h7m2 0h2m4 0h1m2 0h1m1 0h3m1 0h1m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m-37 1h1m5 0h1m1 0h2m1 0h4m5 0h3m3 0h1m1 0h1m3 0h2m-34 1h1m1 0h3m1 0h1m1 0h4m1 0h1m1 0h1m1 0h1m1 0h2m3 0h9m1 0h2m-36 1h1m1 0h3m1 0h1m1 0h4m4 0h1m1 0h2m1 0h4m1 0h1m2 0h2m1 0h2m1 0h2m-37 1h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m1 0h3m2 0h1m5 0h1m1 0h1m6 0h2m-37 1h1m5 0h1m3 0h3m2 0h1m2 0h2m1 0h1m1 0h2m1 0h4m2 0h1m3 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h4m4 0h1m1 0h3m2 0h1m2 0h1m1 0h3\"/></svg>\n"
+}
