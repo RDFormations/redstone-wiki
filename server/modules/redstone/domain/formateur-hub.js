@@ -1,6 +1,7 @@
 const { pageKind } = require('./publish-policy')
 const { isoDate, siteBase } = require('./portal-hub')
 const { qrSvgForUrl } = require('./qr-svg')
+const { evaluateSessionIndicators } = require('./session-readiness')
 
 const MONDAY_BOARD_ID = process.env.MONDAY_MISSIONS_BOARD_ID || '18420737449'
 
@@ -201,7 +202,8 @@ const buildFormateurHub = (session, modules, options = {}) => {
     },
     labs: meta.labs || [],
     publication,
-    modules: moduleRows
+    modules: moduleRows,
+    indicators: evaluateSessionIndicators(session, modules)
   }
 }
 

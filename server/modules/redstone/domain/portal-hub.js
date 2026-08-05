@@ -15,6 +15,8 @@ const buildStagiaireLinks = (session, { siteHost, supportUrl }) => {
   const meta = session.metadata || {}
   const links = meta.links || {}
   const distributed = ['distributed', 'live', 'archived'].includes(session.state)
+  const locale = session.locale_default || 'fr'
+  const host = siteBase(siteHost)
 
   return [
     {
@@ -47,6 +49,13 @@ const buildStagiaireLinks = (session, { siteHost, supportUrl }) => {
       description: 'Question sur la formation',
       url: 'mailto:contact@redstoneformations.fr',
       icon: 'mdi-email-outline'
+    },
+    {
+      id: 'legal',
+      label: 'Mentions légales',
+      description: 'Politique de confidentialité et RGPD',
+      url: `${host}/${locale}/mentions-legales`,
+      icon: 'mdi-shield-account-outline'
     }
   ]
 }

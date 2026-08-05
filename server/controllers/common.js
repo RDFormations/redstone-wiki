@@ -5,6 +5,7 @@ const _ = require('lodash')
 const CleanCSS = require('clean-css')
 const moment = require('moment')
 const qs = require('querystring')
+const { allowFriendlyUnpublishedView } = require('../modules/redstone/domain/formation-page-access')
 
 /* global WIKI */
 
@@ -472,10 +473,12 @@ router.get('/*', async (req, res, next) => {
           pageIsPublished = moment(page.publishEndDate).isSameOrAfter()
         }
         if (!pageIsPublished && !effectivePermissions.pages.write) {
-          _.set(res.locals, 'pageMeta.title', 'Unauthorized')
-          return res.status(403).render('unauthorized', {
-            action: 'view'
-          })
+          if (!allowFriendlyUnpublishedView(pageArgs.path)) {
+            _.set(res.locals, 'pageMeta.title', 'Unauthorized')
+            return res.status(403).render('unauthorized', {
+              action: 'view'
+            })
+          }
         }
 
         // -> Build sidebar navigation

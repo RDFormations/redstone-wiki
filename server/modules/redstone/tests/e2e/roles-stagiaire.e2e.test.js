@@ -47,12 +47,12 @@ describeE2e('LMS — stagiaire sans compte (HTTP Wiki + contrat nav)', () => {
     await expectSiteStatus(formationPath(otherSlug), SITE.UNKNOWN)
   })
 
-  it('après distribute : M01 redirect racine + modules non publiés → 403', async () => {
+  it('après distribute : M01 redirect racine + modules non publiés → page friendly S02', async () => {
     await expectSiteStatus(formationPath(slug), SITE.REDIRECT_STAGIAIRE)
     await expectSiteStatus(formationPath(slug, 'stagiaire'), SITE.OK)
-    await expectSiteStatus(formationPath(slug, 'module-01-e2e'), SITE.FORBIDDEN)
-    await expectSiteStatus(formationPath(slug, 'exercice-01-e2e'), SITE.FORBIDDEN)
-    await expectSiteStatus(formationPath(slug, 'correction-01-e2e'), SITE.FORBIDDEN)
+    await expectSiteStatus(formationPath(slug, 'module-01-e2e'), SITE.OK)
+    await expectSiteStatus(formationPath(slug, 'exercice-01-e2e'), SITE.OK)
+    await expectSiteStatus(formationPath(slug, 'correction-01-e2e'), SITE.OK)
   })
 
   it('nav stagiaire : intro visible, modules restreints masqués avant publish', async () => {
@@ -75,9 +75,9 @@ describeE2e('LMS — stagiaire sans compte (HTTP Wiki + contrat nav)', () => {
     expect(nav.body.progress.published_modules).toBeGreaterThanOrEqual(1)
   })
 
-  it('exercice reste 403 tant que le formateur ne l’a pas publié', async () => {
-    await expectSiteStatus(formationPath(slug, 'exercice-01-e2e'), SITE.FORBIDDEN)
-    await expectSiteStatus(formationPath(slug, 'correction-01-e2e'), SITE.FORBIDDEN)
+  it('exercice reste en page friendly tant que le formateur ne l’a pas publié', async () => {
+    await expectSiteStatus(formationPath(slug, 'exercice-01-e2e'), SITE.OK)
+    await expectSiteStatus(formationPath(slug, 'correction-01-e2e'), SITE.OK)
   })
 
   it('publish exercice débloque uniquement l’exercice (correction séparée)', async () => {

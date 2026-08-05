@@ -34,6 +34,23 @@
             v-icon.mr-2(small) mdi-email-outline
             | Copier message convocation
 
+      v-alert.mb-4(
+        v-if='readinessAlert'
+        type='error'
+        prominent
+        border='left'
+        icon='mdi-alert-circle-outline'
+        ) {{ readinessAlertMessage }}
+
+      .rs-formateur-indicators.mb-4(v-if='sessionIndicators')
+        span.rs-formateur-indicator(
+          v-for='item in linkIndicators'
+          :key='item.id'
+          :class='indicatorClass(item)'
+          )
+          v-icon.mr-1(x-small) {{ item.icon }}
+          | {{ item.label }}
+
       v-row.rs-formateur-grid(dense)
         v-col(cols='12', md='4')
           v-card.rs-formateur-card.rs-formateur-qr-card(flat)
@@ -267,6 +284,23 @@ export default {
     activeLinks () {
       return (this.data && this.data.links) || []
     },
+    sessionIndicators () {
+      return this.data?.indicators || null
+    },
+    readinessAlert () {
+      return Boolean(this.sessionIndicators?.readiness?.alert)
+    },
+    readinessAlertMessage () {
+      return this.sessionIndicators?.readiness?.message || 'Support non prêt — contactez RedStone.'
+    },
+    linkIndicators () {
+      const ind = this.sessionIndicators
+      if (!ind) return []
+      return [
+        { id: 'teams', label: 'Teams', icon: 'mdi-microsoft-teams', ok: ind.teams?.ok },
+        { id: 'emargement', label: 'Émargement', icon: 'mdi-clipboard-check-outline', ok: ind.emargement?.ok }
+      ]
+    },
     convocationText () {
       if (!this.data) return ''
       const hub = `${window.location.origin}${this.localeHref(`/formations/${this.slug}/formateur`)}`
@@ -297,6 +331,9 @@ export default {
       if (href.startsWith('http') || href.startsWith('mailto:')) return href
       const path = href.startsWith('/') ? href.slice(1) : href
       return `/${this.locale}/${path}`
+    },
+    indicatorClass (item) {
+      return item.ok ? 'rs-formateur-indicator--ok' : 'rs-formateur-indicator--missing'
     },
     padNum (n) {
       return String(n).padStart(2, '0')

@@ -375,7 +375,7 @@
                     span {{$t('common:header.delete')}}
               span {{$t('common:page.editPage')}}
             v-alert.mb-5(
-              v-if='!displayPublished && !showFormateurHub && !showStagiaireHub'
+              v-if='!displayPublished && !showFormateurHub && !showStagiaireHub && !showUnpublishedFriendly'
               color='red'
               outlined
               icon='mdi-minus-circle'
@@ -396,7 +396,12 @@
               :slug='formationSlug'
               :locale='locale'
               )
-            .contents(ref='container', v-show='!showFormateurHub && !showStagiaireHub')
+            formation-unpublished-friendly(
+              v-if='showUnpublishedFriendly'
+              :slug='formationSlug'
+              :locale='locale'
+              )
+            .contents(ref='container', v-show='!showFormateurHub && !showStagiaireHub && !showUnpublishedFriendly')
               slot(name='contents')
             .comments-container#discussion(v-if='commentsEnabled && commentsPerms.read && !printView')
               .comments-header
@@ -434,6 +439,7 @@ import NavSidebar from './nav-sidebar.vue'
 import FormationNavSidebar from '../../../components/formation/formation-nav-sidebar.vue'
 import FormationFormateurHub from '../../../components/formation/formation-formateur-hub.vue'
 import FormationStagiaireHub from '../../../components/formation/formation-stagiaire-hub.vue'
+import FormationUnpublishedFriendly from '../../../components/formation/formation-unpublished-friendly.vue'
 import Prism from 'prismjs'
 import mermaid from 'mermaid'
 import { get, sync } from 'vuex-pathify'
@@ -522,6 +528,7 @@ export default {
     FormationNavSidebar,
     FormationFormateurHub,
     FormationStagiaireHub,
+    FormationUnpublishedFriendly,
     StatusIndicator
   },
   props: {
@@ -650,6 +657,14 @@ export default {
       const m = this.path.match(/^formations\/([^/]+)/)
       return m ? m[1] : ''
     },
+    formationStem () {
+      const parts = String(this.path || '').split('/')
+      if (parts[0] !== 'formations' || parts.length < 3) return ''
+      return parts[2]
+    },
+    isFormationRestrictedStem () {
+      return /^(module|exercice|correction)-/.test(this.formationStem)
+    },
     formationDrawerClass () {
       const classes = []
       if (this.isFormationPage) {
@@ -701,6 +716,14 @@ export default {
     },
     showStagiaireHub () {
       return this.isFormationPage && this.isStagiaireHubPath
+    },
+    showUnpublishedFriendly () {
+      return this.isFormationPage &&
+        this.isFormationRestrictedStem &&
+        !this.displayPublished &&
+        !this.canTogglePublish &&
+        !this.showFormateurHub &&
+        !this.showStagiaireHub
     },
     displayPublished () {
       if (this.localPublished !== null) return this.localPublished

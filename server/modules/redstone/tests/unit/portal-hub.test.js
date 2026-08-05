@@ -22,6 +22,7 @@ describe('portal-hub domain', () => {
     expect(hub.slug).toBe('fr-test')
     expect(hub.stagiaireUrl).toContain('/fr/formations/fr-test/stagiaire')
     expect(hub.links.some(l => l.id === 'teams' && l.url.includes('teams.example'))).toBe(true)
+    expect(hub.links.some(l => l.id === 'legal')).toBe(true)
     expect(hub.welcome).toContain('disponible')
     expect(JSON.stringify(hub)).not.toContain('monday_item_id')
   })

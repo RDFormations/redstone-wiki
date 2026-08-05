@@ -54,9 +54,9 @@ const createPublishService = ({
 
     const published = []
     const failed = []
-    for (const path of paths) {
+    const publishOne = async path => {
       const mod = modules.find(m => m.path === path || m.path === `${path}.md`)
-      if (!mod) continue
+      if (!mod) return null
 
       await contentRepo.updatePublished(mod.id, true)
 
@@ -66,8 +66,7 @@ const createPublishService = ({
           published_stagiaire: true
         })
         if (!projection.ok) {
-          failed.push({ path: mod.path, error: projection.error || 'projection_failed' })
-          continue
+          return { path: mod.path, error: projection.error || 'projection_failed' }
         }
         if (projection.page_id) {
           await contentRepo.updatePageId(mod.id, projection.page_id)
@@ -76,7 +75,17 @@ const createPublishService = ({
         await projectionService.setPagePublished(session, mod, true)
       }
 
-      published.push(mod.path)
+      return { path: mod.path, ok: true }
+    }
+
+    const outcomes = await Promise.all(paths.map(publishOne))
+    for (const outcome of outcomes) {
+      if (!outcome) continue
+      if (outcome.error) {
+        failed.push(outcome)
+      } else {
+        published.push(outcome.path)
+      }
     }
 
     if (failed.length) {

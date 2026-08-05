@@ -46,6 +46,8 @@ describe('formateur-hub domain', () => {
     expect(hub.schedule[0].modules[0].practice.correction.isPublished).toBe(false)
     expect(hub.monday.url).toContain('12345678')
     expect(hub.stagiaireQrSvg).toContain('<svg')
+    expect(hub.indicators.teams.ok).toBe(true)
+    expect(hub.indicators.emargement.ok).toBe(true)
     expect(JSON.stringify(hub)).not.toContain('monday_item_id')
   })
 
