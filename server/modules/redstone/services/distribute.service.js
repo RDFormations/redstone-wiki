@@ -93,9 +93,25 @@ const createDistributeService = ({
       return outcome
     }
 
-    if (projectionService.repairStaleRenders) {
-      const repaired = await projectionService.repairStaleRenders(session)
-      if (repaired) logger.info(`(REDSTONE/LMS) ${repaired} page(s) re-rendues pour ${session.slug}`)
+    if (projectionService.verifySessionRenders) {
+      const verify = await projectionService.verifySessionRenders(session)
+      if (!verify.ok) {
+        const outcome = await buildIncompleteOutcome({
+          sessionRepo,
+          sessionId,
+          session,
+          webhooks,
+          errors: verify.stale.map(row => row.path),
+          projection: [...projection, ...hubProjection],
+          errorCode: 'render_invalid',
+          errorMessage: `${verify.stale.length} page(s) sans rendu HTML valide après projection.`
+        })
+        if (mondayPush) mondayPush.schedulePush(sessionId)
+        return outcome
+      }
+      if (verify.repaired) {
+        logger.info(`(REDSTONE/LMS) ${verify.repaired} page(s) re-rendues pour ${session.slug}`)
+      }
     }
 
     const healthRows = toHealthRows(health.checks)

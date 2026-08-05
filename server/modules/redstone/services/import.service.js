@@ -5,6 +5,7 @@ const {
   defaultPublishedStagiaire
 } = require('../domain/publish-policy')
 const { normalizeModuleInput } = require('../domain/import-normalize')
+const { isLmsOwnedHubStem } = require('../domain/hub-shell')
 const { hashContent } = require('../domain/content-hash')
 const { runQaGate } = require('../domain/qa-gate')
 const { runHealthChecks } = require('../domain/health-checks')
@@ -38,6 +39,10 @@ const createImportService = ({
     for (const raw of rawModules) {
       const mod = normalizeModuleInput(raw)
       const stem = mod.path
+      if (isLmsOwnedHubStem(stem)) {
+        logger.info(`(REDSTONE/LMS) Hub ${stem} ignoré à l'import — créé par distribute (ensureHubPages).`)
+        continue
+      }
       const kind = pageKind(stem)
 
       let published = defaultPublishedStagiaire(stem, mod.frontmatter)

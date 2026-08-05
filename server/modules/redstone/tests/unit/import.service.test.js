@@ -72,4 +72,27 @@ describe('import.service', () => {
     expect(result.ok).toBe(false)
     expect(result.error.code).toBe('published_forbidden')
   })
+
+  it('ignore formateur et stagiaire — hubs gérés par distribute', async () => {
+    const mocks = createMocks()
+    const logger = { info: jest.fn() }
+    const service = createImportService({ ...mocks, logger })
+
+    const result = await service.importBulk('sess-1', {
+      modules: [
+        { path: '00-introduction.md', content: `---\ntitle: Intro\n---\n${longBody}` },
+        { path: 'module-01-a.md', content: `---\n---\n${longBody}` },
+        { path: 'exercice-01-a.md', content: `---\npaired: correction-01-a\n---\n${'x'.repeat(250)}` },
+        { path: 'correction-01-a.md', content: `---\npaired: exercice-01-a\n---\n${'x'.repeat(350)}` },
+        { path: 'formateur.md', content: `---\n---\n# Espace formateur\n${longBody}` },
+        { path: 'stagiaire.md', content: `---\n---\n# Liens session\n${longBody}` }
+      ]
+    })
+
+    expect(result.ok).toBe(true)
+    expect(mocks.modules.some(m => m.path === 'formateur')).toBe(false)
+    expect(mocks.modules.some(m => m.path === 'stagiaire')).toBe(false)
+    expect(logger.info).toHaveBeenCalledWith(expect.stringContaining('formateur'))
+    expect(logger.info).toHaveBeenCalledWith(expect.stringContaining('stagiaire'))
+  })
 })

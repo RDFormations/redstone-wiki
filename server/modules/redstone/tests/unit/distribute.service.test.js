@@ -49,7 +49,8 @@ const createMocks = (overrides = {}) => {
     ensureHubPages: jest.fn().mockResolvedValue([
       { ok: true, path: 'stagiaire', page_id: 201 },
       { ok: true, path: 'formateur', page_id: 202 }
-    ])
+    ]),
+    verifySessionRenders: jest.fn().mockResolvedValue({ ok: true, stale: [], repaired: 0 })
   }
   const guestAccess = {
     ensureGuestFormationAccess: jest.fn().mockResolvedValue({ ok: true, created: true })
@@ -117,6 +118,32 @@ describe('distribute.service', () => {
     expect(mocks.webhooks.emit).toHaveBeenCalledWith(
       WEBHOOK_EVENTS.SESSION_DISTRIBUTED,
       expect.objectContaining({ slug: 'test-slug', distributed: true })
+    )
+  })
+
+  it('bloque si rendus HTML invalides après projection', async () => {
+    const mocks = createMocks({
+      projectionService: {
+        projectSession: jest.fn().mockResolvedValue([
+          { ok: true, path: '00-introduction', page_id: 101 }
+        ]),
+        ensureHubPages: jest.fn().mockResolvedValue([
+          { ok: true, path: 'formateur', page_id: 202 }
+        ]),
+        verifySessionRenders: jest.fn().mockResolvedValue({
+          ok: false,
+          stale: [{ path: 'formations/test-slug/formateur', render: '' }],
+          repaired: 1
+        })
+      }
+    })
+    const svc = createDistributeService(mocks)
+    const result = await svc.distribute('sess-1')
+    expect(result.ok).toBe(false)
+    expect(result.error.code).toBe('render_invalid')
+    expect(mocks.webhooks.emit).toHaveBeenCalledWith(
+      WEBHOOK_EVENTS.SESSION_INCOMPLETE,
+      expect.objectContaining({ session_id: 'sess-1' })
     )
   })
 })

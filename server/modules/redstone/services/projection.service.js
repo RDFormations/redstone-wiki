@@ -3,6 +3,7 @@
 const _ = require('lodash')
 const { DEFAULT_EDITOR_KEY, resolveContentType, resolveFromWikiEditors } = require('../domain/wiki-editor')
 const { isStaleMarkdownRender } = require('../domain/wiki-render')
+const { hubBodyMarkdown } = require('../domain/hub-shell')
 
 /**
  * F02 — projection rs_content_modules → table Wiki pages
@@ -19,6 +20,17 @@ const createProjectionService = ({ knex, logger = console }) => {
     await WIKI.models.pages.renderPage(page)
     await WIKI.models.pages.deletePageFromCache(page.hash)
     WIKI.events.outbound.emit('deletePageFromCache', page.hash)
+  }
+
+  const fetchPageRow = async (pagePath, locale) =>
+    knex('pages').where({ path: pagePath, localeCode: locale }).first()
+
+  const assertValidRender = async (pagePath, locale) => {
+    const row = await fetchPageRow(pagePath, locale)
+    if (!row || isStaleMarkdownRender(row)) {
+      throw new Error(`Rendu HTML invalide pour ${pagePath}`)
+    }
+    return row
   }
 
   const contentTypeForEditor = editorKey => {
@@ -63,6 +75,7 @@ const createProjectionService = ({ knex, logger = console }) => {
       })
       if (page) {
         await renderAndInvalidate(page)
+        await assertValidRender(pagePath, locale)
       }
       return existing.id
     }
@@ -97,6 +110,7 @@ const createProjectionService = ({ knex, logger = console }) => {
     })
     if (page) {
       await renderAndInvalidate(page)
+      await assertValidRender(pagePath, locale)
       await WIKI.models.pages.rebuildTree()
     }
     return created?.id || null
@@ -124,9 +138,13 @@ const createProjectionService = ({ knex, logger = console }) => {
     return true
   }
 
-  const repairStaleRenders = async session => {
+  const listSessionPageRows = async session => {
     const prefix = `formations/${session.slug}`
-    const rows = await knex('pages').where('path', 'like', `${prefix}%`)
+    return knex('pages').where('path', 'like', `${prefix}%`).select('*')
+  }
+
+  const repairStaleRenders = async session => {
+    const rows = await listSessionPageRows(session)
     let repaired = 0
     const authorId = await getAdminUserId()
 
@@ -135,6 +153,17 @@ const createProjectionService = ({ knex, logger = console }) => {
       if (await reRenderRow(row, authorId)) repaired += 1
     }
     return repaired
+  }
+
+  const verifySessionRenders = async session => {
+    let rows = await listSessionPageRows(session)
+    let stale = rows.filter(isStaleMarkdownRender)
+    if (!stale.length) return { ok: true, stale: [], repaired: 0 }
+
+    const repaired = await repairStaleRenders(session)
+    rows = await listSessionPageRows(session)
+    stale = rows.filter(isStaleMarkdownRender)
+    return { ok: stale.length === 0, stale, repaired }
   }
 
   const repairAllStaleFormationRenders = async ({ limit } = {}) => {
@@ -174,6 +203,7 @@ const createProjectionService = ({ knex, logger = console }) => {
     },
 
     repairStaleRenders,
+    verifySessionRenders,
     repairAllStaleFormationRenders,
 
     async setPagePublished(session, mod, published) {
@@ -193,13 +223,13 @@ const createProjectionService = ({ knex, logger = console }) => {
         {
           path: 'stagiaire',
           title: 'Liens session',
-          body_md: '<!-- hub stagiaire S01 -->',
+          body_md: hubBodyMarkdown('stagiaire', session),
           published_stagiaire: true
         },
         {
           path: 'formateur',
           title: 'Espace formateur',
-          body_md: '<!-- hub formateur T01 -->',
+          body_md: hubBodyMarkdown('formateur', session),
           published_stagiaire: false
         }
       ]

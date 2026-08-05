@@ -130,9 +130,6 @@ module.exports = {
       webhooks.processPending(50).catch(err => {
         WIKI.logger.warn(`(REDSTONE/LMS) Webhook pending replay: ${err.message}`)
       })
-      projection.repairAllStaleFormationRenders().catch(err => {
-        WIKI.logger.warn(`(REDSTONE/LMS) Repair renders formation: ${err.message}`)
-      })
     })
 
     WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F13, M03, S01/M01, T01, E01/E02, O02/O03, T04')
