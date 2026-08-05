@@ -42,6 +42,34 @@ Sur GitHub : **Settings → General → check "fork"** si créé via « Fork » 
 
 ## Développement local
 
+### Itération rapide (recommandé)
+
+| Besoin | Commande | Délai typique |
+|--------|----------|---------------|
+| **API LMS** (reload auto, sans webpack) | `bash scripts/local-dev-api.sh` | **~10 s** démarrage, **~2 s** par modif |
+| **Dev complet** (API + UI, reload auto) | `bash scripts/local-dev.sh` | 1ère fois ~3–6 min, puis **2–5 s** par modif |
+| **API seule** (conteneur prod) | `bash scripts/local-reload-server.sh` | **~5–10 s** |
+| **Tests unitaires LMS** (hors Docker) | `npm run test:redstone` | **< 5 s** |
+| **Image prod** (smoke CI / prod-like) | `bash scripts/local-up.sh` | rebuild image ~6 min |
+
+```bash
+# Mode dev API — recommandé pour server/modules/redstone/
+bash scripts/local-dev-api.sh
+
+# Mode dev complet — code monté, yarn dev (chokidar + webpack HMR)
+bash scripts/local-dev.sh
+# → modifier server/modules/redstone/ → redémarrage auto
+# → logs : docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f wiki-dev
+
+# Revenir au conteneur prod (image release)
+bash scripts/local-dev-stop.sh
+
+# Variante rapide API sans mode dev (sync server/ + restart)
+bash scripts/local-reload-server.sh
+```
+
+### Stack prod-like (première install / CI)
+
 ```bash
 # Build image
 docker build -t redstone-wiki:2.5-redstone --target release .

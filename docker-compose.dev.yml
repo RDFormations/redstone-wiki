@@ -1,0 +1,71 @@
+# Dev local — code monté en volume, rechargement auto (yarn dev).
+# Usage :
+#   bash scripts/local-dev-api.sh   # API LMS (~10 s démarrage, node --watch)
+#   bash scripts/local-dev.sh       # UI + API (webpack, ~3 min 1ère fois)
+services:
+  wiki-dev-api:
+    image: redstone-wiki:2.5-redstone
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: wikijs
+      DB_PASS: ${POSTGRES_PASSWORD}
+      DB_NAME: wiki
+      REDSTONE_LMS_AGENT_TOKEN: ${REDSTONE_LMS_AGENT_TOKEN:-}
+      REDSTONE_LMS_FORMATEUR_TOKEN: ${REDSTONE_LMS_FORMATEUR_TOKEN:-}
+      REDSTONE_LMS_OPS_TOKEN: ${REDSTONE_LMS_OPS_TOKEN:-}
+    volumes:
+      - ${REDSTONE_WIKI_ROOT}/server:/wiki/server
+      - ./data/wiki:/wiki/data
+      - ${RDF_FORMATIONS_ROOT:-/home/ubuntu/RDF-formations}:/repo:ro
+    command: ["node", "--watch", "--no-deprecation", "server"]
+    restart: unless-stopped
+
+  wiki-dev:
+    build:
+      context: ${REDSTONE_WIKI_ROOT}
+      dockerfile: Dockerfile
+      target: deps
+    image: redstone-wiki:deps
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: wikijs
+      DB_PASS: ${POSTGRES_PASSWORD}
+      DB_NAME: wiki
+      NODE_ENV: development
+      CONFIG_FILE: dev/build/config.yml
+      REDSTONE_LMS_AGENT_TOKEN: ${REDSTONE_LMS_AGENT_TOKEN:-}
+      REDSTONE_LMS_FORMATEUR_TOKEN: ${REDSTONE_LMS_FORMATEUR_TOKEN:-}
+      REDSTONE_LMS_OPS_TOKEN: ${REDSTONE_LMS_OPS_TOKEN:-}
+    volumes:
+      - ${REDSTONE_WIKI_ROOT}:/wiki
+      - wiki-node-modules:/wiki/node_modules
+      - ./data/wiki:/wiki/data
+      - ${RDF_FORMATIONS_ROOT:-/home/ubuntu/RDF-formations}:/repo:ro
+    working_dir: /wiki
+    command:
+      - sh
+      - -ec
+      - |
+        if [ ! -x node_modules/.bin/cross-env ]; then
+          echo '==> yarn install (première fois, volume node_modules vide)...'
+          yarn install --frozen-lockfile --non-interactive
+        fi
+        exec yarn dev
+    restart: unless-stopped
+
+volumes:
+  wiki-node-modules:

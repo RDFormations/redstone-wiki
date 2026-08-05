@@ -34,6 +34,9 @@ services:
       DB_USER: wikijs
       DB_PASS: ${POSTGRES_PASSWORD}
       DB_NAME: wiki
+      REDSTONE_LMS_AGENT_TOKEN: ${REDSTONE_LMS_AGENT_TOKEN:-}
+      REDSTONE_LMS_FORMATEUR_TOKEN: ${REDSTONE_LMS_FORMATEUR_TOKEN:-}
+      REDSTONE_LMS_OPS_TOKEN: ${REDSTONE_LMS_OPS_TOKEN:-}
     volumes:
       - ./data/wiki:/wiki/data
       - ${RDF_FORMATIONS_ROOT:-/home/ubuntu/RDF-formations}:/repo:ro
