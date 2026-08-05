@@ -1,56 +1,81 @@
-# redstone-wiki
+# RedStone Formations — Wiki.js fork
 
-Fork de [Requarks/wiki](https://github.com/Requarks/wiki) **v2.5.314** avec le thème et les composants **RedStone Formations** (portail `formation.redstoneformations.fr`).
+**Dépôt public** : fork de [Requarks/wiki](https://github.com/Requarks/wiki) **v2.5.314** avec les customisations portail `formation.redstoneformations.fr`.
 
-Upstream : Wiki.js 2.5.314 · customisations : client Vue/SCSS (formation sidebar, hubs formateur/stagiaire, callouts Obsidian).
+Travaillez **directement sur la source** dans ce repo (plus d’overlay `wiki-custom/` copié au build Docker).
 
-## Contenu RedStone (vs upstream)
+| | |
+|--|--|
+| **Upstream** | https://github.com/Requarks/wiki |
+| **Base tag** | `v2.5.314` |
+| **Branche RedStone** | `main` (ou `redstone/2.5.314`) |
+| **Image** | `redstone-wiki:2.5-redstone` |
 
-| Zone | Fichiers |
-|------|----------|
-| Shell page | `client/themes/default/components/page.vue` |
+## Customisations RedStone (fichiers à connaître pour merges upstream)
+
+| Zone | Chemins |
+|------|---------|
+| Page shell | `client/themes/default/components/page.vue` |
 | Header | `client/components/common/nav-header.vue` |
 | Bootstrap | `client/index-app.js`, `client/client-app.js` |
-| Formation | `client/components/formation/*.vue` |
-| Thème | `client/themes/default/scss/redstone.scss` |
-| Callouts | `client/helpers/callouts.js` |
-| Assets statiques | `client/static/nav`, `formateur`, `stagiaires`, favicons, logo |
+| Formation UI | `client/components/formation/*.vue` |
+| Thème SCSS | `client/themes/default/scss/redstone.scss` |
+| Callouts Obsidian | `client/helpers/callouts.js` |
+| Assets session | `client/static/nav/`, `formateur/`, `stagiaires/`, `svg/`, favicons |
 
-Les JSON `nav/` / `formateur/` / `stagiaires/` sont générés par `CursorRDF` (`build-formation-nav.py`, `build-formation-formateur.py`) — copiés dans ce repo lors des releases portail.
+JSON `nav` / `formateur` / `stagiaires` : générés par [`CursorRDF`](https://github.com/RDFormations/CursorRDF) (`build-formation-nav.py`, `build-formation-formateur.py`). Sync vers ce repo via `scripts/sync-from-cursorrdf.sh` ou pipeline release.
 
-## Build image
+## Première publication GitHub (org RDFormations)
 
 ```bash
+# 1. Créer le repo public (GitHub UI ou CLI)
+gh repo create RDFormations/redstone-wiki --public --description "Wiki.js fork RedStone Formations v2.5.314"
+
+# 2. Pousser ce clone
+git remote set-url origin git@github.com:RDFormations/redstone-wiki.git
+git push -u origin main
+git push origin redstone/2.5.314  # optionnel, branche versionnée
+```
+
+Sur GitHub : **Settings → General → check "fork"** si créé via « Fork » depuis Requarks/wiki ; sinon lier manuellement avec remote `upstream`.
+
+## Développement local
+
+```bash
+# Build image
 docker build -t redstone-wiki:2.5-redstone --target release .
+
+# Stack locale
+cp .env.example .env
+docker compose up -d --build
+bash scripts/smoke-test.sh
 ```
 
-## Test local (smoke)
+## Sync overlay depuis CursorRDF (transition)
+
+Pendant la migration depuis `infra/formation-portal/wiki-custom/` :
 
 ```bash
-cp .env.example .env
-docker compose build wiki
-docker compose up -d
-# Premier accès : http://127.0.0.1:3000 — assistant Wiki.js
-bash scripts/smoke-test.sh
-docker compose down
+export CURSOR_RDF_ROOT=/path/to/CursorRDF
+./scripts/sync-from-cursorrdf.sh
+git diff --stat
 ```
 
-## Branches
-
-| Branche | Base |
-|---------|------|
-| `redstone/2.5.314` | Wiki.js v2.5.314 + RedStone |
-
-## Repo liés
-
-- [`RDFormations/CursorRDF`](https://github.com/RDFormations/CursorRDF) — scripts sync, overlay source (`infra/formation-portal/wiki-custom/`)
-- [`RDFormations/RDF-formations`](https://github.com/RDFormations/RDF-formations) — contenu cours
-
-## Upgrade upstream
+## Upgrade Wiki.js upstream
 
 ```bash
 git fetch upstream
-git merge v2.5.315  # après ajout remote upstream Requarks/wiki
+git checkout -b upgrade/v2.5.315 upstream/v2.5.315   # quand tag existe
+# merger ou cherry-pick commits RedStone depuis main
+# résoudre conflits sur les fichiers listés ci-dessus
+yarn build && docker build ...
 ```
 
-Résoudre les conflits sur les fichiers client listés ci-dessus.
+## Repos liés
+
+- [`RDFormations/CursorRDF`](https://github.com/RDFormations/CursorRDF) — sync contenu, Monday, agents
+- [`RDFormations/RDF-formations`](https://github.com/RDFormations/RDF-formations) — Markdown cours
+
+---
+
+Le README principal Wiki.js (`README.md`) reste celui d’upstream ; ce fichier documente la couche RedStone.

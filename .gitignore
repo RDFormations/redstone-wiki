@@ -47,3 +47,8 @@ test-results/
 
 # Localization Resources
 /server/locales/**/*.yml
+
+# RedStone local compose
+data/
+build/
+.env
