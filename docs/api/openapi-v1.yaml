@@ -1,0 +1,163 @@
+openapi: 3.0.3
+info:
+  title: LMS RedStone API
+  version: 1.0.0
+  description: API métier formation RedStone (fork Wiki.js)
+
+servers:
+  - url: https://formation.redstoneformations.fr/api/v1
+    description: Production
+  - url: http://localhost:3000/api/v1
+    description: Local
+
+security:
+  - bearerAuth: []
+
+paths:
+  /sessions:
+    post:
+      summary: Créer une session (F01)
+      operationId: createSession
+      tags: [Sessions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionCreate'
+      responses:
+        '201':
+          description: Session créée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session:
+                    $ref: '#/components/schemas/Session'
+        '409':
+          description: Slug ou monday_item_id déjà utilisé
+        '422':
+          description: Validation échouée
+    get:
+      summary: Lister les sessions (F01 / F13)
+      operationId: listSessions
+      tags: [Sessions]
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 50, maximum: 100 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: q
+          in: query
+          schema: { type: string }
+          description: Recherche slug, client, titre
+      responses:
+        '200':
+          description: Liste paginée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Session'
+                  total: { type: integer }
+                  limit: { type: integer }
+                  offset: { type: integer }
+
+  /sessions/{id}:
+    get:
+      summary: Lire une session par UUID
+      operationId: getSessionById
+      tags: [Sessions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Session trouvée
+        '404':
+          description: Session introuvable
+
+  /sessions/by-slug/{slug}:
+    get:
+      summary: Lire une session par slug
+      operationId: getSessionBySlug
+      tags: [Sessions]
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Session trouvée
+        '404':
+          description: Session introuvable
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Token agent-bot (REDSTONE_LMS_AGENT_TOKEN)
+
+  schemas:
+    SessionCreate:
+      type: object
+      required: [slug, monday_item_id, client, title]
+      properties:
+        slug:
+          type: string
+          example: rdf-test-e2e-pipeline-auto-2026-08-04
+        monday_item_id:
+          type: integer
+          example: 12718272029
+        client:
+          type: string
+          example: RDF
+        ref_client:
+          type: string
+          example: TEST-E2E-2026-08
+        title:
+          type: string
+        locale_default:
+          type: string
+          default: fr
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+
+    Session:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string }
+        monday_item_id: { type: integer }
+        client: { type: string }
+        ref_client: { type: string, nullable: true }
+        title: { type: string }
+        locale_default: { type: string }
+        state:
+          type: string
+          enum: [draft, draft_ready, distributed, incomplete, live, archived]
+        starts_at: { type: string, format: date-time, nullable: true }
+        ends_at: { type: string, format: date-time, nullable: true }
+        wiki_path: { type: string }
+        metadata: { type: object }
+        content_ready_at: { type: string, format: date-time, nullable: true }
+        distributed_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }

@@ -19,6 +19,7 @@ Travaillez **directement sur la source** dans ce repo (plus d’overlay `wiki-cu
 | Header | `client/components/common/nav-header.vue` |
 | Bootstrap | `client/index-app.js`, `client/client-app.js` |
 | Formation UI | `client/components/formation/*.vue` |
+| **LMS API (F01+)** | `server/modules/redstone/`, `server/controllers/redstone.js`, `server/core/redstone.js` |
 | Thème SCSS | `client/themes/default/scss/redstone.scss` |
 | Callouts Obsidian | `client/helpers/callouts.js` |
 | Assets session | `client/static/nav/`, `formateur/`, `stagiaires/`, `svg/`, favicons |
@@ -59,6 +60,21 @@ bash scripts/smoke-test.sh
 ```
 
 Voir `AGENTS.md` pour le workflow agents / CursorRDF.
+
+## API LMS RedStone (F01 — registre sessions)
+
+Base : `/api/v1` — auth `Authorization: Bearer $REDSTONE_LMS_AGENT_TOKEN`
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| `POST` | `/sessions` | Créer une session (`draft`) |
+| `GET` | `/sessions` | Lister (pagination, `?q=`) |
+| `GET` | `/sessions/{id}` | Lire par UUID |
+| `GET` | `/sessions/by-slug/{slug}` | Lire par slug |
+
+OpenAPI : `docs/api/openapi-v1.yaml` — tests : `npm run test:redstone`
+
+Migration : `server/db/migrations/2.5.129.js` → table `rs_sessions`
 
 ## Upgrade Wiki.js upstream
 

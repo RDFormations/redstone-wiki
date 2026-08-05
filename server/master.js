@@ -21,6 +21,7 @@ module.exports = async () => {
   WIKI.lang = require('./core/localization').init()
   WIKI.mail = require('./core/mail').init()
   WIKI.system = require('./core/system').init()
+  await require('./core/redstone').init()
 
   // ----------------------------------------
   // Load middlewares
@@ -164,6 +165,7 @@ module.exports = async () => {
 
   app.use('/', ctrl.auth)
   app.use('/', ctrl.upload)
+  app.use('/api/v1', ctrl.redstone)
   app.use('/', ctrl.common)
 
   // ----------------------------------------

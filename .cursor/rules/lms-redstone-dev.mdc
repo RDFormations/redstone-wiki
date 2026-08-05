@@ -1,0 +1,123 @@
+---
+description: >-
+  Clean code et découpage — développement LMS RedStone (fork Wiki.js).
+globs: server/modules/redstone/**,client/components/formation/**,tests/**
+alwaysApply: false
+---
+
+# LMS RedStone — clean code & découpage
+
+Référence : [04-architecture-lms-fork-v1.md](../En%20Cours/formations/architecture/04-architecture-lms-fork-v1.md) · CDC [DEV-RULES.md](../En%20Cours/formations/cdc-lms-fork/DEV-RULES.md)
+
+**Repo fork** : `RDFormations/redstone-wiki` — mêmes règles sur `server/modules/redstone/`, `client/components/formation/`, `tests/`.
+
+## Philosophie (réaliste)
+
+- Clean code **pragmatique** : lisibilité et maintenabilité > dogme du livre.
+- **YAGNI** : pas d'abstraction pour un seul cas d'usage.
+- **Une feature → tests profonds → feature suivante** (CDC §9).
+- Préférer **fonctions pures** et **jump tables** pour règles métier (états, policy, health).
+
+## Découpage en couches (Node — `server/modules/redstone/`)
+
+```text
+api/v1/*.router.js     → HTTP : parse, auth, status code, appel service
+services/*.service.js  → orchestration, transactions DB, appels externes
+domain/*.js            → logique pure (sans import DB/HTTP)
+db/migrations/         → schéma uniquement
+```
+
+| Couche | Fait | Ne fait pas |
+|--------|------|-------------|
+| **Router** | Validation entrée, mapping erreur → HTTP | Règles métier, SQL |
+| **Service** | Enchaîner domain + persistance + webhooks | `if` métier complexes (→ domain) |
+| **Domain** | Transitions d'état, QA, paires exo/correction | `req`/`res`, Knex |
+
+**Interdit** : logique formation dans le core Wiki (`page.vue`, `server/core/`). Dernier recours → `patches/` + `UPGRADE.md`.
+
+## Taille et responsabilité
+
+| Cible | Limite indicative |
+|-------|-------------------|
+| Fichier domain/service | ~150 lignes — au-delà, découper |
+| Composant Vue formation | **< 300 lignes** (F06) |
+| Fonction | ~40 lignes — extraire si plus lisible en 2 fonctions nommées |
+| Router | 1 ressource par fichier (`sessions.router.js`) |
+
+Un fichier = **une raison de changer** (session, import, publish…).
+
+## Nommage
+
+- **Métier** : `distributeSession`, `publishedStagiaire`, `draftReady` — pas `syncWiki`, `gqlPush`.
+- Messages utilisateur et erreurs API en **français métier** (T5 CDC).
+- Tables préfixe `rs_` ; constantes d'état en `SCREAMING_SNAKE` dans `domain/session-state.js`.
+
+## Jump tables (états, policy, health)
+
+```javascript
+// ✅ Transitions explicites — pas de if/else en cascade
+const TRANSITIONS = {
+  draft: { import_ok: 'draft_ready', import_fail: 'incomplete' },
+  draft_ready: { distribute_ok: 'distributed', distribute_fail: 'incomplete' },
+};
+
+const transition = (from, event) => TRANSITIONS[from]?.[event] ?? null;
+```
+
+Même pattern pour `publish-policy.js`, `health-checks.js`, `pair-rules.js`.
+
+## Dépendances
+
+- Services reçoivent `{ db, logger, config }` — pas de singletons cachés.
+- Domain **sans effets de bord** : entrée → sortie, testable sans DB.
+- Pas d'appel service → service : extraire en domain ou composer dans un orchestrateur.
+
+## Vue (`client/components/formation/`)
+
+- **Smart** (cockpit, admin) : fetch API, état local minimal.
+- **Dumb** (indicateurs, tuiles) : props in, events out.
+- Pas de règles métier dans le template — computed / domain JS partagé si besoin.
+
+## Python (intégration CursorRDF)
+
+- `lms_api.py` = **client HTTP mince** (pas de logique distribute/QA dupliquée).
+- QA et policy restent **source de vérité Node** ; Python compare en tests de parité si besoin.
+
+## Tests (obligatoire avant feature suivante)
+
+| Niveau | Quoi tester |
+|--------|-------------|
+| Unit (domain) | Transitions, paires R2, policy E02, hash idempotence |
+| Integration (service) | Import bulk, distribute, publish batch |
+| E2E | Parcours formateur → stagiaire (Playwright) |
+
+- Comportement observable, pas détail d'implémentation.
+- **Jamais** `|| true` sur tests formation (I03).
+- Fixture commune `TEST-E2E` pour parité Python ↔ Node (C02).
+
+## Anti-patterns à éviter
+
+```javascript
+// ❌ Router avec logique métier
+router.post('/distribute', async (req, res) => {
+  if (session.state === 'draft' && !hasIntro(modules)) { ... }
+});
+
+// ✅ Router délègue
+router.post('/distribute', async (req, res) => {
+  const result = await distributeService.run(req.params.id);
+  res.status(result.ok ? 200 : 422).json(result);
+});
+```
+
+- God object / fichier fourre-tout
+- Copier-coller depuis scripts legacy (`sync-formation-wiki.py`) sans passer par les couches
+- `published: true` contournable par agents (E02)
+- JSON nav/formateur commités dans `client/static/` (F05)
+
+## Avant chaque PR
+
+1. Scope minimal — une feature CDC (ex. F01).
+2. Tests ajoutés ou mis à jour pour cette feature.
+3. Pas de modification core Wiki hors `patches/` documenté.
+4. OpenAPI / commentaire route si nouvel endpoint.
