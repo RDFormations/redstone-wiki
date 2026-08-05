@@ -23,7 +23,7 @@ Travaillez **directement sur la source** dans ce repo (plus d’overlay `wiki-cu
 | Callouts Obsidian | `client/helpers/callouts.js` |
 | Assets session | `client/static/nav/`, `formateur/`, `stagiaires/`, `svg/`, favicons |
 
-JSON `nav` / `formateur` / `stagiaires` : générés par [`CursorRDF`](https://github.com/RDFormations/CursorRDF) (`build-formation-nav.py`, `build-formation-formateur.py`). Sync vers ce repo via `scripts/sync-from-cursorrdf.sh` ou pipeline release.
+JSON `nav` / `formateur` / `stagiaires` : générés par [`CursorRDF`](https://github.com/RDFormations/CursorRDF) (`build-formation-nav.py`, `build-formation-formateur.py`) **directement** dans `client/static/` (`scripts/wiki_static.py`).
 
 ## Première publication GitHub (org RDFormations)
 
@@ -51,15 +51,14 @@ docker compose up -d --build
 bash scripts/smoke-test.sh
 ```
 
-## Sync overlay depuis CursorRDF (transition)
-
-Pendant la migration depuis `infra/formation-portal/wiki-custom/` :
+## Scripts prod (VPS)
 
 ```bash
-export CURSOR_RDF_ROOT=/path/to/CursorRDF
-./scripts/sync-from-cursorrdf.sh
-git diff --stat
+./scripts/build-image.sh    # image + stack /opt/redstone-wiki
+./scripts/reload.sh         # itération webpack (~1–3 min)
 ```
+
+Voir `AGENTS.md` pour le workflow agents / CursorRDF.
 
 ## Upgrade Wiki.js upstream
 
