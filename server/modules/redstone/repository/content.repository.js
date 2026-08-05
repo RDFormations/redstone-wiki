@@ -105,6 +105,25 @@ const createContentRepository = knex => ({
       .count({ total: '*' })
       .first()
     return Number(row?.total || 0)
+  },
+
+  async moduleStatsBySessions(sessionIds = []) {
+    if (!sessionIds.length) return {}
+    const rows = await knex(TABLE_MODULES)
+      .whereIn('sessionId', sessionIds)
+      .where('kind', 'module')
+      .groupBy('sessionId')
+      .select('sessionId')
+      .select(
+        knex.raw('COUNT(*)::int as total_modules'),
+        knex.raw('SUM(CASE WHEN "publishedStagiaire" = true THEN 1 ELSE 0 END)::int as published_modules')
+      )
+    return Object.fromEntries(
+      rows.map(r => [
+        r.sessionId,
+        { total_modules: Number(r.total_modules || 0), published_modules: Number(r.published_modules || 0) }
+      ])
+    )
   }
 })
 

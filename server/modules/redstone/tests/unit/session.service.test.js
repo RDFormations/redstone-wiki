@@ -142,7 +142,13 @@ describe('session.service', () => {
       expect(repo.list).toHaveBeenCalledWith({
         limit: 100,
         offset: 0,
-        q: undefined
+        q: '',
+        state: null,
+        datePreset: 'all',
+        published: 'all',
+        terminated: 'all',
+        startsAfter: null,
+        startsBefore: null
       })
     })
   })

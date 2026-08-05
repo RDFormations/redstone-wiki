@@ -36,6 +36,7 @@ module.exports = {
     const { createGuestAccessService } = require(path.join(base, 'services/guest-access.service'))
     const { createHealthService } = require(path.join(base, 'services/health.service'))
     const { createContentNavService } = require(path.join(base, 'services/content-nav.service'))
+    const { createAdminSessionsService } = require(path.join(base, 'services/admin-sessions.service'))
     const { createPortalService } = require(path.join(base, 'services/portal.service'))
     const { fetchMissionItem } = require(path.join(base, 'infrastructure/monday-client'))
 
@@ -66,6 +67,7 @@ module.exports = {
       getSiteHost: () => WIKI.config?.host || process.env.WIKI_SITE_HOST || 'https://formation.redstoneformations.fr',
       logger: WIKI.logger
     })
+    const adminSessions = createAdminSessionsService({ sessionRepo, contentRepo, healthRepo })
 
     WIKI.redstone = {
       sessions: createSessionService({ repo: sessionRepo, logger: WIKI.logger }),
@@ -97,6 +99,7 @@ module.exports = {
       }),
       guestAccess,
       portal,
+      adminSessions,
       health,
       contentNav,
       publish: createPublishService({
@@ -116,7 +119,7 @@ module.exports = {
       })
     })
 
-    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F05, S01/M01, T01, E01/E02, M02, O02/O03, T04')
+    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F05, F13, S01/M01, T01, E01/E02, M02, O02/O03, T04')
   },
   validateLmsConfig
 }

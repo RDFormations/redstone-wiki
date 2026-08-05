@@ -1,4 +1,5 @@
 const { mergeSessionMetadata } = require('../domain/monday-metadata')
+const { applyDatePreset } = require('../domain/session-filters')
 
 const TABLE = 'rs_sessions'
 
@@ -67,7 +68,19 @@ const createSessionRepository = knex => ({
     return rowToSession(row)
   },
 
-  async list({ limit = 50, offset = 0, q = null } = {}) {
+  async list(filters = {}) {
+    const {
+      limit = 50,
+      offset = 0,
+      q = null,
+      state = null,
+      datePreset = 'all',
+      terminated = 'all',
+      published = 'all',
+      startsAfter = null,
+      startsBefore = null
+    } = filters
+
     let base = knex(TABLE)
 
     if (q && typeof q === 'string' && q.trim()) {
@@ -77,11 +90,67 @@ const createSessionRepository = knex => ({
           .whereRaw('LOWER(??) LIKE ?', ['slug', term])
           .orWhereRaw('LOWER(??) LIKE ?', ['client', term])
           .orWhereRaw('LOWER(??) LIKE ?', ['title', term])
+          .orWhereRaw('LOWER(??) LIKE ?', ['refClient', term])
+          .orWhereRaw('CAST(?? AS TEXT) LIKE ?', ['mondayItemId', term.replace(/%/g, '')])
       })
     }
 
+    if (state) base = base.where({ state })
+
+    if (terminated === 'yes') {
+      const today = new Date().toISOString().split('T')[0]
+      base = base.where(builder => {
+        builder.where('state', 'archived').orWhere('endsAt', '<', today)
+      })
+    } else if (terminated === 'no') {
+      const today = new Date().toISOString().split('T')[0]
+      base = base.whereNot('state', 'archived').where(builder => {
+        builder.whereNull('endsAt').orWhere('endsAt', '>=', today)
+      })
+    }
+
+    if (datePreset && datePreset !== 'all') {
+      base = applyDatePreset(base, datePreset, knex)
+    }
+    if (startsAfter) base = base.where('startsAt', '>=', startsAfter)
+    if (startsBefore) base = base.where('startsAt', '<=', startsBefore)
+
+    if (published !== 'all') {
+      const pubSub = knex('rs_content_modules')
+        .select('sessionId')
+        .select(
+          knex.raw('COUNT(*)::int as total_modules'),
+          knex.raw('SUM(CASE WHEN "publishedStagiaire" = true THEN 1 ELSE 0 END)::int as published_modules')
+        )
+        .where('kind', 'module')
+        .groupBy('sessionId')
+        .as('pub')
+
+      base = base.leftJoin(pubSub, 'pub.sessionId', `${TABLE}.id`)
+      if (published === 'none') {
+        base = base.whereRaw('COALESCE(pub.published_modules, 0) = 0')
+      } else if (published === 'any') {
+        base = base.whereRaw('COALESCE(pub.published_modules, 0) > 0')
+      } else if (published === 'partial') {
+        base = base
+          .whereRaw('COALESCE(pub.published_modules, 0) > 0')
+          .whereRaw('COALESCE(pub.published_modules, 0) < COALESCE(pub.total_modules, 0)')
+      } else if (published === 'all_published') {
+        base = base
+          .whereRaw('COALESCE(pub.total_modules, 0) > 0')
+          .whereRaw('COALESCE(pub.published_modules, 0) = COALESCE(pub.total_modules, 0)')
+      }
+    }
+
     const [rows, countRow] = await Promise.all([
-      base.clone().orderBy('startsAt', 'asc').orderBy('createdAt', 'desc').limit(limit).offset(offset),
+      base
+        .clone()
+        .select(`${TABLE}.*`)
+        .orderByRaw(`CASE WHEN ?? = 'incomplete' THEN 0 ELSE 1 END`, [`${TABLE}.state`])
+        .orderBy(`${TABLE}.startsAt`, 'asc')
+        .orderBy(`${TABLE}.createdAt`, 'desc')
+        .limit(limit)
+        .offset(offset),
       base.clone().count({ total: '*' }).first()
     ])
 

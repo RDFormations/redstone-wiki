@@ -1,6 +1,7 @@
 const crypto = require('crypto')
 const { validateCreatePayload, buildWikiPath } = require('../domain/session-validation')
 const { INITIAL_STATE } = require('../domain/session-state')
+const { parseSessionListFilters } = require('../domain/session-filters')
 const { enrichSessionStatus } = require('../domain/session-status')
 
 const DUPLICATE_MESSAGES = {
@@ -106,9 +107,8 @@ const createSessionService = ({ repo, logger = console }) => ({
   },
 
   async list(query = {}) {
-    const limit = Math.min(Math.max(Number.parseInt(query.limit, 10) || 50, 1), 100)
-    const offset = Math.max(Number.parseInt(query.offset, 10) || 0, 0)
-    const result = await repo.list({ limit, offset, q: query.q })
+    const filters = parseSessionListFilters(query)
+    const result = await repo.list(filters)
     return {
       ok: true,
       status: 200,

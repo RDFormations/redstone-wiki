@@ -61,6 +61,8 @@ module.exports = async () => {
       res.sendStatus(404)
     }
   })
+  const { createAssetAccessMiddleware } = require('./modules/redstone/api/middleware/enforce-asset-access')
+  app.use('/_assets', createAssetAccessMiddleware())
   app.use('/_assets', express.static(path.join(WIKI.ROOTPATH, 'assets'), {
     index: false,
     maxAge: '7d'
@@ -167,6 +169,7 @@ module.exports = async () => {
   app.use('/', ctrl.upload)
   app.use('/', ctrl.redstonePortal)
   app.use('/api/formation', ctrl.redstoneFormation)
+  app.use('/api/admin', ctrl.redstoneAdmin)
   app.use('/api/v1', ctrl.redstone)
   app.use('/', ctrl.common)
 

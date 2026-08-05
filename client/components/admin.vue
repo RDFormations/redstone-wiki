@@ -8,6 +8,9 @@
     v-navigation-drawer.pb-0.admin-sidebar(v-model='adminDrawerShown', app, fixed, clipped, :right='$vuetify.rtl', permanent, width='300', :class='$vuetify.theme.dark ? `grey darken-4` : ``')
       vue-scroll(:ops='scrollStyle')
         v-list.radius-0(dense, nav)
+          v-list-item(to='/sessions', color='primary', v-if='hasPermission(`manage:system`)')
+            v-list-item-avatar(size='24', tile): v-icon mdi-school
+            v-list-item-title Sessions formations
           v-list-item(to='/dashboard', color='primary')
             v-list-item-avatar(size='24', tile): v-icon mdi-view-dashboard-variant
             v-list-item-title {{ $t('admin:dashboard.title') }}
@@ -143,7 +146,8 @@ const router = new VueRouter({
   mode: 'history',
   base: '/a',
   routes: [
-    { path: '/', redirect: '/dashboard' },
+    { path: '/', redirect: '/sessions' },
+    { path: '/sessions', component: () => import(/* webpackChunkName: "admin" */ './admin/admin-redstone-sessions.vue') },
     { path: '/dashboard', component: () => import(/* webpackChunkName: "admin" */ './admin/admin-dashboard.vue') },
     { path: '/general', component: () => import(/* webpackChunkName: "admin" */ './admin/admin-general.vue') },
     { path: '/locale', component: () => import(/* webpackChunkName: "admin" */ './admin/admin-locale.vue') },
