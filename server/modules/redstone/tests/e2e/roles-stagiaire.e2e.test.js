@@ -47,8 +47,9 @@ describeE2e('LMS — stagiaire sans compte (HTTP Wiki + contrat nav)', () => {
     await expectSiteStatus(formationPath(otherSlug), SITE.UNKNOWN)
   })
 
-  it('après distribute : hub intro 200, modules non publiés → 403', async () => {
-    await expectSiteStatus(formationPath(slug), SITE.OK)
+  it('après distribute : M01 redirect racine + modules non publiés → 403', async () => {
+    await expectSiteStatus(formationPath(slug), SITE.REDIRECT_STAGIAIRE)
+    await expectSiteStatus(formationPath(slug, 'stagiaire'), SITE.OK)
     await expectSiteStatus(formationPath(slug, 'module-01-e2e'), SITE.FORBIDDEN)
     await expectSiteStatus(formationPath(slug, 'exercice-01-e2e'), SITE.FORBIDDEN)
     await expectSiteStatus(formationPath(slug, 'correction-01-e2e'), SITE.FORBIDDEN)
@@ -93,9 +94,10 @@ describeE2e('LMS — stagiaire sans compte (HTTP Wiki + contrat nav)', () => {
     )
   })
 
-  it('publish intro : hub reste accessible (déjà 200 via 00-introduction)', async () => {
+  it('publish intro : page hub stagiaire reste accessible', async () => {
     await publishModule(sessionId, '00-introduction.md')
-    await expectSiteStatus(formationPath(slug), SITE.OK)
+    await expectSiteStatus(formationPath(slug, 'stagiaire'), SITE.OK)
+    await expectSiteStatus(formationPath(slug), SITE.REDIRECT_STAGIAIRE)
   })
 
   it('tentative path traversal / slug adjacent → pas d’accès', async () => {

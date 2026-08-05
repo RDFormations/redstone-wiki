@@ -34,6 +34,7 @@ module.exports = {
     const { createWebhooksService } = require(path.join(base, 'services/webhooks.service'))
     const { createMondaySyncService } = require(path.join(base, 'services/monday-sync.service'))
     const { createGuestAccessService } = require(path.join(base, 'services/guest-access.service'))
+    const { createPortalService } = require(path.join(base, 'services/portal.service'))
     const { fetchMissionItem } = require(path.join(base, 'infrastructure/monday-client'))
 
     validateLmsConfig().forEach(msg => WIKI.logger.warn(`(REDSTONE/LMS) ${msg}`))
@@ -51,6 +52,14 @@ module.exports = {
     const guestAccess = createGuestAccessService({
       knex,
       reloadAuthGroups: () => WIKI.auth.reloadGroups(),
+      logger: WIKI.logger
+    })
+    const nav = createNavService()
+    const portal = createPortalService({
+      sessionRepo,
+      contentRepo,
+      navService: nav,
+      getSiteHost: () => WIKI.config?.host || process.env.WIKI_SITE_HOST || 'https://formation.redstoneformations.fr',
       logger: WIKI.logger
     })
 
@@ -83,6 +92,7 @@ module.exports = {
         logger: WIKI.logger
       }),
       guestAccess,
+      portal,
       publish: createPublishService({
         sessionRepo,
         contentRepo,
@@ -90,7 +100,7 @@ module.exports = {
         webhooks,
         logger: WIKI.logger
       }),
-      nav: createNavService(),
+      nav,
       projection
     }
 
@@ -100,7 +110,7 @@ module.exports = {
       })
     })
 
-    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F05, C02, E01/E02, M02, O02, T04')
+    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F05, S01/M01, E01/E02, M02, O02, T04')
   },
   validateLmsConfig
 }

@@ -115,7 +115,14 @@ export default {
       this.loading = true
       this.error = ''
       try {
-        const res = await fetch(`/_assets/stagiaires/${encodeURIComponent(this.slug)}.json`)
+        const apiUrl = `/api/v1/public/sessions/by-slug/${encodeURIComponent(this.slug)}/hub`
+        let res = await fetch(apiUrl, { cache: 'no-store' })
+        if (res.ok) {
+          const payload = await res.json()
+          this.data = payload.hub
+          return
+        }
+        res = await fetch(`/_assets/stagiaires/${encodeURIComponent(this.slug)}.json`)
         if (!res.ok) throw new Error('Liens session introuvables')
         this.data = await res.json()
       } catch (e) {

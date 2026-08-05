@@ -104,6 +104,34 @@ const createProjectionService = ({ knex, logger = console }) => {
       await knex('pages')
         .where({ path: pagePath, localeCode: locale })
         .update({ isPublished: published ? 1 : 0, updatedAt: new Date().toISOString() })
+    },
+
+    /** S01/T01 — pages hub natives (stagiaire public, formateur brouillon). */
+    async ensureHubPages(session) {
+      const locale = session.locale_default || 'fr'
+      const hubs = [
+        {
+          path: 'stagiaire',
+          title: 'Liens session',
+          body_md: '<!-- hub stagiaire S01 -->',
+          published_stagiaire: true
+        },
+        {
+          path: 'formateur',
+          title: 'Espace formateur',
+          body_md: '<!-- hub formateur T01 -->',
+          published_stagiaire: false
+        }
+      ]
+      const results = []
+      for (const hub of hubs) {
+        const pageId = await upsertWikiPage({
+          session,
+          mod: { ...hub, kind: 'hub', locale }
+        })
+        results.push({ path: hub.path, page_id: pageId, ok: Boolean(pageId) })
+      }
+      return results
     }
   }
 }

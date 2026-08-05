@@ -165,6 +165,7 @@ module.exports = async () => {
 
   app.use('/', ctrl.auth)
   app.use('/', ctrl.upload)
+  app.use('/', ctrl.redstonePortal)
   app.use('/api/v1', ctrl.redstone)
   app.use('/', ctrl.common)
 

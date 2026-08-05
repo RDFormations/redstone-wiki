@@ -83,6 +83,27 @@ const createDistributeService = ({
       }
     }
 
+    const hubProjection = await projectionService.ensureHubPages(session)
+    const hubFailed = hubProjection.filter(p => !p.ok)
+    if (hubFailed.length) {
+      const updated = await sessionRepo.update(sessionId, { state: 'incomplete' })
+      if (webhooks) {
+        webhooks.emit(WEBHOOK_EVENTS.SESSION_INCOMPLETE, {
+          session_id: sessionId,
+          slug: session.slug,
+          errors: hubFailed.map(p => p.path)
+        })
+      }
+      return {
+        ok: false,
+        status: 422,
+        state: 'incomplete',
+        session: updated,
+        projection: [...projection, ...hubProjection],
+        error: { code: 'hub_projection_failed', message: 'Échec projection hubs stagiaire/formateur.' }
+      }
+    }
+
     const healthRows = health.checks.map(c => ({ id: crypto.randomUUID(), ...c }))
     await healthRepo.replaceForSession(sessionId, healthRows)
 

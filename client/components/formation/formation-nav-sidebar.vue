@@ -370,26 +370,47 @@ export default {
       }
 
       try {
+        const audience = this.canSeeUnpublished ? 'formateur' : 'stagiaire'
+        let fromLmsApi = false
+        let data
         try {
-          let data
-          try {
-            data = await this.fetchJson('/_assets/nav/' + encodeURIComponent(this.slug) + '.json?t=' + Date.now())
-          } catch (e) {
-            await new Promise(r => setTimeout(r, 300))
-            data = await this.fetchJson('/_assets/nav/' + encodeURIComponent(this.slug) + '.json?t=' + Date.now())
-          }
+          data = await this.fetchJson(
+            '/api/v1/public/sessions/by-slug/' +
+              encodeURIComponent(this.slug) +
+              '/nav?audience=' +
+              audience +
+              '&t=' +
+              Date.now()
+          )
           if (data && Array.isArray(data.items) && data.items.length) {
             this.applyNavData(data)
+            fromLmsApi = true
           }
         } catch (e) {
-          if (!this.items.length) throw e
+          // fallback assets statiques ci-dessous
+        }
+
+        if (!this.items.length) {
+          try {
+            try {
+              data = await this.fetchJson('/_assets/nav/' + encodeURIComponent(this.slug) + '.json?t=' + Date.now())
+            } catch (e) {
+              await new Promise(r => setTimeout(r, 300))
+              data = await this.fetchJson('/_assets/nav/' + encodeURIComponent(this.slug) + '.json?t=' + Date.now())
+            }
+            if (data && Array.isArray(data.items) && data.items.length) {
+              this.applyNavData(data)
+            }
+          } catch (e) {
+            if (!this.items.length) throw e
+          }
         } finally {
           this.navLoading = false
         }
 
         if (!this.items.length) return
 
-        if (!this.canSeeUnpublished) {
+        if (!this.canSeeUnpublished && !fromLmsApi) {
           const pubBundled = this.readBundledPublished(this.slug)
           if (pubBundled) {
             this.applyPublishedPaths(pubBundled.paths)
