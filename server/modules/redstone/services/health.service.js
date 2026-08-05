@@ -19,7 +19,8 @@ const createHealthService = ({ sessionRepo, contentRepo, healthRepo }) => ({
         checks: health.checks,
         stored_checks: stored,
         content_ready: Boolean(session.content_ready_at),
-        distributed: Boolean(session.distributed_at)
+        distributed: Boolean(session.distributed_at),
+        renders_ok: Boolean(session.metadata?.lms?.renders_ok)
       }
     }
   }

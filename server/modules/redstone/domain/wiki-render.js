@@ -5,12 +5,21 @@ const isRenderedHtml = render => {
   return value.startsWith('<')
 }
 
-/** Page markdown dont le contenu n'a pas été transformé en HTML (MD brut, vide, ou absent). */
-const isStaleMarkdownRender = row =>
-  row &&
-  row.editorKey === 'markdown' &&
-  row.contentType === 'markdown' &&
-  Boolean(String(row.content || '').trim()) &&
-  !isRenderedHtml(row.render)
+const hasProjectableContent = content => Boolean(String(content || '').trim())
 
-module.exports = { isRenderedHtml, isStaleMarkdownRender }
+/** Page dont le contenu n'a pas été transformé en HTML valide. */
+const isStaleMarkdownRender = row => {
+  if (!row || !hasProjectableContent(row.content)) return false
+  return !isRenderedHtml(row.render)
+}
+
+const buildRenderHealthCheck = (verify = {}) => ({
+  checkId: 'render_valid',
+  level: verify.ok ? 'ok' : 'error',
+  message: verify.ok
+    ? 'Tous les rendus HTML de la session sont valides.'
+    : `${verify.stale?.length || 0} page(s) sans rendu HTML valide.`,
+  blocking: !verify.ok
+})
+
+module.exports = { isRenderedHtml, isStaleMarkdownRender, hasProjectableContent, buildRenderHealthCheck }

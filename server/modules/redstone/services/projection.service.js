@@ -5,6 +5,9 @@ const { DEFAULT_EDITOR_KEY, resolveContentType, resolveFromWikiEditors } = requi
 const { isStaleMarkdownRender } = require('../domain/wiki-render')
 const { hubBodyMarkdown } = require('../domain/hub-shell')
 
+const resolveEditorKey = mod =>
+  mod.editor_key || mod.frontmatter?.editor || mod.frontmatter?.editor_key || DEFAULT_EDITOR_KEY
+
 /**
  * F02 — projection rs_content_modules → table Wiki pages
  * Utilise le contrat Wiki.js (editorKey + contentType) pour déclencher le pipeline markdownCore.
@@ -48,7 +51,7 @@ const createProjectionService = ({ knex, logger = console }) => {
     const title = mod.title || stem
     const content = mod.body_md || ''
     const isPublished = Boolean(mod.published_stagiaire)
-    const editorKey = mod.editor_key || DEFAULT_EDITOR_KEY
+    const editorKey = resolveEditorKey(mod)
     const contentType = contentTypeForEditor(editorKey)
 
     const existing = await knex('pages')
@@ -166,11 +169,35 @@ const createProjectionService = ({ knex, logger = console }) => {
     return { ok: stale.length === 0, stale, repaired }
   }
 
+  const isModuleUnchanged = async (session, mod, editorKey, contentType) => {
+    if (!mod.page_id) return false
+    const stem = mod.path.replace(/\.md$/, '')
+    const { wikiPagePath } = require('../domain/publish-policy')
+    const pagePath = wikiPagePath(session.slug, stem)
+    const locale = mod.locale || session.locale_default || 'fr'
+    const row = await fetchPageRow(pagePath, locale)
+    if (!row) return false
+    return (
+      row.content === (mod.body_md || '') &&
+      row.editorKey === editorKey &&
+      row.contentType === contentType &&
+      !isStaleMarkdownRender(row)
+    )
+  }
+
+  const projectOneModule = async (session, mod, { onlyChanged = false } = {}) => {
+    const editorKey = resolveEditorKey(mod)
+    const contentType = contentTypeForEditor(editorKey)
+    if (onlyChanged && await isModuleUnchanged(session, mod, editorKey, contentType)) {
+      return { path: mod.path, page_id: mod.page_id, ok: true, skipped: true }
+    }
+    const pageId = await upsertWikiPage({ session, mod })
+    return { path: mod.path, page_id: pageId, ok: Boolean(pageId) }
+  }
   const repairAllStaleFormationRenders = async ({ limit } = {}) => {
     const authorId = await getAdminUserId()
     let query = knex('pages')
       .where('path', 'like', 'formations/%')
-      .where('contentType', 'markdown')
       .whereNotNull('content')
       .where('content', '!=', '')
     if (limit) query = query.limit(limit)
@@ -192,14 +219,23 @@ const createProjectionService = ({ knex, logger = console }) => {
       const results = []
       for (const mod of modules) {
         try {
-          const pageId = await upsertWikiPage({ session, mod })
-          results.push({ path: mod.path, page_id: pageId, ok: true })
+          const result = await projectOneModule(session, mod, { onlyChanged })
+          results.push(result)
         } catch (err) {
           logger.error(`(REDSTONE/LMS) Projection échec ${mod.path}: ${err.message}`)
           results.push({ path: mod.path, ok: false, error: err.message })
         }
       }
       return results
+    },
+
+    async projectModule(session, mod, options = {}) {
+      try {
+        return await projectOneModule(session, mod, options)
+      } catch (err) {
+        logger.error(`(REDSTONE/LMS) Projection module ${mod.path}: ${err.message}`)
+        return { path: mod.path, ok: false, error: err.message }
+      }
     },
 
     repairStaleRenders,

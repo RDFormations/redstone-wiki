@@ -4,6 +4,7 @@ const { transition } = require('../domain/session-state')
 const { sessionNotFound, fail } = require('../domain/api-result')
 const { buildIncompleteOutcome } = require('../domain/distribute-outcome')
 const { WEBHOOK_EVENTS } = require('../domain/webhook-events')
+const { buildRenderHealthCheck } = require('../domain/wiki-render')
 
 const createDistributeService = ({
   sessionRepo,
@@ -51,7 +52,9 @@ const createDistributeService = ({
       }
     }
 
-    const projection = await projectionService.projectSession(session, modules)
+    const projection = await projectionService.projectSession(session, modules, {
+      onlyChanged: options.onlyChanged !== false
+    })
     const failed = projection.filter(p => !p.ok)
 
     for (const p of projection.filter(x => x.ok && x.page_id)) {
@@ -93,8 +96,9 @@ const createDistributeService = ({
       return outcome
     }
 
+    let verify = { ok: true, stale: [], repaired: 0 }
     if (projectionService.verifySessionRenders) {
-      const verify = await projectionService.verifySessionRenders(session)
+      verify = await projectionService.verifySessionRenders(session)
       if (!verify.ok) {
         const outcome = await buildIncompleteOutcome({
           sessionRepo,
@@ -114,6 +118,7 @@ const createDistributeService = ({
       }
     }
 
+    health.checks.push(buildRenderHealthCheck(verify))
     const healthRows = toHealthRows(health.checks)
     await healthRepo.replaceForSession(sessionId, healthRows)
 
@@ -126,6 +131,7 @@ const createDistributeService = ({
           content_ready: Boolean(session.content_ready_at),
           distributed: true,
           support_ready: true,
+          renders_ok: true,
           updated_at: new Date().toISOString()
         }
       }

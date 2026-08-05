@@ -1,4 +1,4 @@
-const { isRenderedHtml, isStaleMarkdownRender } = require('../../domain/wiki-render')
+const { isRenderedHtml, isStaleMarkdownRender, buildRenderHealthCheck } = require('../../domain/wiki-render')
 
 describe('wiki-render domain', () => {
   it('isRenderedHtml détecte HTML vs MD brut', () => {
@@ -32,5 +32,29 @@ describe('wiki-render domain', () => {
         render: ''
       })
     ).toBe(true)
+  })
+
+  it('isStaleMarkdownRender — contentType text avec MD brut', () => {
+    expect(
+      isStaleMarkdownRender({
+        editorKey: 'markdown',
+        contentType: 'text',
+        content: '# Titre',
+        render: '# Titre'
+      })
+    ).toBe(true)
+  })
+
+  it('buildRenderHealthCheck reflète verifySessionRenders', () => {
+    expect(buildRenderHealthCheck({ ok: true, stale: [] })).toMatchObject({
+      checkId: 'render_valid',
+      level: 'ok',
+      blocking: false
+    })
+    expect(buildRenderHealthCheck({ ok: false, stale: [{ path: 'x' }] })).toMatchObject({
+      checkId: 'render_valid',
+      level: 'error',
+      blocking: true
+    })
   })
 })

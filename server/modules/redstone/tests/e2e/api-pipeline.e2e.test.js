@@ -120,6 +120,7 @@ describeE2e('LMS API — pipeline F01→F05 (e2e)', () => {
     const session = await api('GET', `/sessions/${sessionId}`, { token: tokens().agent })
     expect(session.body.session.support_ready).toBe(true)
     expect(session.body.session.metadata.lms.support_ready).toBe(true)
+    expect(session.body.session.metadata.lms.renders_ok).toBe(true)
   })
 
   it('F05 — expose la navigation stagiaire et formateur', async () => {

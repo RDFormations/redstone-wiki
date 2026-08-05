@@ -53,13 +53,44 @@ const createPublishService = ({
     }
 
     const published = []
+    const failed = []
     for (const path of paths) {
       const mod = modules.find(m => m.path === path || m.path === `${path}.md`)
       if (!mod) continue
 
       await contentRepo.updatePublished(mod.id, true)
-      await projectionService.setPagePublished(session, mod, true)
+
+      if (projectionService.projectModule) {
+        const projection = await projectionService.projectModule(session, {
+          ...mod,
+          published_stagiaire: true
+        })
+        if (!projection.ok) {
+          failed.push({ path: mod.path, error: projection.error || 'projection_failed' })
+          continue
+        }
+        if (projection.page_id) {
+          await contentRepo.updatePageId(mod.id, projection.page_id)
+        }
+      } else {
+        await projectionService.setPagePublished(session, mod, true)
+      }
+
       published.push(mod.path)
+    }
+
+    if (failed.length) {
+      logger.warn(`(REDSTONE/LMS) Publish ${session.slug}: ${failed.length} échec(s) projection/render`)
+      return {
+        ok: false,
+        status: 422,
+        published,
+        failed,
+        error: {
+          code: 'render_failed',
+          message: `${failed.length} module(s) non publiés — rendu HTML invalide après projection.`
+        }
+      }
     }
 
     logger.info(`(REDSTONE/LMS) Publish ${session.slug}: ${published.length} modules`)

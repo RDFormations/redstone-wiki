@@ -43,4 +43,13 @@ describeE2e('LMS — pages Wiki.js après distribute (e2e smoke)', () => {
     expect(res.status).not.toBe(404)
     expect([200, 302, 403]).toContain(res.status)
   })
+
+  it('projette les hubs formateur et stagiaire (non 404, pas 500)', async () => {
+    for (const hub of ['formateur', 'stagiaire']) {
+      const res = await pingSite(`/formations/${slug}/${hub}`)
+      expect(res.status).not.toBe(404)
+      expect(res.status).not.toBe(500)
+      expect([200, 302, 403]).toContain(res.status)
+    }
+  })
 })

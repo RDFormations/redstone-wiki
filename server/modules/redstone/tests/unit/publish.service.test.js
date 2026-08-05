@@ -16,10 +16,16 @@ const mockModules = [
 const createMocks = () => {
   const contentRepo = {
     listBySession: jest.fn().mockResolvedValue(mockModules),
-    updatePublished: jest.fn().mockResolvedValue(undefined)
+    updatePublished: jest.fn().mockResolvedValue(undefined),
+    updatePageId: jest.fn().mockResolvedValue(undefined)
   }
   const projectionService = {
-    setPagePublished: jest.fn().mockResolvedValue(undefined)
+    setPagePublished: jest.fn().mockResolvedValue(undefined),
+    projectModule: jest.fn().mockImplementation(async (session, mod) => ({
+      ok: true,
+      path: mod.path,
+      page_id: 501
+    }))
   }
   const webhooks = { emit: jest.fn() }
   return {
@@ -27,7 +33,7 @@ const createMocks = () => {
     contentRepo,
     projectionService,
     webhooks,
-    logger: { info: jest.fn() }
+    logger: { info: jest.fn(), warn: jest.fn() }
   }
 }
 
@@ -51,6 +57,10 @@ describe('publish.service', () => {
     expect(result.published).toEqual(['module-01-a'])
     expect(result.count).toBe(1)
     expect(mocks.contentRepo.updatePublished).toHaveBeenCalledTimes(1)
+    expect(mocks.projectionService.projectModule).toHaveBeenCalledWith(
+      mockSession,
+      expect.objectContaining({ path: 'module-01-a', published_stagiaire: true })
+    )
     expect(mocks.webhooks.emit).toHaveBeenCalledWith(
       WEBHOOK_EVENTS.MODULE_PUBLISHED,
       expect.objectContaining({ slug: 'test-slug', by: 'formateur' })
@@ -89,5 +99,20 @@ describe('publish.service', () => {
     const result = await svc.publish('sess-1', { action: 'unknown' })
     expect(result.ok).toBe(false)
     expect(result.error.code).toBe('invalid_publish_action')
+  })
+
+  it('échoue si la projection/render échoue', async () => {
+    const mocks = createMocks()
+    mocks.projectionService.projectModule = jest.fn().mockResolvedValue({
+      ok: false,
+      path: 'module-01-a',
+      error: 'Rendu HTML invalide'
+    })
+    const svc = createPublishService(mocks)
+    const result = await svc.publish('sess-1', { action: 'module', path: 'module-01-a.md' })
+    expect(result.ok).toBe(false)
+    expect(result.status).toBe(422)
+    expect(result.error.code).toBe('render_failed')
+    expect(result.failed).toHaveLength(1)
   })
 })
