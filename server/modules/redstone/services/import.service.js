@@ -10,6 +10,7 @@ const { hashContent } = require('../domain/content-hash')
 const { runQaGate } = require('../domain/qa-gate')
 const { runHealthChecks } = require('../domain/health-checks')
 const { transition } = require('../domain/session-state')
+const { WEBHOOK_EVENTS } = require('../domain/webhook-events')
 
 const normalizeModuleInput = item => {
   if (item.body_md !== undefined) {
@@ -145,14 +146,14 @@ const createImportService = ({
 
     if (webhooks) {
       if (qaGreen) {
-        webhooks.emit('content.draft_ready', {
+        webhooks.emit(WEBHOOK_EVENTS.CONTENT_DRAFT_READY, {
           session_id: sessionId,
           slug: updated.slug,
           qa_score: qa.score,
           state: updated.state
         })
       } else {
-        webhooks.emit('session.incomplete', {
+        webhooks.emit(WEBHOOK_EVENTS.SESSION_INCOMPLETE, {
           session_id: sessionId,
           slug: updated.slug,
           errors: qa.issues?.filter(i => i.severity === 'blocking').map(i => i.code) || []

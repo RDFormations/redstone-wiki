@@ -1,5 +1,6 @@
 const { pageKind } = require('../domain/publish-policy')
 const { publishPairPaths } = require('../domain/pair-rules')
+const { WEBHOOK_EVENTS } = require('../domain/webhook-events')
 
 const createPublishService = ({
   sessionRepo,
@@ -64,7 +65,7 @@ const createPublishService = ({
     logger.info(`(REDSTONE/LMS) Publish ${session.slug}: ${published.length} modules`)
 
     if (webhooks && published.length) {
-      webhooks.emit('module.published', {
+      webhooks.emit(WEBHOOK_EVENTS.MODULE_PUBLISHED, {
         session_id: sessionId,
         slug: session.slug,
         published,

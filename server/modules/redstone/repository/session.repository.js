@@ -1,3 +1,5 @@
+const { mergeSessionMetadata } = require('../domain/monday-metadata')
+
 const TABLE = 'rs_sessions'
 
 const rowToSession = row => {
@@ -92,6 +94,11 @@ const createSessionRepository = knex => ({
   },
 
   async update(sessionId, patch) {
+    const existing = await this.findById(sessionId)
+    if (!existing) {
+      return null
+    }
+
     const row = {}
     const map = {
       state: 'state',
@@ -105,9 +112,12 @@ const createSessionRepository = knex => ({
       ref_client: 'refClient'
     }
     Object.entries(map).forEach(([apiKey, dbKey]) => {
-      if (patch[apiKey] !== undefined) {
-        row[dbKey] = apiKey === 'metadata' ? JSON.stringify(patch[apiKey]) : patch[apiKey]
+      if (patch[apiKey] === undefined) return
+      if (apiKey === 'metadata') {
+        row[dbKey] = JSON.stringify(mergeSessionMetadata(existing.metadata || {}, patch.metadata))
+        return
       }
+      row[dbKey] = patch[apiKey]
     })
     if (!Object.keys(row).length) {
       return this.findById(sessionId)

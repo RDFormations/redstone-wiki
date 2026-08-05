@@ -2,7 +2,16 @@ openapi: 3.0.3
 info:
   title: LMS RedStone API
   version: 1.0.0
-  description: API métier formation RedStone (fork Wiki.js)
+  description: |
+    API métier formation RedStone (fork Wiki.js).
+
+    Authentification Bearer par token (E02). Scopes :
+    - `session:read` — lecture sessions, health, nav
+    - `session:create` — création / upsert
+    - `session:sync` — sync Monday (M02)
+    - `content:import` — import contenu (F03)
+    - `session:distribute` — distribution Wiki (F02)
+    - `content:publish` — publication stagiaire (T04, formateur uniquement)
 
 servers:
   - url: https://formation.redstoneformations.fr/api/v1
@@ -19,6 +28,8 @@ paths:
       summary: Créer une session (F01)
       operationId: createSession
       tags: [Sessions]
+      security:
+        - bearerAuth: [session:create]
       requestBody:
         required: true
         content:
@@ -36,13 +47,15 @@ paths:
                   session:
                     $ref: '#/components/schemas/Session'
         '409':
-          description: Slug ou monday_item_id déjà utilisé
+          $ref: '#/components/responses/Conflict'
         '422':
-          description: Validation échouée
+          $ref: '#/components/responses/ValidationError'
     get:
       summary: Lister les sessions (F01 / F13)
       operationId: listSessions
       tags: [Sessions]
+      security:
+        - bearerAuth: [session:read]
       parameters:
         - name: limit
           in: query
@@ -70,27 +83,67 @@ paths:
                   limit: { type: integer }
                   offset: { type: integer }
 
+  /sessions/upsert:
+    post:
+      summary: Créer ou retrouver une session par monday_item_id (C01)
+      operationId: upsertSession
+      tags: [Sessions]
+      security:
+        - bearerAuth: [session:create]
+      description: |
+        Idempotent pour le pipeline agent : si `monday_item_id` existe déjà,
+        retourne la session existante (200, `created: false`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionCreate'
+      responses:
+        '200':
+          description: Session existante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionUpsertResponse'
+        '201':
+          description: Session créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionUpsertResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
   /sessions/{id}:
     get:
       summary: Lire une session par UUID
       operationId: getSessionById
       tags: [Sessions]
+      security:
+        - bearerAuth: [session:read]
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/SessionId'
       responses:
         '200':
           description: Session trouvée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session:
+                    $ref: '#/components/schemas/Session'
         '404':
-          description: Session introuvable
+          $ref: '#/components/responses/NotFound'
 
   /sessions/by-slug/{slug}:
     get:
       summary: Lire une session par slug
       operationId: getSessionBySlug
       tags: [Sessions]
+      security:
+        - bearerAuth: [session:read]
       parameters:
         - name: slug
           in: path
@@ -99,17 +152,237 @@ paths:
       responses:
         '200':
           description: Session trouvée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session:
+                    $ref: '#/components/schemas/Session'
         '404':
-          description: Session introuvable
+          $ref: '#/components/responses/NotFound'
+
+  /sessions/{id}/sync-monday:
+    post:
+      summary: Synchroniser métadonnées depuis Monday (M02)
+      operationId: syncMonday
+      tags: [Sessions, Monday]
+      security:
+        - bearerAuth: [session:sync]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      description: |
+        Sans body : appelle l'API Monday avec `MONDAY_API_TOKEN` et mappe les colonnes Missions V2.
+        Avec body : mode `override` — patch manuel des champs autorisés (merge metadata).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MondaySyncOverride'
+      responses:
+        '200':
+          description: Sync réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MondaySyncResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '503':
+          description: MONDAY_API_TOKEN absent (mode API)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /sessions/{id}/content/import:
+    post:
+      summary: Importer le contenu cours (F03 / C02)
+      operationId: importContent
+      tags: [Content]
+      security:
+        - bearerAuth: [content:import]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentImportRequest'
+      responses:
+        '200':
+          description: Import traité (QA + health checks)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentImportResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /sessions/{id}/distribute:
+    post:
+      summary: Distribuer vers Wiki.js (F02)
+      operationId: distributeSession
+      tags: [Content]
+      security:
+        - bearerAuth: [session:distribute]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                force:
+                  type: boolean
+                  description: Ignorer les health checks bloquants (OPS)
+      responses:
+        '200':
+          description: Distribution réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributeResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Health checks ou projection échoués
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributeResponse'
+
+  /sessions/{id}/health:
+    get:
+      summary: Health checks session (O11)
+      operationId: getSessionHealth
+      tags: [Operations]
+      security:
+        - bearerAuth: [session:read]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: État santé contenu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /sessions/{id}/publish:
+    post:
+      summary: Publier modules stagiaire (T04)
+      operationId: publishContent
+      tags: [Content]
+      security:
+        - bearerAuth: [content:publish]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishRequest'
+      responses:
+        '200':
+          description: Modules publiés
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishResponse'
+        '403':
+          description: Token agent sans scope publish
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /sessions/{id}/nav:
+    get:
+      summary: Navigation stagiaire ou formateur (F05)
+      operationId: getSessionNav
+      tags: [Content]
+      security:
+        - bearerAuth: [session:read]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - name: audience
+          in: query
+          schema:
+            type: string
+            enum: [stagiaire, formateur]
+            default: stagiaire
+      responses:
+        '200':
+          description: Arborescence navigation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
-      description: Token agent-bot (REDSTONE_LMS_AGENT_TOKEN)
+      description: |
+        Tokens : `REDSTONE_LMS_AGENT_TOKEN` (agent-bot),
+        `REDSTONE_LMS_FORMATEUR_TOKEN` (formateur),
+        `REDSTONE_LMS_OPS_TOKEN` (scope `*`).
+
+  parameters:
+    SessionId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflit (slug ou monday_item_id déjà utilisé)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ValidationError:
+      description: Validation échouée
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
 
   schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }
+
     SessionCreate:
       type: object
       required: [slug, monday_item_id, client, title]
@@ -161,3 +434,174 @@ components:
         distributed_at: { type: string, format: date-time, nullable: true }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+
+    SessionUpsertResponse:
+      type: object
+      properties:
+        session:
+          $ref: '#/components/schemas/Session'
+        created:
+          type: boolean
+
+    MondaySyncOverride:
+      type: object
+      description: Champs autorisés en mode override (sans appel Monday API)
+      properties:
+        title: { type: string }
+        client: { type: string }
+        ref_client: { type: string, nullable: true }
+        starts_at: { type: string, format: date-time, nullable: true }
+        ends_at: { type: string, format: date-time, nullable: true }
+        metadata: { type: object }
+
+    MondaySyncResponse:
+      type: object
+      properties:
+        ok: { type: boolean, example: true }
+        session:
+          $ref: '#/components/schemas/Session'
+        synced_fields:
+          type: array
+          items: { type: string }
+        mode:
+          type: string
+          enum: [override, monday_api]
+
+    ContentModuleInput:
+      type: object
+      required: [path]
+      properties:
+        path:
+          type: string
+          description: Chemin relatif ou stem (ex. module-01-intro.md)
+        content:
+          type: string
+          description: Markdown avec frontmatter YAML
+        body_md:
+          type: string
+        frontmatter:
+          type: object
+        title:
+          type: string
+
+    ContentImportRequest:
+      type: object
+      required: [modules]
+      properties:
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentModuleInput'
+        source:
+          type: string
+          default: agent_pipeline
+        agent_run_id:
+          type: string
+        modules_expected:
+          type: integer
+
+    ContentImportResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        session:
+          $ref: '#/components/schemas/Session'
+        qa:
+          type: object
+          properties:
+            status: { type: string, enum: [green, red] }
+            score: { type: number }
+        health:
+          type: object
+        modules_imported: { type: integer }
+        content_ready: { type: boolean }
+        distributed: { type: boolean }
+
+    DistributeResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        state: { type: string }
+        session:
+          $ref: '#/components/schemas/Session'
+        checks:
+          type: array
+          items:
+            $ref: '#/components/schemas/HealthCheck'
+        projection:
+          type: array
+          items:
+            type: object
+        content_ready: { type: boolean }
+        distributed: { type: boolean }
+        stagiaire_url: { type: string, format: uri }
+
+    HealthCheck:
+      type: object
+      properties:
+        checkId: { type: string }
+        level: { type: string, enum: [ok, warn, error] }
+        blocking: { type: boolean }
+        message: { type: string }
+
+    HealthResponse:
+      type: object
+      properties:
+        session_id: { type: string, format: uuid }
+        ok: { type: boolean }
+        checks:
+          type: array
+          items:
+            $ref: '#/components/schemas/HealthCheck'
+        stored_checks:
+          type: array
+        content_ready: { type: boolean }
+        distributed: { type: boolean }
+
+    PublishRequest:
+      type: object
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [module, exercice, day, all_restricted]
+        path:
+          type: string
+          description: Requis pour action module ou exercice
+        day:
+          type: integer
+          description: Requis pour action day (planning metadata)
+
+    PublishResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        published:
+          type: array
+          items: { type: string }
+        count: { type: integer }
+
+    NavItem:
+      type: object
+      properties:
+        path: { type: string }
+        kind: { type: string }
+        title: { type: string }
+        published: { type: boolean }
+        href: { type: string }
+
+    NavResponse:
+      type: object
+      properties:
+        slug: { type: string }
+        audience: { type: string, enum: [stagiaire, formateur] }
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavItem'
+        progress:
+          type: object
+          properties:
+            published_modules: { type: integer }
+            total_modules: { type: integer }
+            label: { type: string }

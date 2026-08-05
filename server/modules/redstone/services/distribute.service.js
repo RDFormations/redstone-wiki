@@ -1,6 +1,7 @@
 const crypto = require('crypto')
 const { runHealthChecks } = require('../domain/health-checks')
 const { transition } = require('../domain/session-state')
+const { WEBHOOK_EVENTS } = require('../domain/webhook-events')
 
 const createDistributeService = ({
   sessionRepo,
@@ -34,7 +35,7 @@ const createDistributeService = ({
         state: transition(session.state, 'distribute_fail') || 'incomplete'
       })
       if (webhooks) {
-        webhooks.emit('session.incomplete', {
+        webhooks.emit(WEBHOOK_EVENTS.SESSION_INCOMPLETE, {
           session_id: sessionId,
           slug: session.slug,
           errors: blocking.map(c => c.checkId)
@@ -65,7 +66,7 @@ const createDistributeService = ({
         state: 'incomplete'
       })
       if (webhooks) {
-        webhooks.emit('session.incomplete', {
+        webhooks.emit(WEBHOOK_EVENTS.SESSION_INCOMPLETE, {
           session_id: sessionId,
           slug: session.slug,
           errors: failed.map(p => p.path)
@@ -93,7 +94,7 @@ const createDistributeService = ({
     logger.info(`(REDSTONE/LMS) Distribute OK: ${session.slug}`)
 
     if (webhooks) {
-      webhooks.emit('session.distributed', {
+      webhooks.emit(WEBHOOK_EVENTS.SESSION_DISTRIBUTED, {
         session_id: sessionId,
         slug: updated.slug,
         checks_ok: health.ok,
