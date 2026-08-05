@@ -71,10 +71,17 @@ Base : `/api/v1` — auth `Authorization: Bearer $REDSTONE_LMS_AGENT_TOKEN`
 | `GET` | `/sessions` | Lister (pagination, `?q=`) |
 | `GET` | `/sessions/{id}` | Lire par UUID |
 | `GET` | `/sessions/by-slug/{slug}` | Lire par slug |
+| `POST` | `/sessions/{id}/content/import` | Import bulk MD (F03) |
+| `POST` | `/sessions/{id}/distribute` | Distribuer vers Wiki.js (F02) |
+| `GET` | `/sessions/{id}/health` | Health checks (O11) |
+| `POST` | `/sessions/{id}/publish` | Publication formateur (T04) — token formateur |
+| `GET` | `/sessions/{id}/nav?audience=` | Navigation runtime (F05) |
 
-OpenAPI : `docs/api/openapi-v1.yaml` — tests : `npm run test:redstone`
+Client CursorRDF : `.cursor/skills/rdf-formation-portal/scripts/lms_api.py`
 
-Migration : `server/db/migrations/2.5.129.js` → table `rs_sessions`
+OpenAPI : `docs/api/openapi-v1.yaml` — tests : `npm run test:redstone` (43 tests)
+
+Migrations : `2.5.129.js` (`rs_sessions`), `2.5.130.js` (`rs_content_*`, health)
 
 ## Upgrade Wiki.js upstream
 

@@ -89,6 +89,32 @@ const createSessionRepository = knex => ({
       limit,
       offset
     }
+  },
+
+  async update(sessionId, patch) {
+    const row = {}
+    const map = {
+      state: 'state',
+      metadata: 'metadata',
+      content_ready_at: 'contentReadyAt',
+      distributed_at: 'distributedAt',
+      starts_at: 'startsAt',
+      ends_at: 'endsAt',
+      title: 'title',
+      client: 'client',
+      ref_client: 'refClient'
+    }
+    Object.entries(map).forEach(([apiKey, dbKey]) => {
+      if (patch[apiKey] !== undefined) {
+        row[dbKey] = apiKey === 'metadata' ? JSON.stringify(patch[apiKey]) : patch[apiKey]
+      }
+    })
+    if (!Object.keys(row).length) {
+      return this.findById(sessionId)
+    }
+    row.updatedAt = knex.fn.now()
+    await knex(TABLE).where({ id: sessionId }).update(row)
+    return this.findById(sessionId)
   }
 })
 

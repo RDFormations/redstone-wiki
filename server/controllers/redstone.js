@@ -7,6 +7,6 @@ const { createSessionsRouter } = require('../modules/redstone/api/v1/sessions.ro
 const router = express.Router()
 
 router.use(createAuthMiddleware())
-router.use('/sessions', createSessionsRouter(() => WIKI.redstone.sessions))
+router.use('/sessions', createSessionsRouter(() => WIKI.redstone))
 
 module.exports = router
