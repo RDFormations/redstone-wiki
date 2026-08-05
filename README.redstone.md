@@ -107,7 +107,17 @@ Base : `/api/v1` — auth `Authorization: Bearer $REDSTONE_LMS_AGENT_TOKEN`
 
 Client CursorRDF : `.cursor/skills/rdf-formation-portal/scripts/lms_api.py`
 
-OpenAPI : `docs/api/openapi-v1.yaml` — tests : `npm run test:redstone` (43 tests)
+OpenAPI : `docs/api/openapi-v1.yaml`
+
+### Tests
+
+| Commande | Cible | Prérequis |
+|----------|-------|-----------|
+| `npm run test:redstone` | Unitaires (43 tests) | `yarn install` |
+| `bash scripts/e2e-redstone.sh` | E2E API + pages Wiki | `bash scripts/local-dev-api.sh` |
+| `npm run test:redstone:e2e` | E2E seul (idem) | serveur sur `:3000` |
+
+Couverture E2E (vague 1) : F01 sessions, F03 import, C02 QA, F02 distribute, O11 health, F05 nav, T04 publish, E02 auth scopes, smoke pages Wiki.js.
 
 Migrations : `2.5.129.js` (`rs_sessions`), `2.5.130.js` (`rs_content_*`, health)
 

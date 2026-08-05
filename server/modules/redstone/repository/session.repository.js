@@ -66,11 +66,11 @@ const createSessionRepository = knex => ({
   },
 
   async list({ limit = 50, offset = 0, q = null } = {}) {
-    let query = knex(TABLE).orderBy('startsAt', 'asc').orderBy('createdAt', 'desc')
+    let base = knex(TABLE)
 
     if (q && typeof q === 'string' && q.trim()) {
       const term = `%${q.trim().toLowerCase()}%`
-      query = query.where(builder => {
+      base = base.where(builder => {
         builder
           .whereRaw('LOWER(??) LIKE ?', ['slug', term])
           .orWhereRaw('LOWER(??) LIKE ?', ['client', term])
@@ -79,8 +79,8 @@ const createSessionRepository = knex => ({
     }
 
     const [rows, countRow] = await Promise.all([
-      query.clone().limit(limit).offset(offset),
-      query.clone().count({ total: '*' }).first()
+      base.clone().orderBy('startsAt', 'asc').orderBy('createdAt', 'desc').limit(limit).offset(offset),
+      base.clone().count({ total: '*' }).first()
     ])
 
     return {

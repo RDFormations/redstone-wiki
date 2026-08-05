@@ -11,7 +11,8 @@
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --profile --config dev/webpack/webpack.prod.js",
     "watch": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config dev/webpack/webpack.dev.js",
     "test": "eslint --format codeframe --ext .js,.vue . && pug-lint server/views && jest",
-    "test:redstone": "jest server/modules/redstone/tests --coverage=false",
+    "test:redstone": "jest server/modules/redstone/tests/unit --coverage=false",
+    "test:redstone:e2e": "cross-env LMS_E2E_FORCE=1 jest server/modules/redstone/tests/e2e --runInBand --testTimeout=120000 --coverage=false",
     "cypress:open": "cypress open",
     "postinstall": "patch-package"
   },
