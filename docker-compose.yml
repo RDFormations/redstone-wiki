@@ -1,11 +1,4 @@
-# RedStone Formations — Wiki.js (prod + dev builder)
-# Source : https://github.com/RDFormations/redstone-wiki
-#
-# Local :
-#   cp .env.example .env && docker compose up -d --build
-#
-# Prod (VPS) : voir CursorRDF scripts/build-wiki-image.sh
-
+# Prod VPS — /opt/redstone-wiki (données + compose) ; build depuis clone redstone-wiki
 services:
   db:
     image: postgres:16-alpine
@@ -13,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: wiki
       POSTGRES_USER: wikijs
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wikijs-local-test}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     healthcheck:
@@ -24,7 +17,7 @@ services:
 
   wiki:
     build:
-      context: .
+      context: ${REDSTONE_WIKI_ROOT}
       dockerfile: Dockerfile
       target: release
     image: redstone-wiki:2.5-redstone
@@ -39,20 +32,21 @@ services:
       DB_HOST: db
       DB_PORT: 5432
       DB_USER: wikijs
-      DB_PASS: ${POSTGRES_PASSWORD:-wikijs-local-test}
+      DB_PASS: ${POSTGRES_PASSWORD}
       DB_NAME: wiki
     volumes:
       - ./data/wiki:/wiki/data
+      - ${RDF_FORMATIONS_ROOT:-/home/ubuntu/RDF-formations}:/repo:ro
 
   wiki-builder:
     profiles: ["dev"]
     build:
-      context: .
+      context: ${REDSTONE_WIKI_ROOT}
       dockerfile: Dockerfile
       target: deps
     image: redstone-wiki:deps
     volumes:
-      - .:/wiki
+      - ${REDSTONE_WIKI_ROOT}:/wiki
       - wiki-node-modules:/wiki/node_modules
       - ./build:/out
     working_dir: /wiki
@@ -63,7 +57,6 @@ services:
         mkdir -p /out/assets /out/server
         rsync -a --delete assets/ /out/assets/
         rsync -a --delete server/ /out/server/
-        echo "wiki-builder: assets + server → /out"
 
 volumes:
   wiki-node-modules:
