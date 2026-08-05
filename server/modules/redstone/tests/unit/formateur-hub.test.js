@@ -43,6 +43,7 @@ describe('formateur-hub domain', () => {
     expect(hub.schedule).toHaveLength(1)
     expect(hub.schedule[0].modules[0].stem).toBe('module-01-a')
     expect(hub.monday.url).toContain('12345678')
+    expect(hub.stagiaireQrSvg).toContain('<svg')
     expect(JSON.stringify(hub)).not.toContain('monday_item_id')
   })
 

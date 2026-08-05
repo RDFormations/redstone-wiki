@@ -13,6 +13,7 @@ const createDistributeService = ({
   guestAccess,
   webhooks,
   mondayPush,
+  getSiteHost = () => 'https://formation.redstoneformations.fr',
   logger = console
 }) => ({
   async distribute(sessionId, options = {}) {
@@ -143,7 +144,7 @@ const createDistributeService = ({
       content_ready: Boolean(updated.content_ready_at),
       distributed: true,
       guest_access,
-      stagiaire_url: `https://formation.redstoneformations.fr/formations/${session.slug}/stagiaire`
+      stagiaire_url: `${String(getSiteHost()).replace(/\/$/, '')}/${session.locale_default || 'fr'}/formations/${session.slug}/stagiaire`
     }
   }
 })

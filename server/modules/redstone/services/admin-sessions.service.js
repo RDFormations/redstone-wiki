@@ -19,22 +19,25 @@ const businessStatus = session => {
 const mondayUrl = itemId =>
   itemId ? `https://rdformations.monday.com/boards/${MONDAY_BOARD_ID}/pulses/${itemId}` : ''
 
-const toListRow = (session, stats = {}) => ({
-  ...session,
-  ...enrichSessionStatus(session),
-  publication: {
-    published_modules: stats.published_modules || 0,
-    total_modules: stats.total_modules || 0,
-    label: `${stats.published_modules || 0}/${stats.total_modules || 0}`
-  },
-  business_status: businessStatus(session),
-  monday_url: mondayUrl(session.monday_item_id),
-  links: {
-    stagiaire: `/fr/formations/${session.slug}/stagiaire`,
-    formateur: `/fr/formations/${session.slug}/formateur`,
-    monday: mondayUrl(session.monday_item_id)
+const toListRow = (session, stats = {}) => {
+  const locale = session.locale_default || 'fr'
+  return {
+    ...session,
+    ...enrichSessionStatus(session),
+    publication: {
+      published_modules: stats.published_modules || 0,
+      total_modules: stats.total_modules || 0,
+      label: `${stats.published_modules || 0}/${stats.total_modules || 0}`
+    },
+    business_status: businessStatus(session),
+    monday_url: mondayUrl(session.monday_item_id),
+    links: {
+      stagiaire: `/${locale}/formations/${session.slug}/stagiaire`,
+      formateur: `/${locale}/formations/${session.slug}/formateur`,
+      monday: mondayUrl(session.monday_item_id)
+    }
   }
-})
+}
 
 const createAdminSessionsService = ({ sessionRepo, contentRepo, healthRepo }) => ({
   async list(query = {}) {

@@ -1,5 +1,6 @@
 const { pageKind } = require('./publish-policy')
 const { isoDate, siteBase } = require('./portal-hub')
+const { qrSvgForUrl } = require('./qr-svg')
 
 const MONDAY_BOARD_ID = process.env.MONDAY_MISSIONS_BOARD_ID || '18420737449'
 
@@ -160,7 +161,7 @@ const buildFormateurHub = (session, modules, options = {}) => {
     distributed: Boolean(session.distributed_at),
     portalUrl: `${host}/formations/${slug}`,
     stagiaireUrl,
-    stagiaireQrSvg: '',
+    stagiaireQrSvg: qrSvgForUrl(stagiaireUrl),
     formateurHref: `/formations/${slug}/formateur`,
     durationDays: meta.duration_days || meta.durationDays || null,
     reference: session.ref_client || '',

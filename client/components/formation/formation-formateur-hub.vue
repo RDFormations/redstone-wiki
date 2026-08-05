@@ -1,6 +1,7 @@
 <template lang="pug">
   .rs-formateur-hub
     v-alert.mb-4(v-if='error', type='error', dense, outlined) {{ error }}
+    v-progress-linear(v-if='publishBusy', indeterminate, color='primary', height='3')
     v-skeleton-loader(v-if='loading', type='article, actions')
 
     template(v-else-if='data')
@@ -37,7 +38,7 @@
               .rs-formateur-qr-wrap(v-if='data.stagiaireQrSvg', v-html='data.stagiaireQrSvg')
               .rs-formateur-qr-fallback(v-else)
                 v-icon(large, color='grey') mdi-qrcode
-                span.caption.grey--text QR indisponible — rebuild avec segno
+                span.caption.grey--text QR indisponible
               p.rs-formateur-qr-caption Scannez pour ouvrir la page liens session (émargement, support…)
               code.rs-formateur-qr-url {{ data.stagiaireUrl }}
               .rs-formateur-qr-actions

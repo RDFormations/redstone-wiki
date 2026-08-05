@@ -4,34 +4,33 @@
  * Usage (depuis la racine du repo, conteneur wiki-dev-api ou host avec accès DB) :
  *   node scripts/repair-formation-renders.mjs
  *   node scripts/repair-formation-renders.mjs --concurrency 8
+ *   node scripts/repair-formation-renders.mjs --dry-run --limit 20
  */
 import childProcess from 'node:child_process'
+import { createRequire } from 'node:module'
 import { promisify } from 'node:util'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import knex from 'knex'
 
+const require = createRequire(import.meta.url)
+const { isStaleMarkdownRender } = require('../server/modules/redstone/domain/wiki-render.js')
+
 const execFile = promisify(childProcess.execFile)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 
-const isRenderedHtml = render => {
-  const value = String(render || '').trim()
-  if (!value) return true
-  return value.startsWith('<')
-}
-
-const isStale = row =>
-  row?.editorKey === 'markdown' &&
-  row?.contentType === 'markdown' &&
-  Boolean(row?.content) &&
-  !isRenderedHtml(row?.render)
-
 const parseArgs = () => {
   const args = process.argv.slice(2)
-  const idx = args.indexOf('--concurrency')
-  const concurrency = idx >= 0 ? Math.max(1, Number(args[idx + 1]) || 4) : 4
-  return { concurrency }
+  const readFlag = name => {
+    const idx = args.indexOf(name)
+    return idx >= 0 ? args[idx + 1] : null
+  }
+  return {
+    concurrency: Math.max(1, Number(readFlag('--concurrency')) || 4),
+    limit: readFlag('--limit') ? Math.max(1, Number(readFlag('--limit')) || 0) : null,
+    dryRun: args.includes('--dry-run')
+  }
 }
 
 const db = () =>
@@ -80,24 +79,34 @@ const runPool = async (ids, concurrency) => {
 }
 
 const main = async () => {
-  const { concurrency } = parseArgs()
+  const { concurrency, limit, dryRun } = parseArgs()
   const k = db()
-  const rows = await k('pages')
+  let query = k('pages')
     .where('path', 'like', 'formations/%')
     .where('contentType', 'markdown')
     .whereNotNull('content')
     .where('content', '!=', '')
     .select('id', 'path', 'contentType', 'editorKey', 'content', 'render')
 
-  const stale = rows.filter(isStale)
-  console.log(`Pages formation stale: ${stale.length} / ${rows.length}`)
+  const rows = await query
+  const stale = rows.filter(isStaleMarkdownRender)
+  const targets = limit ? stale.slice(0, limit) : stale
 
-  if (!stale.length) {
+  console.log(`Pages formation stale: ${stale.length} / ${rows.length}${limit ? ` (limite ${limit})` : ''}`)
+
+  if (!targets.length) {
     await k.destroy()
     return
   }
 
-  const ids = stale.map(r => r.id)
+  if (dryRun) {
+    targets.slice(0, 15).forEach(row => console.log(`  [dry-run] #${row.id} ${row.path}`))
+    if (targets.length > 15) console.log(`  … et ${targets.length - 15} autres`)
+    await k.destroy()
+    return
+  }
+
+  const ids = targets.map(r => r.id)
   const { done, failed } = await runPool(ids, concurrency)
   console.log(`Terminé: ${done} rendues, ${failed} échecs`)
   await k.destroy()

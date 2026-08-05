@@ -107,6 +107,7 @@ module.exports = {
         guestAccess,
         webhooks,
         mondayPush,
+        getSiteHost: () => WIKI.config?.host || process.env.WIKI_SITE_HOST || 'https://formation.redstoneformations.fr',
         logger: WIKI.logger
       }),
       guestAccess,

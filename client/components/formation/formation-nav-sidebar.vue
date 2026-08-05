@@ -9,7 +9,9 @@
       v-icon.mr-2(small) mdi-link-variant
       | Liens session
     p.rs-sidebar-loading(v-if='navLoading && !items.length') Chargement du menu…
-    p.rs-sidebar-error(v-else-if='navError') Menu indisponible — réessayez dans un instant.
+    .rs-sidebar-error(v-else-if='navError')
+      span Menu indisponible.
+      button.rs-sidebar-retry(type='button', @click='loadItems') Réessayer
     a.rs-sidebar-formateur-cta(
       v-if='canSeeUnpublished && formateurHref'
       :href='formateurHref'

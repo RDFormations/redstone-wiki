@@ -118,7 +118,13 @@
                 td Monday
                 td
                   a(v-if='detail.session.monday_url', :href='detail.session.monday_url', target='_blank') {{ detail.session.monday_item_id }}
-          div.mt-4(v-if='detail.health_checks && detail.health_checks.length')
+          div.mt-4(v-if='distributeErrors.length')
+            v-alert(type='error', dense, outlined)
+              .subtitle-2.mb-2 Distribution bloquée
+              ul.mb-0
+                li(v-for='(check, idx) in distributeErrors', :key='idx')
+                  | {{ check.checkId || check.id }} — {{ check.message }}
+          div.mt-4(v-else-if='detail.health_checks && detail.health_checks.length')
             .subtitle-2 Contrôles santé
             ul
               li(v-for='check in detail.health_checks', :key='check.id || check.checkId')
@@ -164,6 +170,7 @@ export default {
       tableOptions: { page: 1, itemsPerPage: 25, sortBy: [], sortDesc: [] },
       detailOpen: false,
       detail: null,
+      distributeErrors: [],
       pushingMonday: false,
       distributing: false,
       headers: [
@@ -287,6 +294,7 @@ export default {
         const body = await res.json()
         if (!res.ok) throw new Error(body.error?.message || `HTTP ${res.status}`)
         this.detail = body
+        this.distributeErrors = []
         this.detailOpen = true
       } catch (e) {
         this.$store.commit('showNotification', { style: 'red', message: e.message, icon: 'alert' })
@@ -295,6 +303,7 @@ export default {
     async distributeSession () {
       if (!this.detail?.session?.id) return
       this.distributing = true
+      this.distributeErrors = []
       try {
         const res = await fetch(`/api/admin/sessions/${this.detail.session.id}/distribute`, {
           method: 'POST',
@@ -303,7 +312,14 @@ export default {
           body: JSON.stringify({})
         })
         const body = await res.json()
-        if (!res.ok) throw new Error(body.error?.message || body.error?.code || `HTTP ${res.status}`)
+        if (!res.ok) {
+          const blocking = (body.checks || []).filter(c => c.blocking || c.level === 'error')
+          if (blocking.length) {
+            this.distributeErrors = blocking
+            if (body.checks) this.detail.health_checks = body.checks
+          }
+          throw new Error(body.error?.message || body.error?.code || `HTTP ${res.status}`)
+        }
         this.$store.commit('showNotification', {
           style: 'green',
           message: `Session distribuée (${body.session?.state || 'ok'})`,

@@ -1,6 +1,31 @@
-const { pageKind } = require('../domain/publish-policy')
 const { publishPairPaths } = require('../domain/pair-rules')
+const { tripletStems } = require('../domain/formateur-hub')
 const { WEBHOOK_EVENTS } = require('../domain/webhook-events')
+
+const stemFromPath = path => String(path || '').replace(/\.md$/, '')
+
+/** Module → module + exercice + correction existants (aligné UI formateur). */
+const expandModulePublishStems = (stem, modules) => {
+  const stems = stem.startsWith('module-') ? tripletStems(stem) : [stem]
+  const byStem = new Set(modules.map(m => stemFromPath(m.path)))
+  return stems.filter(s => byStem.has(s))
+}
+
+const expandPublishPaths = (paths, modules) => {
+  const seen = new Set()
+  const result = []
+  for (const raw of paths) {
+    const stem = stemFromPath(raw)
+    const expanded = stem.startsWith('module-') ? expandModulePublishStems(stem, modules) : [stem]
+    for (const s of expanded) {
+      if (!seen.has(s)) {
+        seen.add(s)
+        result.push(s)
+      }
+    }
+  }
+  return result
+}
 
 const createPublishService = ({
   sessionRepo,
@@ -20,13 +45,13 @@ const createPublishService = ({
     let paths = []
 
     if (action === 'module' && payload.path) {
-      paths = [payload.path.replace(/\.md$/, '')]
+      paths = expandModulePublishStems(stemFromPath(payload.path), modules)
     } else if (action === 'exercice' && payload.path) {
-      paths = publishPairPaths(payload.path.replace(/\.md$/, ''), modules)
-    } else if (action === 'day' && payload.day) {
+      paths = publishPairPaths(stemFromPath(payload.path), modules)
+    } else if (action === 'day' && payload.day != null) {
       const planning = session.metadata?.planning || []
-      const dayEntry = planning.find(d => d.day === payload.day)
-      paths = dayEntry?.modules || []
+      const dayEntry = planning.find(d => Number(d.day) === Number(payload.day))
+      paths = expandPublishPaths(dayEntry?.modules || [], modules)
     } else if (action === 'all_restricted') {
       paths = modules
         .filter(m => ['module', 'exercice', 'correction'].includes(m.kind))

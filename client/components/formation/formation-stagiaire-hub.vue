@@ -14,11 +14,13 @@
 
       v-row.rs-stagiaire-grid(dense)
         v-col(cols='12', md='6', lg='4', v-for='link in primaryLinks', :key='link.id')
-          a.rs-stagiaire-tile(
-            :href='linkHref(link)'
-            :target='link.external ? "_blank" : null'
-            :rel='link.external ? "noopener" : null'
+          component.rs-stagiaire-tile(
+            :is='link.url ? "a" : "div"'
+            :href='link.url ? linkHref(link) : null'
+            :target='link.url && link.external ? "_blank" : null'
+            :rel='link.url && link.external ? "noopener" : null'
             :class='tileClass(link)'
+            :aria-disabled='!link.url || undefined'
             )
             v-icon.rs-stagiaire-tile-icon {{ link.icon || 'mdi-open-in-new' }}
             strong.rs-stagiaire-tile-label {{ link.label }}
@@ -26,11 +28,13 @@
             span.rs-stagiaire-tile-hint(v-if='!link.url') Lien à venir — demandez au formateur
 
         v-col(cols='12', md='6', lg='4', v-for='link in secondaryLinks', :key='link.id')
-          a.rs-stagiaire-tile.rs-stagiaire-tile--secondary(
-            :href='linkHref(link)'
-            :target='link.external ? "_blank" : null'
-            :rel='link.external ? "noopener" : null'
+          component.rs-stagiaire-tile.rs-stagiaire-tile--secondary(
+            :is='link.url ? "a" : "div"'
+            :href='link.url ? linkHref(link) : null'
+            :target='link.url && link.external ? "_blank" : null'
+            :rel='link.url && link.external ? "noopener" : null'
             :class='{ "rs-stagiaire-tile--disabled": !link.url }'
+            :aria-disabled='!link.url || undefined'
             )
             v-icon.rs-stagiaire-tile-icon(small) {{ link.icon || 'mdi-link' }}
             strong.rs-stagiaire-tile-label {{ link.label }}
@@ -89,7 +93,7 @@ export default {
       }
     },
     linkHref (link) {
-      if (!link.url) return '#'
+      if (!link.url) return null
       if (link.url.startsWith('http') || link.url.startsWith('mailto:')) return link.url
       return this.localeHref(link.url)
     },

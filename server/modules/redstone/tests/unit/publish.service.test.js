@@ -48,12 +48,21 @@ describe('publish.service', () => {
     const svc = createPublishService(mocks)
     const result = await svc.publish('sess-1', { action: 'module', path: 'module-01-a.md', by: 'formateur' })
     expect(result.ok).toBe(true)
-    expect(result.published).toContain('module-01-a')
-    expect(mocks.contentRepo.updatePublished).toHaveBeenCalledWith('m1', true)
+    expect(result.published).toEqual(expect.arrayContaining(['module-01-a', 'exercice-01-a', 'correction-01-a']))
+    expect(result.count).toBe(3)
+    expect(mocks.contentRepo.updatePublished).toHaveBeenCalledTimes(3)
     expect(mocks.webhooks.emit).toHaveBeenCalledWith(
       WEBHOOK_EVENTS.MODULE_PUBLISHED,
       expect.objectContaining({ slug: 'test-slug', by: 'formateur' })
     )
+  })
+
+  it('publie tous les modules du jour avec leurs triplets', async () => {
+    const mocks = createMocks()
+    const svc = createPublishService(mocks)
+    const result = await svc.publish('sess-1', { action: 'day', day: 1 })
+    expect(result.ok).toBe(true)
+    expect(result.published).toEqual(expect.arrayContaining(['module-01-a', 'exercice-01-a', 'correction-01-a']))
   })
 
   it('publie exercice + correction en paire', async () => {

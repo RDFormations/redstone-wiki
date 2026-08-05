@@ -39,6 +39,24 @@ describe('admin-sessions.service F13', () => {
     expect(result.sessions[0].links.stagiaire).toContain('/stagiaire')
   })
 
+  it('utilise locale_default dans les liens admin', async () => {
+    const enSession = { ...mockSession, locale_default: 'en' }
+    const svc = createAdminSessionsService({
+      sessionRepo: {
+        list: jest.fn().mockResolvedValue({ items: [enSession], total: 1, limit: 50, offset: 0 })
+      },
+      contentRepo: {
+        moduleStatsBySessions: jest.fn().mockResolvedValue({
+          s1: { total_modules: 1, published_modules: 0 }
+        })
+      },
+      healthRepo: { listBySession: jest.fn() }
+    })
+    const result = await svc.list()
+    expect(result.sessions[0].links.stagiaire).toBe('/en/formations/test/stagiaire')
+    expect(result.sessions[0].links.formateur).toBe('/en/formations/test/formateur')
+  })
+
   it('getDetail expose actions.can_distribute', async () => {
     const draftReady = { ...mockSession, state: 'draft_ready', distributed_at: null }
     const svc = createAdminSessionsService({
