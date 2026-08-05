@@ -34,6 +34,7 @@ const createImportService = ({
   sessionRepo,
   contentRepo,
   healthRepo,
+  webhooks,
   logger = console
 }) => ({
   async importBulk(sessionId, payload, options = {}) {
@@ -141,6 +142,23 @@ const createImportService = ({
     const updated = await sessionRepo.update(sessionId, patch)
 
     logger.info(`(REDSTONE/LMS) Import ${session.slug}: ${imported.length} modules, QA=${qa.status}`)
+
+    if (webhooks) {
+      if (qaGreen) {
+        webhooks.emit('content.draft_ready', {
+          session_id: sessionId,
+          slug: updated.slug,
+          qa_score: qa.score,
+          state: updated.state
+        })
+      } else {
+        webhooks.emit('session.incomplete', {
+          session_id: sessionId,
+          slug: updated.slug,
+          errors: qa.issues?.filter(i => i.severity === 'blocking').map(i => i.code) || []
+        })
+      }
+    }
 
     return {
       ok: true,

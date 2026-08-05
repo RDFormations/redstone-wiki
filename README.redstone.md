@@ -99,6 +99,8 @@ Base : `/api/v1` — auth `Authorization: Bearer $REDSTONE_LMS_AGENT_TOKEN`
 | `GET` | `/sessions` | Lister (pagination, `?q=`) |
 | `GET` | `/sessions/{id}` | Lire par UUID |
 | `GET` | `/sessions/by-slug/{slug}` | Lire par slug |
+| `POST` | `/sessions/upsert` | Créer ou retourner par `monday_item_id` (C01) |
+| `POST` | `/sessions/{id}/sync-monday` | Sync métadonnées Monday → session (M02) |
 | `POST` | `/sessions/{id}/content/import` | Import bulk MD (F03) |
 | `POST` | `/sessions/{id}/distribute` | Distribuer vers Wiki.js (F02) |
 | `GET` | `/sessions/{id}/health` | Health checks (O11) |
@@ -117,7 +119,7 @@ OpenAPI : `docs/api/openapi-v1.yaml`
 | `bash scripts/e2e-redstone.sh` | E2E API + pages Wiki | `bash scripts/local-dev-api.sh` |
 | `npm run test:redstone:e2e` | E2E seul (idem) | serveur sur `:3000` |
 
-Couverture E2E (vague 1) : F01 sessions, F03 import, C02 QA, F02 distribute, O11 health, F05 nav, T04 publish, E02 auth scopes, smoke pages Wiki.js.
+Couverture E2E (vague 1) : F01 sessions, F03 import, C02 QA, F02 distribute, O11 health, F05 nav, T04 publish, E02 auth, M02 sync-monday, C01 upsert, smoke pages Wiki.
 
 Migrations : `2.5.129.js` (`rs_sessions`), `2.5.130.js` (`rs_content_*`, health)
 

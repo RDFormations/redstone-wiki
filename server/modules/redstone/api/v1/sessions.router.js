@@ -1,5 +1,5 @@
 const express = require('express')
-const { requireScope, SCOPE_READ, SCOPE_CREATE } = require('../middleware/auth-scopes')
+const { requireScope, SCOPE_READ, SCOPE_CREATE, SCOPE_SYNC } = require('../middleware/auth-scopes')
 
 const SCOPE_IMPORT = 'content:import'
 const SCOPE_DISTRIBUTE = 'session:distribute'
@@ -26,6 +26,20 @@ const createSessionsRouter = getServices => {
     }
   })
 
+  router.post('/upsert', requireScope(SCOPE_CREATE), async (req, res, next) => {
+    try {
+      const result = await svc().sessions.upsert(req.body)
+      if (!result.ok) return res.status(result.status).json({ error: result.error })
+      const status = result.created ? 201 : 200
+      return res.status(status).json({
+        session: result.session,
+        created: Boolean(result.created)
+      })
+    } catch (err) {
+      next(err)
+    }
+  })
+
   router.get('/', requireScope(SCOPE_READ), async (req, res, next) => {
     try {
       const result = await svc().sessions.list(req.query)
@@ -45,6 +59,20 @@ const createSessionsRouter = getServices => {
     try {
       const result = await svc().sessions.getBySlug(req.params.slug)
       return sendSession(res, result)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  router.post('/:id/sync-monday', requireScope(SCOPE_SYNC), async (req, res, next) => {
+    try {
+      const result = await svc().mondaySync.syncFromMonday(req.params.id, {
+        payload: Object.keys(req.body || {}).length ? req.body : null
+      })
+      if (!result.ok) {
+        return res.status(result.status).json(result.error ? { error: result.error } : result)
+      }
+      return res.status(200).json(result)
     } catch (err) {
       next(err)
     }

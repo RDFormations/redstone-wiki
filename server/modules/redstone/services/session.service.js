@@ -55,6 +55,30 @@ const createSessionService = ({ repo, logger = console }) => ({
     return { ok: true, status: 201, session: created }
   },
 
+  async upsert(payload) {
+    const validation = validateCreatePayload(payload)
+    if (!validation.ok) {
+      return { ok: false, status: 422, error: validation }
+    }
+
+    const data = validation.value
+    const existingMonday = await repo.findByMondayItemId(data.mondayItemId)
+    if (existingMonday) {
+      return {
+        ok: true,
+        status: 200,
+        session: existingMonday,
+        created: false
+      }
+    }
+
+    const created = await this.create(payload)
+    if (!created.ok) {
+      return created
+    }
+    return { ...created, created: true }
+  },
+
   async getById(id) {
     const session = await repo.findById(id)
     if (!session) {

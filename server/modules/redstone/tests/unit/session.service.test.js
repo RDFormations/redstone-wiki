@@ -76,6 +76,36 @@ describe('session.service', () => {
     })
   })
 
+  describe('upsert', () => {
+    it('retourne la session existante par monday_item_id', async () => {
+      const existing = { id: 'uuid-existing', slug: 'existing', monday_item_id: 12718272029 }
+      const repo = createMockRepo({
+        findByMondayItemId: jest.fn().mockResolvedValue(existing)
+      })
+      const service = createSessionService({ repo, logger: { info: jest.fn() } })
+
+      const result = await service.upsert(TEST_PAYLOAD)
+
+      expect(result.ok).toBe(true)
+      expect(result.status).toBe(200)
+      expect(result.created).toBe(false)
+      expect(result.session).toBe(existing)
+      expect(repo.insert).not.toHaveBeenCalled()
+    })
+
+    it('crée si monday_item_id absent', async () => {
+      const repo = createMockRepo()
+      const service = createSessionService({ repo, logger: { info: jest.fn() } })
+
+      const result = await service.upsert(TEST_PAYLOAD)
+
+      expect(result.ok).toBe(true)
+      expect(result.status).toBe(201)
+      expect(result.created).toBe(true)
+      expect(repo.insert).toHaveBeenCalled()
+    })
+  })
+
   describe('getById', () => {
     it('retourne 404 si absente', async () => {
       const repo = createMockRepo({ findById: jest.fn().mockResolvedValue(null) })

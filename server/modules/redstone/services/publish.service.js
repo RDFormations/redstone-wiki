@@ -5,6 +5,7 @@ const createPublishService = ({
   sessionRepo,
   contentRepo,
   projectionService,
+  webhooks,
   logger = console
 }) => ({
   async publish(sessionId, payload) {
@@ -61,6 +62,16 @@ const createPublishService = ({
     }
 
     logger.info(`(REDSTONE/LMS) Publish ${session.slug}: ${published.length} modules`)
+
+    if (webhooks && published.length) {
+      webhooks.emit('module.published', {
+        session_id: sessionId,
+        slug: session.slug,
+        published,
+        count: published.length,
+        by: payload.by || 'formateur'
+      })
+    }
 
     return {
       ok: true,

@@ -7,6 +7,7 @@ const createDistributeService = ({
   contentRepo,
   healthRepo,
   projectionService,
+  webhooks,
   logger = console
 }) => ({
   async distribute(sessionId, options = {}) {
@@ -32,6 +33,13 @@ const createDistributeService = ({
       const updated = await sessionRepo.update(sessionId, {
         state: transition(session.state, 'distribute_fail') || 'incomplete'
       })
+      if (webhooks) {
+        webhooks.emit('session.incomplete', {
+          session_id: sessionId,
+          slug: session.slug,
+          errors: blocking.map(c => c.checkId)
+        })
+      }
       return {
         ok: false,
         status: 422,
@@ -56,6 +64,13 @@ const createDistributeService = ({
       const updated = await sessionRepo.update(sessionId, {
         state: 'incomplete'
       })
+      if (webhooks) {
+        webhooks.emit('session.incomplete', {
+          session_id: sessionId,
+          slug: session.slug,
+          errors: failed.map(p => p.path)
+        })
+      }
       return {
         ok: false,
         status: 422,
@@ -76,6 +91,16 @@ const createDistributeService = ({
     })
 
     logger.info(`(REDSTONE/LMS) Distribute OK: ${session.slug}`)
+
+    if (webhooks) {
+      webhooks.emit('session.distributed', {
+        session_id: sessionId,
+        slug: updated.slug,
+        checks_ok: health.ok,
+        content_ready: Boolean(updated.content_ready_at),
+        distributed: true
+      })
+    }
 
     return {
       ok: true,

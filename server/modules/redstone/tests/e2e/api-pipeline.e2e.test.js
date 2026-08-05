@@ -138,4 +138,45 @@ describeE2e('LMS API — pipeline F01→F05 (e2e)', () => {
     expect(res.body.ok).toBe(true)
     expect(res.body.published).toContain('module-01-e2e')
   })
+
+  it('M02 — sync metadata Monday (override local)', async () => {
+    const res = await api('POST', `/sessions/${sessionId}/sync-monday`, {
+      token: tokens().agent,
+      body: {
+        ref_client: 'E2E-REF',
+        metadata: {
+          links: { teams: 'https://teams.microsoft.com/l/e2e-test' },
+          monday: { etat: 'Confirmé' }
+        }
+      }
+    })
+    expect(res.status).toBe(200)
+    expect(res.body.ok).toBe(true)
+    expect(res.body.session.ref_client).toBe('E2E-REF')
+    expect(res.body.session.metadata.links.teams).toContain('teams.microsoft.com')
+  })
+})
+
+describeE2e('LMS API — upsert idempotent (C01)', () => {
+  it('retourne la même session sur double upsert', async () => {
+    const slug = uniqueSlug('e2e-upsert')
+    const mondayId = uniqueMondayId()
+    const body = {
+      slug,
+      monday_item_id: mondayId,
+      client: 'RDF',
+      title: 'Upsert E2E'
+    }
+    const first = await api('POST', '/sessions/upsert', { token: tokens().agent, body })
+    expect([200, 201]).toContain(first.status)
+    expect(first.body.created).toBe(true)
+
+    const second = await api('POST', '/sessions/upsert', {
+      token: tokens().agent,
+      body: { ...body, slug: uniqueSlug('other-slug') }
+    })
+    expect(second.status).toBe(200)
+    expect(second.body.created).toBe(false)
+    expect(second.body.session.id).toBe(first.body.session.id)
+  })
 })
