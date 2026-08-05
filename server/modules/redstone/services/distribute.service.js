@@ -1,6 +1,8 @@
-const crypto = require('crypto')
 const { runHealthChecks } = require('../domain/health-checks')
+const { toHealthRows } = require('../domain/health-rows')
 const { transition } = require('../domain/session-state')
+const { sessionNotFound, fail } = require('../domain/api-result')
+const { buildIncompleteOutcome } = require('../domain/distribute-outcome')
 const { WEBHOOK_EVENTS } = require('../domain/webhook-events')
 
 const createDistributeService = ({
@@ -14,23 +16,17 @@ const createDistributeService = ({
 }) => ({
   async distribute(sessionId, options = {}) {
     const session = await sessionRepo.findById(sessionId)
-    if (!session) {
-      return { ok: false, status: 404, error: { code: 'session_not_found', message: 'Session introuvable.' } }
-    }
+    if (!session) return sessionNotFound()
 
     const modules = await contentRepo.listBySession(sessionId)
     if (!modules.length) {
-      return {
-        ok: false,
-        status: 422,
-        error: { code: 'no_content', message: 'Aucun contenu à distribuer — importer d\'abord.' }
-      }
+      return fail(422, 'no_content', 'Aucun contenu à distribuer — importer d\'abord.')
     }
 
     const health = runHealthChecks(session, modules, { agentImport: false })
     const blocking = health.checks.filter(c => c.blocking)
     if (blocking.length && !options.force) {
-      const healthRows = health.checks.map(c => ({ id: crypto.randomUUID(), ...c }))
+      const healthRows = toHealthRows(health.checks)
       await healthRepo.replaceForSession(sessionId, healthRows)
       const updated = await sessionRepo.update(sessionId, {
         state: transition(session.state, 'distribute_fail') || 'incomplete'
@@ -63,48 +59,34 @@ const createDistributeService = ({
     }
 
     if (failed.length) {
-      const updated = await sessionRepo.update(sessionId, {
-        state: 'incomplete'
-      })
-      if (webhooks) {
-        webhooks.emit(WEBHOOK_EVENTS.SESSION_INCOMPLETE, {
-          session_id: sessionId,
-          slug: session.slug,
-          errors: failed.map(p => p.path)
-        })
-      }
-      return {
-        ok: false,
-        status: 422,
-        state: 'incomplete',
-        session: updated,
+      return buildIncompleteOutcome({
+        sessionRepo,
+        sessionId,
+        session,
+        webhooks,
+        errors: failed.map(p => p.path),
         projection,
-        error: { code: 'projection_failed', message: 'Échec projection vers Wiki.js.' }
-      }
+        errorCode: 'projection_failed',
+        errorMessage: 'Échec projection vers Wiki.js.'
+      })
     }
 
     const hubProjection = await projectionService.ensureHubPages(session)
     const hubFailed = hubProjection.filter(p => !p.ok)
     if (hubFailed.length) {
-      const updated = await sessionRepo.update(sessionId, { state: 'incomplete' })
-      if (webhooks) {
-        webhooks.emit(WEBHOOK_EVENTS.SESSION_INCOMPLETE, {
-          session_id: sessionId,
-          slug: session.slug,
-          errors: hubFailed.map(p => p.path)
-        })
-      }
-      return {
-        ok: false,
-        status: 422,
-        state: 'incomplete',
-        session: updated,
+      return buildIncompleteOutcome({
+        sessionRepo,
+        sessionId,
+        session,
+        webhooks,
+        errors: hubFailed.map(p => p.path),
         projection: [...projection, ...hubProjection],
-        error: { code: 'hub_projection_failed', message: 'Échec projection hubs stagiaire/formateur.' }
-      }
+        errorCode: 'hub_projection_failed',
+        errorMessage: 'Échec projection hubs stagiaire/formateur.'
+      })
     }
 
-    const healthRows = health.checks.map(c => ({ id: crypto.randomUUID(), ...c }))
+    const healthRows = toHealthRows(health.checks)
     await healthRepo.replaceForSession(sessionId, healthRows)
 
     const nextState = transition(session.state, 'distribute_ok') || 'distributed'

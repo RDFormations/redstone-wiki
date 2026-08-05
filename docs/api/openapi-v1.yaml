@@ -23,6 +23,43 @@ security:
   - bearerAuth: []
 
 paths:
+  /public/sessions/by-slug/{slug}/hub:
+    get:
+      summary: Hub stagiaire public (S01) — sans auth
+      operationId: getPublicStagiaireHub
+      tags: [Public]
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Données hub stagiaire (liens Teams, émargement, support)
+        '404':
+          description: Session introuvable ou non publique
+
+  /public/sessions/by-slug/{slug}/nav:
+    get:
+      summary: Navigation publique (F05) — sans auth
+      operationId: getPublicNav
+      tags: [Public]
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+        - name: audience
+          in: query
+          schema: { type: string, enum: [stagiaire, formateur], default: stagiaire }
+      responses:
+        '200':
+          description: Bundle nav (items filtrés stagiaire si audience=stagiaire)
+        '404':
+          description: Session introuvable ou non publique
+
   /sessions:
     post:
       summary: Créer une session (F01)

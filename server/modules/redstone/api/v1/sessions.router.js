@@ -1,13 +1,7 @@
 const express = require('express')
 const { requireScope, SCOPE_READ, SCOPE_CREATE, SCOPE_SYNC } = require('../middleware/auth-scopes')
 const { asyncHandler } = require('../middleware/error-handler')
-
-const sendSession = (res, result) => {
-  if (!result.ok) {
-    return res.status(result.status).json({ error: result.error })
-  }
-  return res.status(result.status).json(result.session ? { session: result.session } : result)
-}
+const { sendSession } = require('../helpers/response')
 
 const createSessionsRouter = getServices => {
   const router = express.Router()

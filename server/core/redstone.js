@@ -34,6 +34,8 @@ module.exports = {
     const { createWebhooksService } = require(path.join(base, 'services/webhooks.service'))
     const { createMondaySyncService } = require(path.join(base, 'services/monday-sync.service'))
     const { createGuestAccessService } = require(path.join(base, 'services/guest-access.service'))
+    const { createHealthService } = require(path.join(base, 'services/health.service'))
+    const { createContentNavService } = require(path.join(base, 'services/content-nav.service'))
     const { createPortalService } = require(path.join(base, 'services/portal.service'))
     const { fetchMissionItem } = require(path.join(base, 'infrastructure/monday-client'))
 
@@ -55,6 +57,8 @@ module.exports = {
       logger: WIKI.logger
     })
     const nav = createNavService()
+    const health = createHealthService({ sessionRepo, contentRepo, healthRepo })
+    const contentNav = createContentNavService({ sessionRepo, contentRepo, navService: nav })
     const portal = createPortalService({
       sessionRepo,
       contentRepo,
@@ -93,6 +97,8 @@ module.exports = {
       }),
       guestAccess,
       portal,
+      health,
+      contentNav,
       publish: createPublishService({
         sessionRepo,
         contentRepo,

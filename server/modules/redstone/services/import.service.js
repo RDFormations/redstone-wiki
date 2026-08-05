@@ -1,35 +1,17 @@
 const crypto = require('crypto')
-const { parseFrontmatter } = require('../domain/parse-frontmatter')
 const {
   pageKind,
-  stemFromPath,
   agentMaySetPublished,
   defaultPublishedStagiaire
 } = require('../domain/publish-policy')
+const { normalizeModuleInput } = require('../domain/import-normalize')
 const { hashContent } = require('../domain/content-hash')
 const { runQaGate } = require('../domain/qa-gate')
 const { runHealthChecks } = require('../domain/health-checks')
+const { toHealthRows } = require('../domain/health-rows')
 const { transition } = require('../domain/session-state')
+const { sessionNotFound, fail } = require('../domain/api-result')
 const { WEBHOOK_EVENTS } = require('../domain/webhook-events')
-
-const normalizeModuleInput = item => {
-  if (item.body_md !== undefined) {
-    return {
-      path: item.path.replace(/\.md$/, ''),
-      body_md: item.body_md,
-      frontmatter: item.frontmatter || {},
-      title: item.title || item.path
-    }
-  }
-  const parsed = parseFrontmatter(item.content || '')
-  const path = stemFromPath(item.path || item.filename || '')
-  return {
-    path,
-    body_md: parsed.body,
-    frontmatter: parsed.frontmatter,
-    title: item.title || parsed.frontmatter.title || path
-  }
-}
 
 const createImportService = ({
   sessionRepo,
@@ -40,18 +22,12 @@ const createImportService = ({
 }) => ({
   async importBulk(sessionId, payload, options = {}) {
     const sessionResult = await sessionRepo.findById(sessionId)
-    if (!sessionResult) {
-      return { ok: false, status: 404, error: { code: 'session_not_found', message: 'Session introuvable.' } }
-    }
+    if (!sessionResult) return sessionNotFound()
     const session = sessionResult
 
     const rawModules = payload.modules || payload.files || []
     if (!Array.isArray(rawModules) || !rawModules.length) {
-      return {
-        ok: false,
-        status: 422,
-        error: { code: 'modules_required', message: 'Au moins un module est requis.' }
-      }
+      return fail(422, 'modules_required', 'Au moins un module est requis.')
     }
 
     const source = options.source || payload.source || 'agent_pipeline'
@@ -126,10 +102,7 @@ const createImportService = ({
     })
 
     const health = runHealthChecks(session, imported, { agentImport: isAgent })
-    const healthRows = health.checks.map(c => ({
-      id: crypto.randomUUID(),
-      ...c
-    }))
+    const healthRows = toHealthRows(health.checks)
     await healthRepo.replaceForSession(sessionId, healthRows)
 
     const qaGreen = qa.status === 'green'
@@ -174,4 +147,4 @@ const createImportService = ({
   }
 })
 
-module.exports = { createImportService, normalizeModuleInput }
+module.exports = { createImportService }
