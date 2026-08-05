@@ -12,6 +12,7 @@ const createDistributeService = ({
   projectionService,
   guestAccess,
   webhooks,
+  mondayPush,
   logger = console
 }) => ({
   async distribute(sessionId, options = {}) {
@@ -38,6 +39,7 @@ const createDistributeService = ({
           errors: blocking.map(c => c.checkId)
         })
       }
+      if (mondayPush) mondayPush.schedulePush(sessionId)
       return {
         ok: false,
         status: 422,
@@ -59,7 +61,7 @@ const createDistributeService = ({
     }
 
     if (failed.length) {
-      return buildIncompleteOutcome({
+      const outcome = await buildIncompleteOutcome({
         sessionRepo,
         sessionId,
         session,
@@ -69,12 +71,14 @@ const createDistributeService = ({
         errorCode: 'projection_failed',
         errorMessage: 'Échec projection vers Wiki.js.'
       })
+      if (mondayPush) mondayPush.schedulePush(sessionId)
+      return outcome
     }
 
     const hubProjection = await projectionService.ensureHubPages(session)
     const hubFailed = hubProjection.filter(p => !p.ok)
     if (hubFailed.length) {
-      return buildIncompleteOutcome({
+      const outcome = await buildIncompleteOutcome({
         sessionRepo,
         sessionId,
         session,
@@ -84,6 +88,8 @@ const createDistributeService = ({
         errorCode: 'hub_projection_failed',
         errorMessage: 'Échec projection hubs stagiaire/formateur.'
       })
+      if (mondayPush) mondayPush.schedulePush(sessionId)
+      return outcome
     }
 
     const healthRows = toHealthRows(health.checks)
@@ -116,9 +122,11 @@ const createDistributeService = ({
         slug: updated.slug,
         checks_ok: health.ok,
         content_ready: Boolean(updated.content_ready_at),
-        distributed: true
+        distributed: true,
+        support_ready: true
       })
     }
+    if (mondayPush) mondayPush.schedulePush(sessionId)
 
     return {
       ok: true,

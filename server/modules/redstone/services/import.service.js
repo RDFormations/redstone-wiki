@@ -18,6 +18,7 @@ const createImportService = ({
   contentRepo,
   healthRepo,
   webhooks,
+  mondayPush,
   logger = console
 }) => ({
   async importBulk(sessionId, payload, options = {}) {
@@ -141,6 +142,8 @@ const createImportService = ({
         })
       }
     }
+
+    if (mondayPush) mondayPush.schedulePush(sessionId)
 
     return {
       ok: true,

@@ -125,6 +125,13 @@
                 | {{ check.checkId }} — {{ check.level }}: {{ check.message }}
         v-card-actions
           v-spacer
+          v-btn(
+            v-if='detail.session.monday_item_id'
+            color='primary'
+            text
+            :loading='pushingMonday'
+            @click='pushMonday'
+            ) Sync Monday (M03)
           v-btn(text, @click='detailOpen = false') Fermer
 </template>
 
@@ -150,6 +157,7 @@ export default {
       tableOptions: { page: 1, itemsPerPage: 25, sortBy: [], sortDesc: [] },
       detailOpen: false,
       detail: null,
+      pushingMonday: false,
       headers: [
         { text: 'Titre', value: 'title' },
         { text: 'Client', value: 'client' },
@@ -274,6 +282,28 @@ export default {
         this.detailOpen = true
       } catch (e) {
         this.$store.commit('showNotification', { style: 'red', message: e.message, icon: 'alert' })
+      }
+    },
+    async pushMonday () {
+      if (!this.detail?.session?.id) return
+      this.pushingMonday = true
+      try {
+        const res = await fetch(`/api/admin/sessions/${this.detail.session.id}/push-monday`, {
+          method: 'POST',
+          credentials: 'same-origin'
+        })
+        const body = await res.json()
+        if (!res.ok) throw new Error(body.error?.message || `HTTP ${res.status}`)
+        this.$store.commit('showNotification', {
+          style: 'green',
+          message: `Monday mis à jour (${(body.monday?.updated || []).length} colonne(s))`,
+          icon: 'check'
+        })
+        await this.openDetail({ id: this.detail.session.id })
+      } catch (e) {
+        this.$store.commit('showNotification', { style: 'red', message: e.message, icon: 'alert' })
+      } finally {
+        this.pushingMonday = false
       }
     },
     stateColor (state) {

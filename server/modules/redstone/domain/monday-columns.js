@@ -7,7 +7,21 @@ const MONDAY_COLUMNS = {
   etat: 'color_mm502yqg',
   teams: 'link_mm50j8dk',
   portail_formation: 'link_mm503wz6',
-  notes: 'long_text_mm50dyvt'
+  notes: 'long_text_mm50dyvt',
+  /** M03 — colonnes LMS (IDs via env, optionnels jusqu'à provision board) */
+  portal_status: process.env.MONDAY_LMS_COL_PORTAL_STATUS || '',
+  support_ready: process.env.MONDAY_LMS_COL_SUPPORT_READY || '',
+  session_state: process.env.MONDAY_LMS_COL_SESSION_STATE || '',
+  last_sync: process.env.MONDAY_LMS_COL_LAST_SYNC || '',
+  error_detail: process.env.MONDAY_LMS_COL_ERROR_DETAIL || ''
 }
 
-module.exports = { MONDAY_COLUMNS }
+const LMS_PUSH_COLUMNS = [
+  'portal_status',
+  'support_ready',
+  'session_state',
+  'last_sync',
+  'error_detail'
+]
+
+module.exports = { MONDAY_COLUMNS, LMS_PUSH_COLUMNS }

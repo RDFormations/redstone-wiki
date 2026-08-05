@@ -56,6 +56,18 @@ const createSessionsRouter = getServices => {
   )
 
   router.post(
+    '/:id/push-monday',
+    requireScope(SCOPE_SYNC),
+    asyncHandler(async (req, res) => {
+      const result = await svc().mondayPush.pushSession(req.params.id)
+      if (!result.ok) {
+        return res.status(result.status).json({ error: result.error })
+      }
+      return res.status(200).json({ ok: true, ...result })
+    })
+  )
+
+  router.post(
     '/:id/sync-monday',
     requireScope(SCOPE_SYNC),
     asyncHandler(async (req, res) => {

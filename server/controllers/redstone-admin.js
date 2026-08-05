@@ -33,4 +33,13 @@ router.get('/sessions/:id', async (req, res) => {
   return res.status(200).json(result)
 })
 
+router.post('/sessions/:id/push-monday', async (req, res) => {
+  if (!isOps(req)) return deny(res, 403, 'Accès OPS requis.')
+  if (!WIKI.redstone?.mondayPush) return res.status(503).json({ ok: false, error: { message: 'LMS indisponible.' } })
+
+  const result = await WIKI.redstone.mondayPush.pushSession(req.params.id)
+  if (!result.ok) return res.status(result.status).json({ ok: false, error: result.error })
+  return res.status(200).json({ ok: true, ...result })
+})
+
 module.exports = router
