@@ -69,9 +69,41 @@ const stagiaireNav = sessionId =>
     query: { audience: 'stagiaire' }
   })
 
+const getModule = (sessionId, path, token = tokens().formateur) =>
+  api('GET', `/sessions/${sessionId}/content/module`, {
+    token,
+    query: { path }
+  })
+
+const editModule = (sessionId, path, body_md, token = tokens().formateur, extra = {}) =>
+  api('PATCH', `/sessions/${sessionId}/content/module`, {
+    token,
+    body: { path, body_md, ...extra }
+  })
+
+const listVersions = (sessionId, path, token = tokens().formateur) =>
+  api('GET', `/sessions/${sessionId}/content/versions`, {
+    token,
+    query: { path }
+  })
+
+const getVersion = (sessionId, versionId, token = tokens().formateur) =>
+  api('GET', `/sessions/${sessionId}/content/versions/${versionId}`, { token })
+
+const diffVersion = (sessionId, versionId, token = tokens().formateur, base = null) =>
+  api('GET', `/sessions/${sessionId}/content/versions/${versionId}/diff`, {
+    token,
+    ...(base ? { query: { base } } : {})
+  })
+
 module.exports = {
   provisionDistributedSession,
   publishModule,
   publishExercice,
-  stagiaireNav
+  stagiaireNav,
+  getModule,
+  editModule,
+  listVersions,
+  getVersion,
+  diffVersion
 }
