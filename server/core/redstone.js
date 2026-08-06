@@ -38,6 +38,8 @@ module.exports = {
     const { createContentNavService } = require(path.join(base, 'services/content-nav.service'))
     const { createMondayPushService } = require(path.join(base, 'services/monday-push.service'))
     const { createAdminSessionsService } = require(path.join(base, 'services/admin-sessions.service'))
+    const { createContentVersionsService } = require(path.join(base, 'services/content-versions.service'))
+    const { createLegalPagesService } = require(path.join(base, 'services/legal-pages.service'))
     const { createPortalService } = require(path.join(base, 'services/portal.service'))
     const { fetchMissionItem } = require(path.join(base, 'infrastructure/monday-client'))
 
@@ -69,6 +71,8 @@ module.exports = {
       logger: WIKI.logger
     })
     const adminSessions = createAdminSessionsService({ sessionRepo, contentRepo, healthRepo })
+    const contentVersions = createContentVersionsService({ sessionRepo, contentRepo })
+    const legalPages = createLegalPagesService({ knex, logger: WIKI.logger })
     const getMondayToken = () => process.env.MONDAY_API_TOKEN || process.env.MONDAY_TOKEN
     const mondayPush = createMondayPushService({
       sessionRepo,
@@ -113,6 +117,8 @@ module.exports = {
       guestAccess,
       portal,
       adminSessions,
+      contentVersions,
+      legalPages,
       health,
       contentNav,
       publish: createPublishService({
@@ -130,9 +136,14 @@ module.exports = {
       webhooks.processPending(50).catch(err => {
         WIKI.logger.warn(`(REDSTONE/LMS) Webhook pending replay: ${err.message}`)
       })
+      legalPages.ensureSiteLegalPages(['fr']).then(() => {
+        return guestAccess.ensureGuestLegalPagesAccess()
+      }).catch(err => {
+        WIKI.logger.warn(`(REDSTONE/LMS) Pages légales: ${err.message}`)
+      })
     })
 
-    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F13, M03, S01/M01, T01, E01/E02, O02/O03, T04')
+    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F13, M03, S01/M01, T01, E01/E02/E07, O02/O03, T04, C14')
   },
   validateLmsConfig
 }

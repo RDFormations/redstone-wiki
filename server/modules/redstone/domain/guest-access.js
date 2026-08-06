@@ -2,6 +2,8 @@
 
 const GUESTS_GROUP_ID = 2
 
+const LEGAL_GUEST_PATHS = Object.freeze(['mentions-legales', 'politique-confidentialite'])
+
 const GUEST_FORMATION_ROLES = Object.freeze([
   'read:pages',
   'read:assets',
@@ -42,12 +44,34 @@ const upsertGuestRule = (rules, slug) => {
   return [...without, rule]
 }
 
+const buildGuestLegalRule = path => ({
+  id: `guest-legal-${path.replace(/\//g, '-')}`,
+  deny: false,
+  match: 'START',
+  roles: [...GUEST_FORMATION_ROLES],
+  path,
+  locales: []
+})
+
+const upsertGuestLegalRules = rules => {
+  let next = [...rules]
+  for (const path of LEGAL_GUEST_PATHS) {
+    const rule = buildGuestLegalRule(path)
+    next = next.filter(r => r.id !== rule.id && r.path !== path)
+    next.push(rule)
+  }
+  return next
+}
+
 module.exports = {
   GUESTS_GROUP_ID,
   GUEST_FORMATION_ROLES,
+  LEGAL_GUEST_PATHS,
   guestRulePath,
   guestRuleId,
   buildGuestFormationRule,
+  buildGuestLegalRule,
   parsePageRules,
-  upsertGuestRule
+  upsertGuestRule,
+  upsertGuestLegalRules
 }

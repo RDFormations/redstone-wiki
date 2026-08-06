@@ -70,6 +70,34 @@ const createContentRouter = getServices => {
     })
   )
 
+  router.get(
+    '/:id/content/versions',
+    requireScope(SCOPE_READ),
+    asyncHandler(async (req, res) => {
+      const path = req.query.path
+      if (!path) {
+        return res.status(422).json({
+          error: { code: 'path_required', message: 'Query path requis (ex. module-01-a.md).' }
+        })
+      }
+      const result = await svc().contentVersions.listForModule(req.params.id, path)
+      if (!result.ok) return res.status(result.status).json({ error: result.error })
+      const { ok: _ok, status: _status, ...body } = result
+      return res.status(200).json(body)
+    })
+  )
+
+  router.get(
+    '/:id/content/versions/:versionId',
+    requireScope(SCOPE_READ),
+    asyncHandler(async (req, res) => {
+      const result = await svc().contentVersions.getVersion(req.params.id, req.params.versionId)
+      if (!result.ok) return res.status(result.status).json({ error: result.error })
+      const { ok: _ok, status: _status, ...body } = result
+      return res.status(200).json(body)
+    })
+  )
+
   return router
 }
 

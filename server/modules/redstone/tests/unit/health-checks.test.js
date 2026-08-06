@@ -54,4 +54,24 @@ describe('health-checks', () => {
     expect(result.ok).toBe(false)
     expect(result.checks.some(c => c.checkId === 'published_forbidden_agent')).toBe(true)
   })
+
+  it('readiness_j48 avertit si session dans les 48 h et cours incomplet', () => {
+    const starts = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    const session = {
+      ...baseSession,
+      state: 'distributed',
+      content_ready_at: null,
+      starts_at: starts,
+      metadata: { planning: [{ day: 1, modules: ['module-01-a'] }] }
+    }
+    const modules = [
+      { path: '00-introduction', body_md: long(900), kind: 'intro' },
+      { path: 'module-01-a', body_md: long(900), kind: 'module' }
+    ]
+    const result = runHealthChecks(session, modules)
+    const j48 = result.checks.find(c => c.checkId === 'readiness_j48')
+    expect(j48).toBeDefined()
+    expect(j48.level).toBe('warning')
+    expect(j48.blocking).toBe(false)
+  })
 })

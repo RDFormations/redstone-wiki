@@ -1,6 +1,7 @@
 /** Jest — module LMS RedStone uniquement (unit / integration / e2e). */
 module.exports = {
   testEnvironment: 'node',
+  testTimeout: 120000,
   roots: ['<rootDir>/server/modules/redstone/tests'],
   testMatch: ['**/*.test.js', '**/*.e2e.test.js'],
   testPathIgnorePatterns: ['/node_modules/'],

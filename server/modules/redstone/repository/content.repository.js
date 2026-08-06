@@ -124,6 +124,39 @@ const createContentRepository = knex => ({
         { total_modules: Number(r.total_modules || 0), published_modules: Number(r.published_modules || 0) }
       ])
     )
+  },
+
+  async listVersions(moduleId) {
+    const rows = await knex(TABLE_VERSIONS)
+      .where({ moduleId })
+      .orderBy('version', 'desc')
+    return rows.map(row => ({
+      id: row.id,
+      module_id: row.moduleId,
+      version: row.version,
+      source: row.source,
+      author: row.author,
+      agent_run_id: row.agentRunId,
+      content_hash: row.contentHash,
+      created_at: row.createdAt
+    }))
+  },
+
+  async findVersion(versionId) {
+    const row = await knex(TABLE_VERSIONS).where({ id: versionId }).first()
+    if (!row) return null
+    return {
+      id: row.id,
+      module_id: row.moduleId,
+      version: row.version,
+      body_md: row.bodyMd,
+      frontmatter: typeof row.frontmatter === 'string' ? JSON.parse(row.frontmatter) : (row.frontmatter || {}),
+      source: row.source,
+      author: row.author,
+      agent_run_id: row.agentRunId,
+      content_hash: row.contentHash,
+      created_at: row.createdAt
+    }
   }
 })
 

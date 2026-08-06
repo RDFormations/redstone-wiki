@@ -77,6 +77,21 @@ const runHealthChecks = (session, modules, options = {}) => {
     blocking: false
   })
 
+  const { evaluateCourseReady, hoursUntilStart, HOURS_J48 } = require('./session-readiness')
+  const hours = hoursUntilStart(session.starts_at)
+  if (hours !== null && hours <= HOURS_J48) {
+    const readiness = evaluateCourseReady(session, modules)
+    checks.push({
+      checkId: 'readiness_j48',
+      level: readiness.ready ? 'ok' : 'warning',
+      message: readiness.ready
+        ? 'Cours prêt (critères J-48 h).'
+        : `Cours non prêt à J-48 h : ${readiness.issues.join(', ')}`,
+      blocking: false,
+      details: readiness
+    })
+  }
+
   const blocking = checks.filter(c => c.blocking)
   const ok = blocking.length === 0
 
