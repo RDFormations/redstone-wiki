@@ -1,6 +1,7 @@
 const {
   buildGuestFormationRule,
   upsertGuestRule,
+  upsertGuestLegalRules,
   parsePageRules,
   guestRulePath
 } = require('../../domain/guest-access')
@@ -23,6 +24,13 @@ describe('guest-access domain', () => {
   it('parse pageRules string JSON', () => {
     const rules = parsePageRules('[{"id":"x","path":"a"}]')
     expect(rules[0].path).toBe('a')
+  })
+
+  it('upsertGuestLegalRules ajoute mentions-legales et politique', () => {
+    const rules = upsertGuestLegalRules([])
+    expect(rules.map(r => r.path)).toEqual(
+      expect.arrayContaining(['mentions-legales', 'politique-confidentialite'])
+    )
   })
 })
 
