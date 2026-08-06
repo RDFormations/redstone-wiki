@@ -430,7 +430,7 @@ router.get('/*', async (req, res, next) => {
 
     try {
       // -> Get Page from cache
-      const page = await WIKI.models.pages.getPage({
+      let page = await WIKI.models.pages.getPage({
         path: pageArgs.path,
         locale: pageArgs.locale,
         userId: req.user.id,

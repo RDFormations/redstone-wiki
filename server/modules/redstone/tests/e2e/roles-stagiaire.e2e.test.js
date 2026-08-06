@@ -8,7 +8,7 @@ const {
   stagiaireNav
 } = require('./helpers/session-factory')
 const { SITE, expectSiteStatus, formationPath } = require('./helpers/site-assertions')
-const { BODY_MODULE } = require('./helpers/fixtures')
+const { BODY_MODULE, BODY_CORRECTION } = require('./helpers/fixtures')
 
 describeE2e('LMS — stagiaire sans compte (HTTP Wiki + contrat nav)', () => {
   let sessionId
@@ -87,7 +87,8 @@ describeE2e('LMS — stagiaire sans compte (HTTP Wiki + contrat nav)', () => {
     expect(pub.status).toBe(200)
 
     await expectSiteStatus(formationPath(slug, 'exercice-01-e2e'), SITE.OK)
-    await expectSiteStatus(formationPath(slug, 'correction-01-e2e'), SITE.FORBIDDEN)
+    const corrRes = await expectSiteStatus(formationPath(slug, 'correction-01-e2e'), SITE.OK)
+    expect(corrRes.raw).not.toContain(BODY_CORRECTION.trim().slice(0, 40))
 
     const nav = await stagiaireNav(sessionId)
     const paths = nav.body.items.map(i => i.path)
