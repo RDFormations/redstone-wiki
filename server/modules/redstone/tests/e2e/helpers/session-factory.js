@@ -15,7 +15,11 @@ const provisionDistributedSession = async (options = {}) => {
       monday_item_id: options.mondayItemId || uniqueMondayId(),
       client: options.client || 'RDF',
       title: options.title || `E2E ${slug}`,
-      ref_client: options.refClient
+      ref_client: options.refClient,
+      metadata: {
+        ...(options.trainerEmail ? { trainer_email: options.trainerEmail } : {}),
+        ...(options.metadata || {})
+      }
     }
   })
   if (created.status !== 201) {

@@ -55,12 +55,22 @@ const createMocks = (overrides = {}) => {
   const guestAccess = {
     ensureGuestFormationAccess: jest.fn().mockResolvedValue({ ok: true, created: true })
   }
+  const trainerAccess = {
+    ensureSessionTrainerAccess: jest.fn().mockResolvedValue({
+      ok: true,
+      group_id: 99,
+      group_name: 'formateurs-test-slug',
+      created: true,
+      assignment: { ok: true, skipped: true }
+    })
+  }
   return {
     sessionRepo,
     contentRepo,
     healthRepo,
     projectionService,
     guestAccess,
+    trainerAccess,
     webhooks,
     logger: { info: jest.fn() },
     ...overrides
@@ -115,6 +125,7 @@ describe('distribute.service', () => {
     expect(result.distributed).toBe(true)
     expect(mocks.healthRepo.replaceForSession).toHaveBeenCalled()
     expect(mocks.guestAccess.ensureGuestFormationAccess).toHaveBeenCalledWith('test-slug')
+    expect(mocks.trainerAccess.ensureSessionTrainerAccess).toHaveBeenCalled()
     expect(mocks.webhooks.emit).toHaveBeenCalledWith(
       WEBHOOK_EVENTS.SESSION_DISTRIBUTED,
       expect.objectContaining({ slug: 'test-slug', distributed: true })

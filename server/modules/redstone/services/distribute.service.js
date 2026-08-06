@@ -13,6 +13,7 @@ const createDistributeService = ({
   healthRepo,
   projectionService,
   guestAccess,
+  trainerAccess,
   webhooks,
   mondayPush,
   getSiteHost = () => 'https://formation.redstoneformations.fr',
@@ -146,6 +147,11 @@ const createDistributeService = ({
       guest_access = await guestAccess.ensureGuestFormationAccess(updated.slug)
     }
 
+    let trainer_access = null
+    if (trainerAccess) {
+      trainer_access = await trainerAccess.ensureSessionTrainerAccess(updated, options)
+    }
+
     logger.info(`(REDSTONE/LMS) Distribute OK: ${session.slug}`)
 
     if (webhooks) {
@@ -170,6 +176,7 @@ const createDistributeService = ({
       content_ready: Boolean(updated.content_ready_at),
       distributed: true,
       guest_access,
+      trainer_access,
       stagiaire_url: `${String(getSiteHost()).replace(/\/$/, '')}/${session.locale_default || 'fr'}/formations/${session.slug}/stagiaire`
     }
   }
