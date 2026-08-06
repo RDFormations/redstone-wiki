@@ -1,0 +1,68 @@
+name: RedStone LMS Tests
+
+on:
+  push:
+    branches:
+      - main
+      - 'cursor/**'
+      - 'redstone/**'
+    paths:
+      - 'server/modules/redstone/**'
+      - 'client/components/formation/**'
+      - 'server/controllers/redstone*.js'
+      - 'server/controllers/common.js'
+      - 'scripts/test-redstone.sh'
+      - 'scripts/ci-wiki-*.sh'
+      - 'jest.config.redstone.js'
+      - '.github/workflows/redstone-lms.yml'
+  pull_request:
+    branches:
+      - main
+      - 'cursor/**'
+      - 'redstone/**'
+
+jobs:
+  unit:
+    name: Unit (offline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --non-interactive
+
+      - name: Run RedStone unit tests
+        run: npm run test:redstone
+
+  e2e:
+    name: Integration + E2E
+    runs-on: ubuntu-latest
+    needs: unit
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --non-interactive
+
+      - name: Bootstrap Wiki.js (Docker)
+        run: bash scripts/ci-wiki-up.sh
+
+      - name: Run integration + e2e
+        env:
+          LMS_E2E_FORCE: '1'
+        run: bash scripts/test-redstone.sh --e2e
+
+      - name: Teardown
+        if: always()
+        run: bash scripts/ci-wiki-down.sh

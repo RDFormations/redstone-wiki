@@ -49,7 +49,7 @@ Sur GitHub : **Settings → General → check "fork"** si créé via « Fork » 
 | **API LMS** (reload auto, sans webpack) | `bash scripts/local-dev-api.sh` | **~10 s** démarrage, **~2 s** par modif |
 | **Dev complet** (API + UI, reload auto) | `bash scripts/local-dev.sh` | 1ère fois ~3–6 min, puis **2–5 s** par modif |
 | **API seule** (conteneur prod) | `bash scripts/local-reload-server.sh` | **~5–10 s** |
-| **Tests unitaires LMS** (hors Docker) | `npm run test:redstone` | **< 5 s** |
+| **Tests unitaires LMS** (hors Docker) | `npm run test:redstone` ou `bash scripts/test-redstone.sh` | **< 10 s** |
 | **Image prod** (smoke CI / prod-like) | `bash scripts/local-up.sh` | rebuild image ~6 min |
 
 ```bash
@@ -115,9 +115,10 @@ OpenAPI : `docs/api/openapi-v1.yaml`
 
 | Commande | Cible | Prérequis |
 |----------|-------|-----------|
-| `npm run test:redstone` | Unitaires (43 tests) | `yarn install` |
-| `bash scripts/e2e-redstone.sh` | E2E API + pages Wiki | `bash scripts/local-dev-api.sh` |
-| `npm run test:redstone:e2e` | E2E seul (idem) | serveur sur `:3000` |
+| `npm run test:redstone` | Unitaires (~149 tests, offline) | `yarn install` |
+| `bash scripts/test-redstone.sh` | Unitaires seuls | `yarn install` |
+| `bash scripts/test-redstone.sh --all` | Unit + integration + e2e | `bash scripts/local-dev-api.sh` |
+| `bash scripts/e2e-redstone.sh` | Integration + e2e (alias `--e2e`) | serveur sur `:3000` |
 
 Couverture E2E (vague 1) : F01 sessions, F03 import, C02 QA, F02 distribute, O11 health, F05 nav, T04 publish, E02 auth, M02 sync-monday, C01 upsert, smoke pages Wiki.
 

@@ -66,3 +66,14 @@ python3 scripts/refresh-formation-nav-published.py --all
 ```
 
 Puis commit JSON dans redstone-wiki si besoin release.
+
+## Tests LMS
+
+| Commande | Scope | Prérequis |
+|----------|-------|-----------|
+| `npm run test:redstone` | Unitaires (~149, offline) | `yarn install` |
+| `bash scripts/test-redstone.sh` | Idem | — |
+| `bash scripts/test-redstone.sh --all` | Unit + integration + e2e | `bash scripts/local-dev-api.sh` |
+| `bash scripts/ci-wiki-up.sh` | Bootstrap Docker pour CI/local e2e | Docker |
+
+CI : `.github/workflows/redstone-lms.yml` (unit sur chaque PR, e2e avec Wiki Docker).

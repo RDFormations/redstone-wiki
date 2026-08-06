@@ -1,6 +1,6 @@
 /**
  * Tests d'intégration services LMS — exécution avec Postgres (même gate que E2E).
- * Gate : LMS_INTEGRATION_FORCE=1 + serveur Wiki.js local.
+ * Gate : LMS_E2E_FORCE=1 + serveur Wiki.js local (voir scripts/test-redstone.sh --e2e).
  */
 const { describeE2e } = require('../e2e/helpers/e2e-suite')
 const { api, tokens } = require('../e2e/helpers/lms-client')

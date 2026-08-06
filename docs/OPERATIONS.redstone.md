@@ -51,7 +51,8 @@ SELECT name FROM migrations WHERE name LIKE '2.5.12%' OR name LIKE '2.5.13%' ORD
 |------|----------|-------|
 | API watch | `bash scripts/local-dev-api.sh` | Backend LMS (~10 s) |
 | Dev complet | `bash scripts/local-dev.sh` | UI + API webpack |
-| Tests | `npm run test:redstone:all` | unit + integration + e2e |
+| Tests | `bash scripts/test-redstone.sh` | unit offline |
+| Tests complets | `bash scripts/test-redstone.sh --all` | unit + integration + e2e |
 
 ## Webhooks (O02)
 
