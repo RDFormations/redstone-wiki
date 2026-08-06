@@ -19,8 +19,32 @@ const allowFriendlyUnpublishedView = pagePath => {
   return ['module', 'exercice', 'correction'].includes(pageKind(stem))
 }
 
+/** Retire le contenu sensible du payload page avant rendu SSR (S02). */
+const stripPageForFriendlyView = page => {
+  if (!page) return page
+  page.render = ''
+  page.content = ''
+  page.toc = typeof page.toc === 'string' ? page.toc : JSON.stringify(page.toc || [])
+  return page
+}
+
+const resolveFormationPageView = ({ page, pagePath, pageIsPublished, canWrite }) => {
+  if (pageIsPublished || canWrite) {
+    return { formationUnpublishedFriendly: false, page }
+  }
+  if (!allowFriendlyUnpublishedView(pagePath)) {
+    return { denied: true }
+  }
+  return {
+    formationUnpublishedFriendly: true,
+    page: stripPageForFriendlyView({ ...page })
+  }
+}
+
 module.exports = {
   formationSlugFromPath,
   formationStemFromPath,
-  allowFriendlyUnpublishedView
+  allowFriendlyUnpublishedView,
+  stripPageForFriendlyView,
+  resolveFormationPageView
 }

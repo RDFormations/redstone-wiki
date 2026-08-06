@@ -114,5 +114,44 @@ describe('publish.service', () => {
     expect(result.status).toBe(422)
     expect(result.error.code).toBe('render_failed')
     expect(result.failed).toHaveLength(1)
+    expect(mocks.contentRepo.updatePublished).not.toHaveBeenCalled()
+  })
+
+  it('met à jour published_stagiaire après projection réussie', async () => {
+    const calls = []
+    const mocks = createMocks()
+    mocks.projectionService.projectModule = jest.fn().mockImplementation(async () => {
+      calls.push('project')
+      return { ok: true, path: 'module-01-a', page_id: 501 }
+    })
+    mocks.contentRepo.updatePublished = jest.fn().mockImplementation(async () => {
+      calls.push('lms')
+    })
+    const svc = createPublishService(mocks)
+    const result = await svc.publish('sess-1', { action: 'module', path: 'module-01-a.md' })
+    expect(result.ok).toBe(true)
+    expect(calls).toEqual(['project', 'lms'])
+  })
+
+  it('dépublie un module restreint sans re-projection', async () => {
+    const mocks = createMocks()
+    mocks.contentRepo.updatePublished = jest.fn().mockResolvedValue(undefined)
+    const svc = createPublishService(mocks)
+    const result = await svc.publish('sess-1', {
+      action: 'module',
+      path: 'module-01-a',
+      published: false
+    })
+    expect(result.ok).toBe(true)
+    expect(result.unpublished).toEqual(['module-01-a'])
+    expect(result.published).toEqual([])
+    expect(mocks.projectionService.projectModule).not.toHaveBeenCalled()
+    expect(mocks.projectionService.setPagePublished).toHaveBeenCalledWith(
+      mockSession,
+      expect.objectContaining({ path: 'module-01-a' }),
+      false
+    )
+    expect(mocks.contentRepo.updatePublished).toHaveBeenCalledWith('m1', false)
+    expect(mocks.webhooks.emit).not.toHaveBeenCalled()
   })
 })

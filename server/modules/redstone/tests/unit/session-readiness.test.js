@@ -28,6 +28,20 @@ describe('session-readiness domain', () => {
     expect(ready.issues).toHaveLength(0)
   })
 
+  it('evaluateCourseReady ne exige pas publication stagiaire J1 (CDC §7.4)', () => {
+    const modules = baseModules().map(m => ({ ...m, published_stagiaire: false }))
+    const ready = evaluateCourseReady(baseSession, modules)
+    expect(ready.ready).toBe(true)
+    expect(ready.issues).toHaveLength(0)
+  })
+
+  it('evaluateCourseReady échoue si module jour 1 absent', () => {
+    const modules = baseModules().filter(m => m.path !== 'module-01-a')
+    const ready = evaluateCourseReady(baseSession, modules)
+    expect(ready.ready).toBe(false)
+    expect(ready.issues).toContain('missing:module-01-a')
+  })
+
   it('evaluateCourseReady échoue si QA absente', () => {
     const ready = evaluateCourseReady(
       { ...baseSession, content_ready_at: null },

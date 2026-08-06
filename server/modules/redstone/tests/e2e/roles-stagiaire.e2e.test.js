@@ -8,6 +8,7 @@ const {
   stagiaireNav
 } = require('./helpers/session-factory')
 const { SITE, expectSiteStatus, formationPath } = require('./helpers/site-assertions')
+const { BODY_MODULE } = require('./helpers/fixtures')
 
 describeE2e('LMS — stagiaire sans compte (HTTP Wiki + contrat nav)', () => {
   let sessionId
@@ -50,7 +51,8 @@ describeE2e('LMS — stagiaire sans compte (HTTP Wiki + contrat nav)', () => {
   it('après distribute : M01 redirect racine + modules non publiés → page friendly S02', async () => {
     await expectSiteStatus(formationPath(slug), SITE.REDIRECT_STAGIAIRE)
     await expectSiteStatus(formationPath(slug, 'stagiaire'), SITE.OK)
-    await expectSiteStatus(formationPath(slug, 'module-01-e2e'), SITE.OK)
+    const moduleRes = await expectSiteStatus(formationPath(slug, 'module-01-e2e'), SITE.OK)
+    expect(moduleRes.raw).not.toContain(BODY_MODULE.trim().slice(0, 40))
     await expectSiteStatus(formationPath(slug, 'exercice-01-e2e'), SITE.OK)
     await expectSiteStatus(formationPath(slug, 'correction-01-e2e'), SITE.OK)
   })

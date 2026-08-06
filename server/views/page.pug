@@ -31,9 +31,13 @@ block body
       comments-external=comments.codeTemplate
       edit-shortcuts=Buffer.from(JSON.stringify(config.editShortcuts)).toString('base64')
       filename=pageFilename
+      formation-unpublished-friendly=formationUnpublishedFriendly.toString()
       )
       template(slot='contents')
-        div!= page.render
+        if formationUnpublishedFriendly
+          //- S02 — contenu affiché par formation-unpublished-friendly.vue (pas de fuite SSR)
+        else
+          div!= page.render
       template(slot='comments')
         div!= comments.main
   if injectCode.body

@@ -177,10 +177,13 @@ const createProjectionService = ({ knex, logger = console }) => {
     const locale = mod.locale || session.locale_default || 'fr'
     const row = await fetchPageRow(pagePath, locale)
     if (!row) return false
+    const wikiPublished = Boolean(row.isPublished)
+    const lmsPublished = Boolean(mod.published_stagiaire)
     return (
       row.content === (mod.body_md || '') &&
       row.editorKey === editorKey &&
       row.contentType === contentType &&
+      wikiPublished === lmsPublished &&
       !isStaleMarkdownRender(row)
     )
   }

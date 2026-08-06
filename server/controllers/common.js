@@ -5,7 +5,7 @@ const _ = require('lodash')
 const CleanCSS = require('clean-css')
 const moment = require('moment')
 const qs = require('querystring')
-const { allowFriendlyUnpublishedView } = require('../modules/redstone/domain/formation-page-access')
+const { applyFormationPageView } = require('../modules/redstone/api/middleware/formation-page-view')
 
 /* global WIKI */
 
@@ -472,13 +472,21 @@ router.get('/*', async (req, res, next) => {
         if (pageIsPublished && !_.isEmpty(page.publishEndDate)) {
           pageIsPublished = moment(page.publishEndDate).isSameOrAfter()
         }
+        let formationUnpublishedFriendly = false
         if (!pageIsPublished && !effectivePermissions.pages.write) {
-          if (!allowFriendlyUnpublishedView(pageArgs.path)) {
+          const formationView = applyFormationPageView({
+            page,
+            pagePath: pageArgs.path,
+            canWrite: effectivePermissions.pages.write
+          })
+          if (formationView.denied) {
             _.set(res.locals, 'pageMeta.title', 'Unauthorized')
             return res.status(403).render('unauthorized', {
               action: 'view'
             })
           }
+          formationUnpublishedFriendly = formationView.formationUnpublishedFriendly
+          page = formationView.page
         }
 
         // -> Build sidebar navigation
@@ -558,7 +566,8 @@ router.get('/*', async (req, res, next) => {
             injectCode,
             comments: commentTmpl,
             effectivePermissions,
-            pageFilename
+            pageFilename,
+            formationUnpublishedFriendly
           })
         }
       } else if (pageArgs.path === 'home') {

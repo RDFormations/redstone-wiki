@@ -5,6 +5,7 @@ const { sessionNotFound, fail } = require('../domain/api-result')
 const { buildIncompleteOutcome } = require('../domain/distribute-outcome')
 const { WEBHOOK_EVENTS } = require('../domain/webhook-events')
 const { buildRenderHealthCheck } = require('../domain/wiki-render')
+const { enrichSessionStatus } = require('../domain/session-status')
 
 const createDistributeService = ({
   sessionRepo,
@@ -97,25 +98,23 @@ const createDistributeService = ({
     }
 
     let verify = { ok: true, stale: [], repaired: 0 }
-    if (projectionService.verifySessionRenders) {
-      verify = await projectionService.verifySessionRenders(session)
-      if (!verify.ok) {
-        const outcome = await buildIncompleteOutcome({
-          sessionRepo,
-          sessionId,
-          session,
-          webhooks,
-          errors: verify.stale.map(row => row.path),
-          projection: [...projection, ...hubProjection],
-          errorCode: 'render_invalid',
-          errorMessage: `${verify.stale.length} page(s) sans rendu HTML valide après projection.`
-        })
-        if (mondayPush) mondayPush.schedulePush(sessionId)
-        return outcome
-      }
-      if (verify.repaired) {
-        logger.info(`(REDSTONE/LMS) ${verify.repaired} page(s) re-rendues pour ${session.slug}`)
-      }
+    verify = await projectionService.verifySessionRenders(session)
+    if (!verify.ok) {
+      const outcome = await buildIncompleteOutcome({
+        sessionRepo,
+        sessionId,
+        session,
+        webhooks,
+        errors: verify.stale.map(row => row.path),
+        projection: [...projection, ...hubProjection],
+        errorCode: 'render_invalid',
+        errorMessage: `${verify.stale.length} page(s) sans rendu HTML valide après projection.`
+      })
+      if (mondayPush) mondayPush.schedulePush(sessionId)
+      return outcome
+    }
+    if (verify.repaired) {
+      logger.info(`(REDSTONE/LMS) ${verify.repaired} page(s) re-rendues pour ${session.slug}`)
     }
 
     health.checks.push(buildRenderHealthCheck(verify))
@@ -123,14 +122,19 @@ const createDistributeService = ({
     await healthRepo.replaceForSession(sessionId, healthRows)
 
     const nextState = transition(session.state, 'distribute_ok') || 'distributed'
+    const statusFlags = enrichSessionStatus({
+      ...session,
+      state: nextState,
+      distributed_at: new Date().toISOString()
+    })
     const updated = await sessionRepo.update(sessionId, {
       state: nextState,
-      distributed_at: new Date().toISOString(),
+      distributed_at: statusFlags.distributed ? new Date().toISOString() : session.distributed_at,
       metadata: {
         lms: {
-          content_ready: Boolean(session.content_ready_at),
-          distributed: true,
-          support_ready: true,
+          content_ready: statusFlags.content_ready,
+          distributed: statusFlags.distributed,
+          support_ready: statusFlags.support_ready,
           renders_ok: true,
           updated_at: new Date().toISOString()
         }
@@ -151,7 +155,7 @@ const createDistributeService = ({
         checks_ok: health.ok,
         content_ready: Boolean(updated.content_ready_at),
         distributed: true,
-        support_ready: true
+        support_ready: statusFlags.support_ready
       })
     }
     if (mondayPush) mondayPush.schedulePush(sessionId)

@@ -580,6 +580,10 @@ export default {
       type: Boolean,
       default: false
     },
+    formationUnpublishedFriendly: {
+      type: Boolean,
+      default: false
+    },
     toc: {
       type: String,
       default: ''
@@ -718,6 +722,7 @@ export default {
       return this.isFormationPage && this.isStagiaireHubPath
     },
     showUnpublishedFriendly () {
+      if (this.formationUnpublishedFriendly) return true
       return this.isFormationPage &&
         this.isFormationRestrictedStem &&
         !this.displayPublished &&
@@ -1054,9 +1059,47 @@ export default {
       }
       return _.get(resp, 'data.pages.update.page')
     },
+    async publishRestrictedViaLms (published = true) {
+      const action = this.formationStem.startsWith('exercice-')
+        ? 'exercice'
+        : this.formationStem.startsWith('correction-')
+          ? 'correction'
+          : 'module'
+      const res = await fetch(`/api/formation/${encodeURIComponent(this.formationSlug)}/publish`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, path: this.formationStem, published })
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(json.error?.message || json.message || `Publication échouée (${res.status})`)
+      }
+      return json
+    },
     async togglePublish () {
       if (!this.canTogglePublish || this.publishBusy || !this.isFormationPage) return
       const next = !this.displayPublished
+      if (this.isFormationRestrictedStem) {
+        this.publishBusy = true
+        try {
+          await this.publishRestrictedViaLms(next)
+          this.localPublished = next
+          this.$store.set('page/isPublished', next)
+          this.$root.$emit('formation-nav-refresh')
+          this.$root.$emit('formation-nav-assets-refresh')
+          this.$store.commit('showNotification', {
+            style: next ? 'green' : 'orange',
+            message: next ? 'Module publié via LMS' : 'Module dépublié via LMS',
+            icon: next ? 'check' : 'minus-circle'
+          })
+        } catch (err) {
+          this.$store.commit('pushGraphError', err)
+        } finally {
+          this.publishBusy = false
+        }
+        return
+      }
       this.publishBusy = true
       try {
         const targets = []

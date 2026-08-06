@@ -52,37 +52,45 @@ const createPublishService = ({
       }
     }
 
+    const wantPublished = payload.published !== false
     const published = []
+    const unpublished = []
     const failed = []
-    const publishOne = async path => {
+    const applyOne = async path => {
       const mod = modules.find(m => m.path === path || m.path === `${path}.md`)
       if (!mod) return null
 
-      await contentRepo.updatePublished(mod.id, true)
-
-      if (projectionService.projectModule) {
-        const projection = await projectionService.projectModule(session, {
-          ...mod,
-          published_stagiaire: true
-        })
-        if (!projection.ok) {
-          return { path: mod.path, error: projection.error || 'projection_failed' }
+      if (wantPublished) {
+        if (projectionService.projectModule) {
+          const projection = await projectionService.projectModule(session, {
+            ...mod,
+            published_stagiaire: true
+          })
+          if (!projection.ok) {
+            return { path: mod.path, error: projection.error || 'projection_failed' }
+          }
+          if (projection.page_id) {
+            await contentRepo.updatePageId(mod.id, projection.page_id)
+          }
+        } else {
+          await projectionService.setPagePublished(session, mod, true)
         }
-        if (projection.page_id) {
-          await contentRepo.updatePageId(mod.id, projection.page_id)
-        }
-      } else {
-        await projectionService.setPagePublished(session, mod, true)
+        await contentRepo.updatePublished(mod.id, true)
+        return { path: mod.path, ok: true }
       }
 
-      return { path: mod.path, ok: true }
+      await projectionService.setPagePublished(session, mod, false)
+      await contentRepo.updatePublished(mod.id, false)
+      return { path: mod.path, ok: true, unpublished: true }
     }
 
-    const outcomes = await Promise.all(paths.map(publishOne))
+    const outcomes = await Promise.all(paths.map(applyOne))
     for (const outcome of outcomes) {
       if (!outcome) continue
       if (outcome.error) {
         failed.push(outcome)
+      } else if (outcome.unpublished) {
+        unpublished.push(outcome.path)
       } else {
         published.push(outcome.path)
       }
@@ -94,6 +102,7 @@ const createPublishService = ({
         ok: false,
         status: 422,
         published,
+        unpublished,
         failed,
         error: {
           code: 'render_failed',
@@ -102,9 +111,11 @@ const createPublishService = ({
       }
     }
 
-    logger.info(`(REDSTONE/LMS) Publish ${session.slug}: ${published.length} modules`)
+    const verb = wantPublished ? 'Publish' : 'Unpublish'
+    const changed = wantPublished ? published : unpublished
+    logger.info(`(REDSTONE/LMS) ${verb} ${session.slug}: ${changed.length} modules`)
 
-    if (webhooks && published.length) {
+    if (webhooks && wantPublished && published.length) {
       webhooks.emit(WEBHOOK_EVENTS.MODULE_PUBLISHED, {
         session_id: sessionId,
         slug: session.slug,
@@ -117,8 +128,9 @@ const createPublishService = ({
     return {
       ok: true,
       status: 200,
-      published,
-      count: published.length
+      published: wantPublished ? published : [],
+      unpublished,
+      count: changed.length
     }
   }
 })

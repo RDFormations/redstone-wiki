@@ -61,5 +61,8 @@ const uniqueMondayId = () =>
 module.exports = {
   minimalCourseModules,
   uniqueSlug,
-  uniqueMondayId
+  uniqueMondayId,
+  BODY_MODULE,
+  BODY_EXERCICE,
+  BODY_CORRECTION
 }

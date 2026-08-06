@@ -19,7 +19,7 @@ const dayOneModuleStems = (session, modules) => {
 
   if (planning.length) {
     const day1 = planning.find(d => Number(d.day) === 1) || planning[0]
-    return (day1?.modules || []).filter(stem => moduleStems.includes(stem))
+    return day1?.modules || []
   }
   return moduleStems
 }
