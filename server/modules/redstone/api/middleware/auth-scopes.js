@@ -7,6 +7,7 @@ const SCOPE_CREATE = 'session:create'
 const SCOPE_IMPORT = 'content:import'
 const SCOPE_DISTRIBUTE = 'session:distribute'
 const SCOPE_PUBLISH = 'content:publish'
+const SCOPE_EDIT = 'content:edit'
 const SCOPE_SYNC = 'session:sync'
 
 const ALL_AGENT_SCOPES = [
@@ -19,7 +20,8 @@ const ALL_AGENT_SCOPES = [
 
 const ALL_FORMATEUR_SCOPES = [
   SCOPE_READ,
-  SCOPE_PUBLISH
+  SCOPE_PUBLISH,
+  SCOPE_EDIT
 ]
 
 const parseBearer = header => {
@@ -98,6 +100,7 @@ module.exports = {
   SCOPE_IMPORT,
   SCOPE_DISTRIBUTE,
   SCOPE_PUBLISH,
+  SCOPE_EDIT,
   SCOPE_SYNC,
   createAuthMiddleware,
   requireScope,

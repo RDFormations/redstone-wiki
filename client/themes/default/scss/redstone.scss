@@ -1408,3 +1408,91 @@ html[data-rs-theme='light'] .rs-sidebar-expand,
     background: #f5f0ff;
   }
 }
+
+.rs-formateur-action-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  font-size: 0.68rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+  border: 1px solid rgba(33, 0, 81, 0.2);
+  background: #fff;
+  color: #210051;
+  cursor: pointer;
+
+  &:hover { background: #f5f0ff; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &--inline {
+    margin-left: 0.25rem;
+    padding: 0.1rem 0.3rem;
+  }
+}
+
+.rs-module-editor-textarea textarea {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.rs-module-editor-preview {
+  min-height: 320px;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.rs-module-versions-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rs-module-versions-item {
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  margin-bottom: 0.4rem;
+  cursor: pointer;
+
+  &:hover { background: #f9fafb; }
+  &--active {
+    border-color: #210051;
+    background: #f5f0ff;
+  }
+}
+
+.rs-module-versions-source {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  background: #e5e7eb;
+  color: #374151;
+
+  &--ui_edit { background: #dbeafe; color: #1e40af; }
+  &--agent_pipeline { background: #ede9fe; color: #5b21b6; }
+  &--chatbot { background: #fef3c7; color: #92400e; }
+}
+
+.rs-module-versions-diff {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  max-height: 420px;
+  overflow: auto;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #111827;
+  color: #e5e7eb;
+}
+
+.rs-module-versions-hunk--add { color: #86efac; }
+.rs-module-versions-hunk--remove { color: #fca5a5; }
+.rs-module-versions-hunk--same { color: #9ca3af; }

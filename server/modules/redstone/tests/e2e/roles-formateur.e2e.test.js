@@ -115,6 +115,44 @@ describeE2e('LMS — formateur (lecture + publish uniquement)', () => {
     const res = await api('GET', `/sessions/${sessionId}`, { token: 'fake-formateur' })
     expect(res.status).toBe(401)
   })
+
+  it('édite un module (C12) et crée une version ui_edit', async () => {
+    const before = await api('GET', `/sessions/${sessionId}/content/module`, {
+      token: tokens().formateur,
+      query: { path: 'module-01-e2e' }
+    })
+    expect(before.status).toBe(200)
+    const newBody = `${before.body.body_md || '# E2E'}\n\n<!-- edit ${Date.now()} -->`
+
+    const edited = await api('PATCH', `/sessions/${sessionId}/content/module`, {
+      token: tokens().formateur,
+      body: { path: 'module-01-e2e', body_md: newBody }
+    })
+    expect(edited.status).toBe(200)
+    expect(edited.body.version).toBeGreaterThan(before.body.current_version)
+
+    const versions = await api('GET', `/sessions/${sessionId}/content/versions`, {
+      token: tokens().formateur,
+      query: { path: 'module-01-e2e' }
+    })
+    expect(versions.status).toBe(200)
+    expect(versions.body.versions[0].source).toBe('ui_edit')
+
+    const latestId = versions.body.versions[0].id
+    const diff = await api('GET', `/sessions/${sessionId}/content/versions/${latestId}/diff`, {
+      token: tokens().formateur
+    })
+    expect(diff.status).toBe(200)
+    expect(diff.body.summary.added).toBeGreaterThan(0)
+  })
+
+  it('agent ne peut pas éditer sans scope content:edit (formateur oui)', async () => {
+    const res = await api('PATCH', `/sessions/${sessionId}/content/module`, {
+      token: tokens().agent,
+      body: { path: 'module-01-e2e', body_md: '# Agent edit attempt' }
+    })
+    expect(res.status).toBe(403)
+  })
 })
 
 describeE2e('LMS — formateur ne peut pas usurper le rôle agent', () => {

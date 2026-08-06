@@ -4,7 +4,8 @@ const {
   SCOPE_READ,
   SCOPE_IMPORT,
   SCOPE_DISTRIBUTE,
-  SCOPE_PUBLISH
+  SCOPE_PUBLISH,
+  SCOPE_EDIT
 } = require('../middleware/auth-scopes')
 const { asyncHandler } = require('../middleware/error-handler')
 const { sendSession, sendResult } = require('../helpers/response')
@@ -92,6 +93,52 @@ const createContentRouter = getServices => {
     requireScope(SCOPE_READ),
     asyncHandler(async (req, res) => {
       const result = await svc().contentVersions.getVersion(req.params.id, req.params.versionId)
+      if (!result.ok) return res.status(result.status).json({ error: result.error })
+      const { ok: _ok, status: _status, ...body } = result
+      return res.status(200).json(body)
+    })
+  )
+
+  router.get(
+    '/:id/content/versions/:versionId/diff',
+    requireScope(SCOPE_READ),
+    asyncHandler(async (req, res) => {
+      const result = await svc().contentVersions.compareVersions(
+        req.params.id,
+        req.params.versionId,
+        req.query.base || null
+      )
+      if (!result.ok) return res.status(result.status).json({ error: result.error })
+      const { ok: _ok, status: _status, ...body } = result
+      return res.status(200).json(body)
+    })
+  )
+
+  router.get(
+    '/:id/content/module',
+    requireScope(SCOPE_READ),
+    asyncHandler(async (req, res) => {
+      const path = req.query.path
+      if (!path) {
+        return res.status(422).json({
+          error: { code: 'path_required', message: 'Query path requis.' }
+        })
+      }
+      const result = await svc().contentEdit.getModule(req.params.id, path)
+      if (!result.ok) return res.status(result.status).json({ error: result.error })
+      const { ok: _ok, status: _status, ...body } = result
+      return res.status(200).json(body)
+    })
+  )
+
+  router.patch(
+    '/:id/content/module',
+    requireScope(SCOPE_EDIT),
+    asyncHandler(async (req, res) => {
+      const result = await svc().contentEdit.updateModule(req.params.id, req.body, {
+        source: req.body.source || 'ui_edit',
+        author: req.redstoneAuth?.role || req.body.author
+      })
       if (!result.ok) return res.status(result.status).json({ error: result.error })
       const { ok: _ok, status: _status, ...body } = result
       return res.status(200).json(body)

@@ -3,7 +3,7 @@ const { createContentVersionsService, normalizePath } = require('../../services/
 const session = { id: 'sess-1', slug: 'test' }
 const mod = {
   id: 'mod-1',
-  path: 'module-01-a.md',
+  path: 'module-01-a',
   current_version: 2
 }
 const versions = [
@@ -12,9 +12,9 @@ const versions = [
 ]
 
 describe('content-versions.service', () => {
-  it('normalizePath ajoute .md', () => {
-    expect(normalizePath('module-01-a')).toBe('module-01-a.md')
-    expect(normalizePath('module-01-a.md')).toBe('module-01-a.md')
+  it('normalizePath retire .md', () => {
+    expect(normalizePath('module-01-a')).toBe('module-01-a')
+    expect(normalizePath('module-01-a.md')).toBe('module-01-a')
   })
 
   it('listForModule retourne les versions', async () => {

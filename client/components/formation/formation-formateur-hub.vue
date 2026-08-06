@@ -129,6 +129,20 @@
                         )
                         v-icon(x-small) mdi-cloud-upload
                         span Publier
+                      button.rs-formateur-action-btn(
+                        v-if='canEdit && useLmsApi'
+                        type='button'
+                        title='Éditer le module'
+                        @click.prevent='editModule(mod)'
+                        )
+                        v-icon(x-small) mdi-pencil-outline
+                      button.rs-formateur-action-btn(
+                        v-if='canEdit && useLmsApi'
+                        type='button'
+                        title='Historique des versions'
+                        @click.prevent='showVersions(mod)'
+                        )
+                        v-icon(x-small) mdi-history
                       span.rs-formateur-badge(
                         :class='pubBadgeClass(mod.isPublished)'
                         ) {{ pubBadgeLabel(mod.isPublished) }}
@@ -228,6 +242,20 @@
                       @click.prevent.stop='publishItem(mod, "module")'
                       )
                       v-icon(x-small) mdi-cloud-upload
+                    button.rs-formateur-action-btn.rs-formateur-action-btn--inline(
+                      v-if='canEdit && useLmsApi'
+                      type='button'
+                      title='Éditer'
+                      @click.prevent.stop='editModule(mod)'
+                      )
+                      v-icon(x-small) mdi-pencil-outline
+                    button.rs-formateur-action-btn.rs-formateur-action-btn--inline(
+                      v-if='canEdit && useLmsApi'
+                      type='button'
+                      title='Historique'
+                      @click.prevent.stop='showVersions(mod)'
+                      )
+                      v-icon(x-small) mdi-history
                     span.rs-formateur-badge(
                       :class='pubBadgeClass(mod.isPublished)'
                       ) {{ pubBadgeLabel(mod.isPublished) }}
@@ -249,12 +277,28 @@
                     span.rs-formateur-badge(
                       :class='pubBadgeClass(item.isPublished, item.kind)'
                       ) {{ pubBadgeLabel(item.isPublished, item.kind) }}
+
+    formation-module-editor(
+      ref='moduleEditor'
+      :slug='slug'
+      @saved='onModuleSaved'
+      )
+    formation-module-versions(
+      ref='moduleVersions'
+      :slug='slug'
+      )
 </template>
 
 <script>
 import { get } from 'vuex-pathify'
+import FormationModuleEditor from './formation-module-editor.vue'
+import FormationModuleVersions from './formation-module-versions.vue'
 
 export default {
+  components: {
+    FormationModuleEditor,
+    FormationModuleVersions
+  },
   props: {
     slug: { type: String, required: true },
     locale: { type: String, default: 'fr' }
@@ -273,6 +317,9 @@ export default {
     canPublish () {
       const elevated = ['manage:system', 'write:pages', 'manage:pages']
       return (this.permissions || []).some(p => elevated.includes(p))
+    },
+    canEdit () {
+      return this.canPublish
     },
     dateRange () {
       if (!this.data || !this.data.dates) return ''
@@ -533,6 +580,19 @@ export default {
       } finally {
         this.publishBusy = false
       }
+    },
+    editModule (mod) {
+      if (!this.canEdit || !this.useLmsApi) return
+      this.$refs.moduleEditor?.openFor(mod)
+    },
+    showVersions (mod) {
+      if (!this.canEdit || !this.useLmsApi) return
+      this.$refs.moduleVersions?.openFor(mod)
+    },
+    async onModuleSaved () {
+      await this.load()
+      this.$root.$emit('formation-nav-refresh')
+      this.$root.$emit('formation-nav-assets-refresh')
     }
   }
 }

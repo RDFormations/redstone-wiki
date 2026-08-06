@@ -39,6 +39,7 @@ module.exports = {
     const { createMondayPushService } = require(path.join(base, 'services/monday-push.service'))
     const { createAdminSessionsService } = require(path.join(base, 'services/admin-sessions.service'))
     const { createContentVersionsService } = require(path.join(base, 'services/content-versions.service'))
+    const { createContentEditService } = require(path.join(base, 'services/content-edit.service'))
     const { createLegalPagesService } = require(path.join(base, 'services/legal-pages.service'))
     const { createPortalService } = require(path.join(base, 'services/portal.service'))
     const { fetchMissionItem } = require(path.join(base, 'infrastructure/monday-client'))
@@ -72,6 +73,12 @@ module.exports = {
     })
     const adminSessions = createAdminSessionsService({ sessionRepo, contentRepo, healthRepo })
     const contentVersions = createContentVersionsService({ sessionRepo, contentRepo })
+    const contentEdit = createContentEditService({
+      sessionRepo,
+      contentRepo,
+      projectionService: projection,
+      logger: WIKI.logger
+    })
     const legalPages = createLegalPagesService({ knex, logger: WIKI.logger })
     const getMondayToken = () => process.env.MONDAY_API_TOKEN || process.env.MONDAY_TOKEN
     const mondayPush = createMondayPushService({
@@ -118,6 +125,7 @@ module.exports = {
       portal,
       adminSessions,
       contentVersions,
+      contentEdit,
       legalPages,
       health,
       contentNav,
@@ -143,7 +151,7 @@ module.exports = {
       })
     })
 
-    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F13, M03, S01/M01, T01, E01/E02/E07, O02/O03, T04, C14')
+    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F13, M03, S01/M01, T01, E01/E02/E07, O02/O03, T04, C12/C14')
   },
   validateLmsConfig
 }
