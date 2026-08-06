@@ -14,10 +14,23 @@
           span(v-if='data.location') · {{ data.location }}
           span(v-if='data.modality') · {{ data.modality }}
           span(v-if='data.reference') · Réf. {{ data.reference }}
+        .rs-formateur-hero-progress(v-if='data.publication.total')
+          .rs-formateur-hero-progress-head
+            span Publication
+            strong {{ publicationPercent }}%
+          v-progress-linear(
+            :value='publicationPercent'
+            color='primary'
+            height='8'
+            rounded
+            )
+          .rs-formateur-hero-progress-meta
+            span {{ data.publication.published }} / {{ data.publication.total }} modules
+            span(v-if='data.publication.draft') · {{ data.publication.draft }} brouillon(s)
         .rs-formateur-hero-stats
           .rs-formateur-stat
             strong {{ data.publication.published }}
-            span / {{ data.publication.total }} modules publiés
+            span modules publiés
           .rs-formateur-stat(v-if='data.publication.exercice && data.publication.exercice.total')
             strong {{ data.publication.exercice.published }}
             span / {{ data.publication.exercice.total }} exercices
@@ -30,7 +43,8 @@
           .rs-formateur-stat(v-if='data.participants')
             strong {{ data.participants }}
             span participant(s)
-          button.rs-formateur-copy.mt-2(type='button', @click='copyConvocationMessage')
+        .rs-formateur-hero-actions
+          button.rs-formateur-copy(type='button', @click='copyConvocationMessage')
             v-icon.mr-2(small) mdi-email-outline
             | Copier message convocation
 
@@ -119,33 +133,33 @@
                     .rs-formateur-module-row
                       a.rs-formateur-module-link(:href='localeHref(mod.href)')
                         span.rs-formateur-module-num {{ padNum(mod.moduleNum) }}
-                        span {{ mod.title }}
-                      button.rs-formateur-publish-btn(
-                        v-if='canPublish && !mod.isPublished'
-                        type='button'
-                        :disabled='publishBusy'
-                        title='Publier le module'
-                        @click.prevent='publishItem(mod, "module")'
-                        )
-                        v-icon(x-small) mdi-cloud-upload
-                        span Publier
-                      button.rs-formateur-action-btn(
-                        v-if='canEdit && useLmsApi'
-                        type='button'
-                        title='Éditer le module'
-                        @click.prevent='editModule(mod)'
-                        )
-                        v-icon(x-small) mdi-pencil-outline
-                      button.rs-formateur-action-btn(
-                        v-if='canEdit && useLmsApi'
-                        type='button'
-                        title='Historique des versions'
-                        @click.prevent='showVersions(mod)'
-                        )
-                        v-icon(x-small) mdi-history
-                      span.rs-formateur-badge(
-                        :class='pubBadgeClass(mod.isPublished)'
-                        ) {{ pubBadgeLabel(mod.isPublished) }}
+                        span.rs-formateur-module-title {{ mod.title }}
+                      .rs-formateur-module-actions
+                        button.rs-formateur-icon-btn.rs-formateur-icon-btn--publish(
+                          v-if='canPublish && !mod.isPublished'
+                          type='button'
+                          :disabled='publishBusy'
+                          title='Publier le module'
+                          @click.prevent='publishItem(mod, "module")'
+                          )
+                          v-icon(small) mdi-cloud-upload-outline
+                        button.rs-formateur-icon-btn(
+                          v-if='canEdit && useLmsApi'
+                          type='button'
+                          title='Éditer le module'
+                          @click.prevent='editModule(mod)'
+                          )
+                          v-icon(small) mdi-pencil-outline
+                        button.rs-formateur-icon-btn(
+                          v-if='canEdit && useLmsApi'
+                          type='button'
+                          title='Historique des versions'
+                          @click.prevent='showVersions(mod)'
+                          )
+                          v-icon(small) mdi-history
+                        span.rs-formateur-badge(
+                          :class='pubBadgeClass(mod.isPublished)'
+                          ) {{ pubBadgeLabel(mod.isPublished) }}
                     ul.rs-formateur-practice-list(
                       v-if='practiceItems(mod).length'
                       )
@@ -222,7 +236,9 @@
               v-icon.mr-2(color='primary', small) mdi-eye-settings
               | Publication des modules
               v-spacer
-              span.caption.grey--text {{ data.publication.draft }} brouillon(s)
+              .rs-formateur-pub-summary
+                span.rs-formateur-pub-summary-pill {{ data.publication.published }} publiés
+                span.rs-formateur-pub-summary-pill.rs-formateur-pub-summary-pill--draft(v-if='data.publication.draft') {{ data.publication.draft }} brouillon(s)
             v-card-text.pt-0
               .rs-formateur-pub-grid
                 .rs-formateur-pub-block(
@@ -235,30 +251,32 @@
                     )
                     span.rs-formateur-module-num {{ padNum(mod.moduleNum) }}
                     span.rs-formateur-pub-title {{ mod.title }}
-                    button.rs-formateur-publish-btn.rs-formateur-publish-btn--inline(
-                      v-if='canPublish && !mod.isPublished'
-                      type='button'
-                      :disabled='publishBusy'
-                      @click.prevent.stop='publishItem(mod, "module")'
-                      )
-                      v-icon(x-small) mdi-cloud-upload
-                    button.rs-formateur-action-btn.rs-formateur-action-btn--inline(
-                      v-if='canEdit && useLmsApi'
-                      type='button'
-                      title='Éditer'
-                      @click.prevent.stop='editModule(mod)'
-                      )
-                      v-icon(x-small) mdi-pencil-outline
-                    button.rs-formateur-action-btn.rs-formateur-action-btn--inline(
-                      v-if='canEdit && useLmsApi'
-                      type='button'
-                      title='Historique'
-                      @click.prevent.stop='showVersions(mod)'
-                      )
-                      v-icon(x-small) mdi-history
-                    span.rs-formateur-badge(
-                      :class='pubBadgeClass(mod.isPublished)'
-                      ) {{ pubBadgeLabel(mod.isPublished) }}
+                    .rs-formateur-pub-actions(@click.prevent.stop)
+                      button.rs-formateur-icon-btn.rs-formateur-icon-btn--publish(
+                        v-if='canPublish && !mod.isPublished'
+                        type='button'
+                        :disabled='publishBusy'
+                        title='Publier'
+                        @click='publishItem(mod, "module")'
+                        )
+                        v-icon(x-small) mdi-cloud-upload-outline
+                      button.rs-formateur-icon-btn(
+                        v-if='canEdit && useLmsApi'
+                        type='button'
+                        title='Éditer'
+                        @click='editModule(mod)'
+                        )
+                        v-icon(x-small) mdi-pencil-outline
+                      button.rs-formateur-icon-btn(
+                        v-if='canEdit && useLmsApi'
+                        type='button'
+                        title='Historique'
+                        @click='showVersions(mod)'
+                        )
+                        v-icon(x-small) mdi-history
+                      span.rs-formateur-badge(
+                        :class='pubBadgeClass(mod.isPublished)'
+                        ) {{ pubBadgeLabel(mod.isPublished) }}
                   a.rs-formateur-pub-item.rs-formateur-pub-item--practice(
                     v-for='item in practiceItems(mod)'
                     :key='item.stem'
@@ -347,6 +365,11 @@ export default {
         { id: 'teams', label: 'Teams', icon: 'mdi-microsoft-teams', ok: ind.teams?.ok },
         { id: 'emargement', label: 'Émargement', icon: 'mdi-clipboard-check-outline', ok: ind.emargement?.ok }
       ]
+    },
+    publicationPercent () {
+      const pub = this.data?.publication
+      if (!pub || !pub.total) return 0
+      return Math.round((pub.published / pub.total) * 100)
     },
     convocationText () {
       if (!this.data) return ''

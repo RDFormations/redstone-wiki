@@ -1,34 +1,45 @@
 <template lang="pug">
-  v-dialog.rs-module-editor(v-model='open', max-width='960', scrollable, persistent)
-    v-card
-      v-card-title.rs-module-editor-title
-        v-icon.mr-2(small, color='primary') mdi-pencil-outline
-        | Éditer — {{ activeTitle }}
-        v-spacer
-        v-btn(icon, small, :disabled='saving', @click='requestClose')
+  v-dialog.rs-module-editor(v-model='open', max-width='980', scrollable, persistent, content-class='rs-module-editor-dialog')
+    v-card.rs-module-editor-card
+      .rs-module-editor-header
+        .rs-module-editor-header-main
+          .rs-module-editor-kicker Édition module
+          h2.rs-module-editor-heading {{ activeTitle }}
+          code.rs-module-editor-path {{ activePath }}
+        v-btn.rs-module-editor-close(icon, :disabled='saving', @click='requestClose')
           v-icon mdi-close
-      v-card-subtitle.caption {{ activePath }}
-      v-progress-linear(v-if='loading || saving', indeterminate, color='primary', height='2')
-      v-card-text.pt-0
+      v-progress-linear(v-if='loading || saving', indeterminate, color='primary', height='3')
+      v-card-text.rs-module-editor-body
         v-alert.mb-3(v-if='error', type='error', dense, outlined) {{ error }}
-        v-tabs(v-model='tab', grow, background-color='transparent')
-          v-tab Édition
-          v-tab Aperçu
-        v-tabs-items(v-model='tab')
+        v-tabs.rs-module-editor-tabs(v-model='tab', grow, background-color='transparent', slider-color='primary')
+          v-tab
+            v-icon.mr-2(small) mdi-language-markdown
+            | Édition
+          v-tab
+            v-icon.mr-2(small) mdi-eye-outline
+            | Aperçu
+        v-tabs-items.rs-module-editor-panels(v-model='tab')
           v-tab-item
             v-textarea.rs-module-editor-textarea(
               v-model='bodyMd'
               outlined
               auto-grow
-              rows='18'
+              rows='20'
               hide-details
               :disabled='loading || saving'
               placeholder='Contenu Markdown…'
               )
           v-tab-item
-            .rs-module-editor-preview.contents(v-html='previewHtml')
-      v-card-actions
-        span.caption.grey--text(v-if='currentVersion') Version {{ currentVersion }}
+            .rs-module-editor-preview.contents(v-if='bodyMd', v-html='previewHtml')
+            .rs-module-editor-preview-empty(v-else)
+              v-icon(large, color='grey lighten-1') mdi-text-box-outline
+              p Aucun contenu — commencez à écrire dans l'onglet Édition.
+      v-card-actions.rs-module-editor-footer
+        .rs-module-editor-meta
+          span.rs-module-editor-version(v-if='currentVersion')
+            v-icon.mr-1(x-small) mdi-source-branch
+            | Version {{ currentVersion }}
+          span.rs-module-editor-dirty(v-if='dirty') Modifications non enregistrées
         v-spacer
         v-btn(text, :disabled='saving', @click='requestClose') Annuler
         v-btn(
@@ -37,7 +48,9 @@
           :loading='saving'
           :disabled='loading || !dirty'
           @click='save'
-          ) Enregistrer
+          )
+          v-icon(left, small) mdi-content-save-outline
+          | Enregistrer
 </template>
 
 <script>

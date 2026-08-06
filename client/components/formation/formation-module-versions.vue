@@ -1,53 +1,70 @@
 <template lang="pug">
-  v-dialog.rs-module-versions(v-model='open', max-width='900', scrollable)
-    v-card
-      v-card-title
-        v-icon.mr-2(small, color='primary') mdi-history
-        | Historique — {{ activeTitle }}
-        v-spacer
-        v-btn(icon, small, @click='open = false')
+  v-dialog.rs-module-versions(v-model='open', max-width='960', scrollable, content-class='rs-module-versions-dialog')
+    v-card.rs-module-versions-card
+      .rs-module-versions-header
+        .rs-module-versions-header-main
+          .rs-module-versions-kicker Historique
+          h2.rs-module-versions-heading {{ activeTitle }}
+          code.rs-module-versions-path {{ activePath }}
+          span.rs-module-versions-current(v-if='currentVersion') v{{ currentVersion }} actuelle
+        v-btn.rs-module-versions-close(icon, @click='open = false')
           v-icon mdi-close
-      v-card-subtitle.caption {{ activePath }}
-      v-progress-linear(v-if='loading', indeterminate, color='primary', height='2')
-      v-card-text.pt-0
+      v-progress-linear(v-if='loading', indeterminate, color='primary', height='3')
+      v-card-text.rs-module-versions-body
         v-alert.mb-3(v-if='error', type='error', dense, outlined) {{ error }}
         v-row(dense)
           v-col(cols='12', md='4')
-            .rs-module-versions-filter.mb-2
-              v-select(
+            .rs-module-versions-sidebar
+              v-select.rs-module-versions-filter(
                 v-model='sourceFilter'
                 :items='sourceOptions'
                 dense
                 outlined
                 hide-details
+                prepend-inner-icon='mdi-filter-variant'
                 label='Filtrer par source'
                 )
-            ul.rs-module-versions-timeline
-              li.rs-module-versions-item(
-                v-for='ver in filteredVersions'
-                :key='ver.id'
-                :class='{ "rs-module-versions-item--active": selectedId === ver.id }'
-                @click='selectVersion(ver)'
-                )
-                .rs-module-versions-item-head
-                  strong v{{ ver.version }}
-                  span.rs-module-versions-source(:class='sourceClass(ver.source)') {{ sourceLabel(ver.source) }}
-                .caption.grey--text {{ formatDate(ver.created_at) }}
-                .caption(v-if='ver.author') {{ ver.author }}
+              .rs-module-versions-empty(v-if='!loading && !filteredVersions.length')
+                v-icon(color='grey') mdi-history
+                p Aucune version pour ce filtre.
+              ul.rs-module-versions-timeline(v-else)
+                li.rs-module-versions-item(
+                  v-for='(ver, idx) in filteredVersions'
+                  :key='ver.id'
+                  :class='versionItemClass(ver, idx)'
+                  @click='selectVersion(ver)'
+                  )
+                  .rs-module-versions-item-dot
+                  .rs-module-versions-item-body
+                    .rs-module-versions-item-head
+                      strong v{{ ver.version }}
+                      span.rs-module-versions-source(:class='sourceClass(ver.source)') {{ sourceLabel(ver.source) }}
+                      span.rs-module-versions-current-badge(v-if='ver.version === currentVersion') actuelle
+                    .rs-module-versions-item-date {{ formatDate(ver.created_at) }}
+                    .rs-module-versions-item-author(v-if='ver.author') {{ ver.author }}
           v-col(cols='12', md='8')
-            v-progress-linear(v-if='diffLoading', indeterminate, color='primary', height='2')
-            template(v-if='diff')
-              .rs-module-versions-summary.mb-2
-                span.mr-3 +{{ diff.summary.added }}
-                span.mr-3 -{{ diff.summary.removed }}
-                span {{ diff.summary.unchanged }} inchangées
-              pre.rs-module-versions-diff
-                div(
-                  v-for='(hunk, idx) in diff.diff'
-                  :key='idx'
-                  :class='hunkClass(hunk)'
-                  ) {{ hunkPrefix(hunk) }}{{ hunk.line }}
-            p.grey--text.caption(v-else-if='!diffLoading') Sélectionnez une version pour voir le diff.
+            .rs-module-versions-diff-panel
+              v-progress-linear(v-if='diffLoading', indeterminate, color='primary', height='2')
+              template(v-if='diff')
+                .rs-module-versions-summary
+                  .rs-module-versions-chip.rs-module-versions-chip--add
+                    v-icon.mr-1(x-small) mdi-plus
+                    | {{ diff.summary.added }} ajoutées
+                  .rs-module-versions-chip.rs-module-versions-chip--remove
+                    v-icon.mr-1(x-small) mdi-minus
+                    | {{ diff.summary.removed }} supprimées
+                  .rs-module-versions-chip.rs-module-versions-chip--same
+                    v-icon.mr-1(x-small) mdi-equal
+                    | {{ diff.summary.unchanged }} inchangées
+                pre.rs-module-versions-diff
+                  div(
+                    v-for='(hunk, idx) in diff.diff'
+                    :key='idx'
+                    :class='hunkClass(hunk)'
+                    ) {{ hunkPrefix(hunk) }}{{ hunk.line }}
+              .rs-module-versions-diff-empty(v-else-if='!diffLoading')
+                v-icon(large, color='grey lighten-1') mdi-file-compare
+                p Sélectionnez une version pour comparer avec l'actuelle.
 </template>
 
 <script>
@@ -145,6 +162,13 @@ export default {
         this.error = e.message || String(e)
       } finally {
         this.diffLoading = false
+      }
+    },
+    versionItemClass (ver, idx) {
+      return {
+        'rs-module-versions-item--active': this.selectedId === ver.id,
+        'rs-module-versions-item--current': ver.version === this.currentVersion,
+        'rs-module-versions-item--last': idx === this.filteredVersions.length - 1
       }
     },
     sourceLabel (source) {
