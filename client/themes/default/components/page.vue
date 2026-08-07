@@ -441,12 +441,12 @@ import FormationFormateurHub from '../../../components/formation/formation-forma
 import FormationStagiaireHub from '../../../components/formation/formation-stagiaire-hub.vue'
 import FormationUnpublishedFriendly from '../../../components/formation/formation-unpublished-friendly.vue'
 import Prism from 'prismjs'
-import mermaid from 'mermaid'
 import { get, sync } from 'vuex-pathify'
 import _ from 'lodash'
 import ClipboardJS from 'clipboard'
 import Vue from 'vue'
 import { enhanceCallouts } from '../../../helpers/callouts.js'
+import { enhanceMermaidDiagrams } from '../../../helpers/mermaid.js'
 
 /* global siteLangs */
 
@@ -829,7 +829,10 @@ export default {
     this.$store.set('page/mode', 'view')
   },
   updated () {
-    this.$nextTick(() => this.enhancePageCallouts())
+    this.$nextTick(() => {
+      this.enhancePageCallouts()
+      this.enhancePageMermaid()
+    })
   },
   mounted () {
     try {
@@ -858,15 +861,15 @@ export default {
     // -> Callouts Obsidian [!note] [!tip] …
     this.enhancePageCallouts()
     if (this.$refs.container && typeof MutationObserver !== 'undefined') {
-      this._calloutObserver = new MutationObserver(() => this.enhancePageCallouts())
+      this._calloutObserver = new MutationObserver(() => {
+        this.enhancePageCallouts()
+        this.enhancePageMermaid()
+      })
       this._calloutObserver.observe(this.$refs.container, { childList: true, subtree: true })
     }
 
-    // -> Render Mermaid diagrams
-    mermaid.mermaidAPI.initialize({
-      startOnLoad: true,
-      theme: this.$vuetify.theme.dark ? `dark` : `default`
-    })
+    // -> Render Mermaid diagrams (cadre RedStone, zoom, plein écran)
+    this.enhancePageMermaid()
 
     // -> Handle anchor scrolling
     if (window.location.hash && window.location.hash.length > 1) {
@@ -902,6 +905,12 @@ export default {
   methods: {
     enhancePageCallouts () {
       if (this.$refs.container) enhanceCallouts(this.$refs.container)
+    },
+    enhancePageMermaid () {
+      if (!this.$refs.container) return
+      enhanceMermaidDiagrams(this.$refs.container, {
+        isDark: Boolean(this.$vuetify?.theme?.dark)
+      })
     },
     applySidebarLayoutState () {
       const collapsed = this.formationMainCollapsed

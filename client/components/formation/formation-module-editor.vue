@@ -30,7 +30,7 @@
               placeholder='Contenu Markdown…'
               )
           v-tab-item
-            .rs-module-editor-preview.contents(v-if='bodyMd', v-html='previewHtml')
+            .rs-module-editor-preview.contents(ref='preview', v-if='bodyMd', v-html='previewHtml')
             .rs-module-editor-preview-empty(v-else)
               v-icon(large, color='grey lighten-1') mdi-text-box-outline
               p Aucun contenu — commencez à écrire dans l'onglet Édition.
@@ -55,6 +55,7 @@
 
 <script>
 import MarkdownIt from 'markdown-it'
+import { enhanceMermaidDiagrams } from '../../helpers/mermaid.js'
 
 const md = new MarkdownIt({ html: false, linkify: true, breaks: true })
 
@@ -92,7 +93,22 @@ export default {
       return this.bodyMd !== this.initialBody
     }
   },
+  watch: {
+    tab (value) {
+      if (value === 1) this.$nextTick(() => this.enhancePreviewMermaid())
+    },
+    bodyMd () {
+      if (this.tab === 1) this.$nextTick(() => this.enhancePreviewMermaid())
+    }
+  },
   methods: {
+    enhancePreviewMermaid () {
+      const root = this.$refs.preview
+      if (!root) return
+      enhanceMermaidDiagrams(root, {
+        isDark: Boolean(this.$vuetify?.theme?.dark)
+      })
+    },
     async openFor (mod) {
       if (!mod || !mod.stem) return
       this.activeStem = mod.stem

@@ -220,7 +220,7 @@ import plantuml from './markdown/plantuml'
 import Prism from 'prismjs'
 
 // Mermaid
-import mermaid from 'mermaid'
+import { enhanceMermaidDiagrams } from '../../helpers/mermaid.js'
 
 // Helpers
 import katexHelper from './common/katex'
@@ -365,8 +365,6 @@ md.renderer.rules.emoji = (token, idx) => {
 // ========================================
 // Vue Component
 // ========================================
-
-let mermaidId = 0
 
 export default {
   components: {
@@ -586,12 +584,10 @@ export default {
       })
     },
     renderMermaidDiagrams () {
-      document.querySelectorAll('.editor-markdown-preview pre.codeblock-mermaid > code').forEach(elm => {
-        mermaidId++
-        const mermaidDef = elm.innerText
-        const mmElm = document.createElement('div')
-        mmElm.innerHTML = `<div id="mermaid-id-${mermaidId}">${mermaid.render(`mermaid-id-${mermaidId}`, mermaidDef)}</div>`
-        elm.parentElement.replaceWith(mmElm)
+      const root = document.querySelector('.editor-markdown-preview')
+      if (!root) return
+      enhanceMermaidDiagrams(root, {
+        isDark: Boolean(this.$vuetify?.theme?.dark)
       })
     },
     autocomplete (cm, change) {
@@ -730,12 +726,6 @@ export default {
     if (this.mode === 'create' && !this.$store.get('editor/content')) {
       this.$store.set('editor/content', '# Header\nYour content here')
     }
-
-    // Initialize Mermaid API
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: this.$vuetify.theme.dark ? `dark` : `default`
-    })
 
     // Initialize CodeMirror
 

@@ -1984,3 +1984,194 @@ html[data-rs-theme='light'] .rs-sidebar-expand,
     padding: 1rem;
   }
 }
+
+// ── Mermaid diagrams ──────────────────────────────────────────────────
+
+body.rs-mermaid-fs-active {
+  overflow: hidden;
+}
+
+.rs-mermaid {
+  margin: 1.25rem 0;
+  border-radius: 12px;
+  border: 1px solid rgba(33, 0, 81, 0.12);
+  background: linear-gradient(180deg, #faf8ff 0%, #ffffff 42%);
+  box-shadow: 0 2px 12px rgba(33, 0, 81, 0.06);
+  overflow: hidden;
+
+  .theme--dark & {
+    border-color: rgba(196, 181, 253, 0.18);
+    background: linear-gradient(180deg, #1a1033 0%, #1e1830 42%);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  }
+
+  &--fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    margin: 0;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+
+    .rs-mermaid-viewport {
+      flex: 1;
+      max-height: none;
+      min-height: 0;
+    }
+  }
+}
+
+.rs-mermaid-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0.65rem;
+  border-bottom: 1px solid rgba(33, 0, 81, 0.08);
+  background: rgba(33, 0, 81, 0.03);
+
+  .theme--dark & {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+
+.rs-mermaid-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5b21b6;
+
+  .theme--dark & { color: #c4b5fd; }
+}
+
+.rs-mermaid-label-icon {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #7c3aed, #210051);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+
+  .theme--dark & {
+    background: linear-gradient(135deg, #c4b5fd, #7c3aed);
+  }
+}
+
+.rs-mermaid-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rs-mermaid-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 0.45rem;
+  border-radius: 7px;
+  border: 1px solid rgba(33, 0, 81, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+  color: #210051;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+
+  &:hover {
+    background: #f5f0ff;
+    border-color: rgba(33, 0, 81, 0.28);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  .theme--dark & {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #e9d5ff;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+  }
+}
+
+.rs-mermaid-viewport {
+  overflow: auto;
+  max-height: min(72vh, 640px);
+  padding: 1rem 1.25rem 1.25rem;
+  background:
+    radial-gradient(circle at 1px 1px, rgba(33, 0, 81, 0.06) 1px, transparent 0) 0 0 / 18px 18px,
+    #fff;
+
+  .theme--dark & {
+    background:
+      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0) 0 0 / 18px 18px,
+      #16101f;
+  }
+
+  .rs-mermaid--fullscreen & {
+    max-height: none;
+    padding: 1.5rem;
+  }
+}
+
+.rs-mermaid-canvas {
+  transform-origin: center top;
+  transition: transform 0.15s ease;
+  min-width: min-content;
+
+  svg {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto !important;
+  }
+}
+
+.rs-mermaid-error {
+  padding: 1rem 1.1rem;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+
+  strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #7f1d1d;
+  }
+
+  .theme--dark & {
+    background: rgba(127, 29, 29, 0.2);
+    border-color: rgba(252, 165, 165, 0.25);
+    color: #fecaca;
+
+    pre { color: #fca5a5; }
+  }
+}
+
+.v-main .contents .rs-mermaid,
+.rs-module-editor-preview .rs-mermaid {
+  margin: 1.5rem 0;
+}
