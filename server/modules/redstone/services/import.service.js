@@ -84,7 +84,7 @@ const createImportService = ({
         content_hash: contentHash,
         current_version: version,
         page_id: existing?.page_id || null,
-        locale: session.locale_default || 'fr'
+        locale: mod.locale || session.locale_default || 'fr'
       }
 
       const versionRow = {
