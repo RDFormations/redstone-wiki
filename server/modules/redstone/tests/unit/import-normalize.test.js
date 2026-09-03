@@ -32,4 +32,19 @@ describe('import-normalize', () => {
     expect(result.path).toBe('exercice-02-b')
     expect(result.title).toBe('exercice-02-b')
   })
+
+  it('F08 — extrait locale depuis cours/en/...', () => {
+    const { parseLocaleFromPath, normalizeModuleInput: norm } = require('../../domain/import-normalize')
+    expect(parseLocaleFromPath('cours/en/module-01-a.md')).toEqual({
+      locale: 'en',
+      path: 'module-01-a'
+    })
+    const result = norm({
+      path: 'cours/fr/module-02-a.md',
+      body_md: '# FR',
+      title: 'M2'
+    })
+    expect(result.path).toBe('module-02-a')
+    expect(result.locale).toBe('fr')
+  })
 })

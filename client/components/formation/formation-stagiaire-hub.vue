@@ -5,6 +5,11 @@
 
     template(v-else-if='data')
       header.rs-stagiaire-hero
+        img.rs-stagiaire-brand-logo(
+          v-if='brandLogoUrl'
+          :src='brandLogoUrl'
+          :alt='brandAlt'
+          )
         .rs-stagiaire-hero-kicker Votre formation
         h1.rs-stagiaire-hero-title {{ data.title }}
         p.rs-stagiaire-hero-sub(v-if='data.client') {{ data.client }}
@@ -44,9 +49,27 @@
           .rs-stagiaire-trainer
             v-icon.mr-2(small) mdi-account-tie
             | Formateur : {{ data.trainer }}
+
+        v-col(cols='12', v-if='labs.length')
+          .rs-stagiaire-labs
+            h2.rs-stagiaire-labs-title
+              v-icon.mr-2(small) mdi-folder-zip-outline
+              | Labs / fichiers pratiques
+            a.rs-stagiaire-lab(
+              v-for='lab in labs'
+              :key='lab.id || lab.url'
+              :href='lab.url'
+              target='_blank'
+              rel='noopener'
+              )
+              v-icon.mr-2(small) mdi-download
+              span {{ lab.label || lab.filename }}
+              span.rs-stagiaire-lab-size(v-if='lab.size_bytes')  ({{ formatSize(lab.size_bytes) }})
 </template>
 
 <script>
+import { applyBrandCssVars, resolveBrandingHint } from '../../helpers/client-branding'
+
 export default {
   props: {
     slug: { type: String, required: true },
@@ -60,6 +83,16 @@ export default {
     }
   },
   computed: {
+    labs () {
+      return (this.data && this.data.labs) || []
+    },
+    brandLogoUrl () {
+      return (this.data && this.data.branding && this.data.branding.logo_url) || ''
+    },
+    brandAlt () {
+      const key = this.data && this.data.branding && this.data.branding.client_key
+      return key ? `Logo ${key}` : 'Logo client'
+    },
     metaLine () {
       if (!this.data) return ''
       const parts = []
@@ -87,6 +120,12 @@ export default {
     slug: { immediate: true, handler () { this.load() } }
   },
   methods: {
+    formatSize (bytes) {
+      const n = Number(bytes) || 0
+      if (n < 1024) return `${n} o`
+      if (n < 1024 * 1024) return `${Math.round(n / 1024)} Ko`
+      return `${(n / (1024 * 1024)).toFixed(1)} Mo`
+    },
     tileClass (link) {
       return {
         'rs-stagiaire-tile--disabled': !link.url
@@ -124,17 +163,30 @@ export default {
         if (res.ok) {
           const payload = await res.json()
           this.data = payload.hub
+          this.applyBranding(payload.hub && payload.hub.branding)
           return
         }
         res = await fetch(`/_assets/stagiaires/${encodeURIComponent(this.slug)}.json`)
         if (!res.ok) throw new Error('Liens session introuvables')
         this.data = await res.json()
+        this.applyBranding(
+          (this.data && this.data.branding) ||
+          resolveBrandingHint({ slug: this.slug, client: this.data && this.data.client })
+        )
       } catch (e) {
         this.error = e.message || String(e)
         this.data = null
       } finally {
         this.loading = false
       }
+    },
+    applyBranding (branding) {
+      if (!branding) return
+      if (this.data && !this.data.branding) {
+        this.data = { ...this.data, branding }
+      }
+      applyBrandCssVars(branding)
+      this.$root.$emit('formation-branding', branding)
     }
   }
 }

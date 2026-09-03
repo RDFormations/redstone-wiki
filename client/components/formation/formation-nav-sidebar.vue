@@ -21,6 +21,11 @@
       v-icon.mr-2(small) mdi-account-tie
       | Espace formateur
     .rs-sidebar-hero(v-if='heroTitle')
+      img.rs-sidebar-brand-logo(
+        v-if='brandLogoUrl'
+        :src='brandLogoUrl'
+        :alt='brandAlt'
+        )
       .rs-sidebar-hero-badge Formation
       h2.rs-sidebar-hero-title {{ heroTitle }}
       p.rs-sidebar-hero-meta(v-if='moduleCount') {{ moduleCount }} modules · support autonome
@@ -42,14 +47,8 @@
               )
               span.rs-nav-badge(v-if='block.badge') {{ block.badge }}
               span.rs-nav-link-text {{ block.module.shortTitle }}
-            span.rs-nav-link.rs-nav-link--pending(
-              v-else-if='block.module'
-              :title='"Module bientôt disponible"'
-              )
-              span.rs-nav-badge(v-if='block.badge') {{ block.badge }}
-              span.rs-nav-link-text {{ block.module.shortTitle }}
             .rs-nav-practice(
-              v-if='block.practice'
+              v-if='blockHasVisiblePractice(block)'
               :aria-label='practiceAriaLabel(block)'
               )
               a.rs-nav-practice-link(
@@ -88,18 +87,13 @@
               )
               span.rs-nav-badge(v-if='item.badge') {{ item.badge }}
               span.rs-nav-link-text {{ item.shortTitle }}
-            span.rs-nav-link.rs-nav-link--pending(
-              v-else
-              :title='"Page bientôt disponible"'
-              )
-              span.rs-nav-badge(v-if='item.badge') {{ item.badge }}
-              span.rs-nav-link-text {{ item.shortTitle }}
 </template>
 
 <script>
 import gql from 'graphql-tag'
 import _ from 'lodash'
 import { get } from 'vuex-pathify'
+import { applyBrandCssVars, resolveBrandingHint } from '../../helpers/client-branding'
 
 const SECTIONS = [
   { id: 'formateur', label: 'Formateur', icon: '★', match: (p) => /\/formateur$/i.test('/' + p) },
@@ -131,6 +125,7 @@ export default {
     return {
       items: [],
       heroTitle: '',
+      branding: null,
       navLoading: false,
       navError: false
     }
@@ -140,6 +135,13 @@ export default {
     locale: get('page/locale'),
     isAuthenticated: get('user/authenticated'),
     permissions: get('user/permissions'),
+    brandLogoUrl () {
+      return (this.branding && this.branding.logo_url) || ''
+    },
+    brandAlt () {
+      const key = this.branding && this.branding.client_key
+      return key ? `Logo ${key}` : 'Logo formation'
+    },
     canSeeUnpublished () {
       if (!this.isAuthenticated) return false
       const elevated = ['manage:system', 'write:pages', 'manage:pages']
@@ -200,10 +202,16 @@ export default {
         return g.items.length > 0
       }).map(g => {
         if (g.id === 'modules') {
-          return { ...g, blocks: this.buildModuleBlocks(g.items), items: [] }
+          const blocks = this.buildModuleBlocks(g.items).filter(b => this.blockVisible(b))
+          return { ...g, blocks, items: [] }
         }
-        g.items.sort((a, b) => a.title.localeCompare(b.title, 'fr'))
-        return g
+        // Stagiaire : ne jamais lister les pages non publiées (pas de placeholder)
+        const visibleItems = g.items.filter(it => this.linkVisible(it))
+        visibleItems.sort((a, b) => a.title.localeCompare(b.title, 'fr'))
+        return { ...g, items: visibleItems }
+      }).filter(g => {
+        if (g.id === 'modules') return g.blocks.length > 0
+        return g.items.length > 0
       })
     },
     hasNavContent () {
@@ -229,6 +237,17 @@ export default {
   methods: {
     linkVisible (item) {
       return item && (item.isPublished !== false || this.canSeeUnpublished)
+    },
+    blockVisible (block) {
+      if (!block) return false
+      if (block.module && this.linkVisible(block.module)) return true
+      return this.blockHasVisiblePractice(block)
+    },
+    blockHasVisiblePractice (block) {
+      const pr = block && block.practice
+      if (!pr) return false
+      return (pr.exercice && this.linkVisible(pr.exercice)) ||
+        (pr.correction && this.linkVisible(pr.correction))
     },
     moduleNum (path) {
       const m = (path || '').match(/(?:module|exercice|correction)-(\d+)/i)
@@ -354,16 +373,38 @@ export default {
         path: it.path,
         title: it.title,
         href: it.href || '/' + it.path,
-        isPublished: it.isPublished !== false
+        // LMS API envoie `isPublished` (bundle) ; tolère aussi `published`
+        isPublished: it.isPublished != null
+          ? it.isPublished !== false
+          : it.published !== false
       }))
       this.heroTitle = data.title || this.slug.replace(/-/g, ' ')
+      if (data.branding) {
+        this.applyBranding(data.branding)
+      }
+    },
+    applyBranding (branding) {
+      if (!branding) return
+      this.branding = branding
+      applyBrandCssVars(branding)
+      this.$root.$emit('formation-branding', branding)
+    },
+    ensureBrandingFallback () {
+      if (this.branding && this.branding.logo_url) return
+      this.applyBranding(resolveBrandingHint({
+        slug: this.slug,
+        client: this.branding && this.branding.client_key
+      }))
     },
     applyPublishedPaths (paths) {
       const publishedSet = new Set(paths || [])
-      this.items = this.items.map(it => ({
-        ...it,
-        isPublished: publishedSet.has(it.path)
-      }))
+      this.items = this.items
+        .map(it => ({
+          ...it,
+          isPublished: publishedSet.has(it.path)
+        }))
+        // Stagiaire : retirer totalement les non publiés (pas de ligne grisée)
+        .filter(it => it.isPublished || this.canSeeUnpublished)
     },
     async fetchJson (url, timeoutMs = 6000) {
       const fetchPromise = fetch(url, { cache: 'reload' }).then(res => {
@@ -491,6 +532,7 @@ export default {
           this.navError = true
         }
       } finally {
+        this.ensureBrandingFallback()
         this.navLoading = false
       }
     },

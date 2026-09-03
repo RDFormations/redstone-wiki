@@ -1,4 +1,4 @@
-const { sessionNotFound } = require('../domain/api-result')
+const { sessionNotFound, fail } = require('../domain/api-result')
 const { diffLines, summarizeDiff } = require('../domain/text-diff')
 
 const normalizePath = path => {
@@ -6,7 +6,7 @@ const normalizePath = path => {
   return p.endsWith('.md') ? p.slice(0, -3) : p
 }
 
-const createContentVersionsService = ({ sessionRepo, contentRepo }) => ({
+const createContentVersionsService = ({ sessionRepo, contentRepo, contentEdit }) => ({
   async listForModule(sessionId, rawPath) {
     const session = await sessionRepo.findById(sessionId)
     if (!session) return sessionNotFound()
@@ -115,6 +115,35 @@ const createContentVersionsService = ({ sessionRepo, contentRepo }) => ({
       base_version: baseVersionId || (version.version > 1 ? version.version - 1 : null),
       diff: hunks,
       summary: summarizeDiff(hunks)
+    }
+  },
+
+  /** F09 — restaure le corps d'une version N (nouvelle version courante). */
+  async restoreVersion(sessionId, versionId, options = {}) {
+    if (!contentEdit?.updateModule) {
+      return fail(503, 'edit_unavailable', 'Service édition indisponible.')
+    }
+    const loaded = await this.getVersion(sessionId, versionId)
+    if (!loaded.ok) return loaded
+
+    const result = await contentEdit.updateModule(
+      sessionId,
+      {
+        path: loaded.path,
+        body_md: loaded.version.body_md,
+        frontmatter: loaded.version.frontmatter
+      },
+      {
+        source: options.source || 'ui_edit',
+        author: options.author || 'formateur',
+        agent_run_id: options.agent_run_id || null
+      }
+    )
+    if (!result.ok) return result
+    return {
+      ...result,
+      restored_from_version: loaded.version.version,
+      restored_from_id: loaded.version.id
     }
   }
 })

@@ -2,6 +2,7 @@ const { parseSessionListFilters } = require('../domain/session-filters')
 const { enrichSessionStatus } = require('../domain/session-status')
 const { SESSION_STATES } = require('../domain/session-state')
 const { canDistribute } = require('../domain/session-actions')
+const { resolveClientBranding } = require('../domain/client-branding')
 
 const MONDAY_BOARD_ID = process.env.MONDAY_MISSIONS_BOARD_ID || '18420737449'
 
@@ -73,8 +74,10 @@ const createAdminSessionsService = ({ sessionRepo, contentRepo, healthRepo }) =>
       status: 200,
       session: {
         ...row,
+        metadata: session.metadata || {},
         actions: { can_distribute: canDistribute(row) }
       },
+      branding: resolveClientBranding(session),
       health_checks: storedChecks
     }
   }

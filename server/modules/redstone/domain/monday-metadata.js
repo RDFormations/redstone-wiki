@@ -74,11 +74,13 @@ const mapMondayItemToSessionPatch = item => {
 const mergeSessionMetadata = (existing = {}, incoming = {}) => {
   const links = { ...(existing.links || {}), ...(incoming.links || {}) }
   const monday = { ...(existing.monday || {}), ...(incoming.monday || {}) }
+  const branding = { ...(existing.branding || {}), ...(incoming.branding || {}) }
   return {
     ...existing,
     ...incoming,
     links: Object.keys(links).length ? links : existing.links,
     monday: Object.keys(monday).length ? monday : existing.monday,
+    branding: Object.keys(branding).length ? branding : existing.branding,
     planning: incoming.planning || existing.planning
   }
 }

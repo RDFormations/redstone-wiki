@@ -104,7 +104,7 @@ describe('trainer-access service', () => {
     expect(userGroups).toEqual([{ userId: 5, groupId: 10 }])
   })
 
-  it('signale user_not_found sans bloquer le groupe', async () => {
+  it('signale user_not_found si auto-provision désactivée', async () => {
     const knex = table => {
       if (table === 'groups') {
         return {
@@ -125,9 +125,11 @@ describe('trainer-access service', () => {
       logger: { info: () => {}, warn: () => {} }
     })
     const result = await svc.ensureSessionTrainerAccess(
-      { slug: 'y', metadata: { trainer_email: 'missing@test.fr' } }
+      { slug: 'y', metadata: { trainer_email: 'missing@test.fr' } },
+      { auto_provision: false }
     )
     expect(result.ok).toBe(true)
     expect(result.assignment.reason).toBe('user_not_found')
+    expect(result.incomplete).toBe(true)
   })
 })

@@ -420,10 +420,19 @@ router.get('/*', async (req, res, next) => {
   const pageArgs = pageHelper.parsePath(req.path, { stripExt })
   const isPage = (stripExt || pageArgs.path.indexOf('.') === -1)
 
+  // F06 — /formations/{slug}/edit/{module} → page hub edit
+  const { parseFormationEditPath } = require('../modules/redstone/domain/formation-edit-path')
+  const formationEdit = parseFormationEditPath(pageArgs.path)
+  if (formationEdit) {
+    pageArgs.path = formationEdit.hubPath
+    pageArgs.formationEditModule = formationEdit.moduleStem
+  }
+
   if (isPage) {
     if (WIKI.config.lang.namespacing && !pageArgs.explicitLocale) {
       const query = !_.isEmpty(req.query) ? `?${qs.stringify(req.query)}` : ''
-      return res.redirect(`/${pageArgs.locale}/${pageArgs.path}${query}`)
+      const redirectPath = formationEdit ? formationEdit.fullPath : pageArgs.path
+      return res.redirect(`/${pageArgs.locale}/${redirectPath}${query}`)
     }
 
     req.i18n.changeLanguage(pageArgs.locale)
@@ -463,6 +472,15 @@ router.get('/*', async (req, res, next) => {
       if (page) {
         _.set(res.locals, 'pageMeta.title', page.title)
         _.set(res.locals, 'pageMeta.description', page.description)
+
+        if (formationEdit) {
+          page.path = formationEdit.fullPath
+          page.extra = page.extra || { css: '', js: '' }
+          if (_.isString(page.extra)) {
+            try { page.extra = JSON.parse(page.extra) } catch (e) { page.extra = { css: '', js: '' } }
+          }
+          page.extra.formationEditModule = formationEdit.moduleStem || ''
+        }
 
         // -> Check Publishing State
         let pageIsPublished = page.isPublished

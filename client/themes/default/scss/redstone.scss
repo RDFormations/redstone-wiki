@@ -4,6 +4,11 @@ $rs-primary: #210051;
 $rs-primary-soft: #3d1a7a;
 $rs-sidebar: #210051;
 
+:root {
+  --rs-brand-primary: #5b21b6;
+  --rs-brand-accent: #a78bfa;
+}
+
 .v-application {
   font-family: 'Inter', system-ui, sans-serif !important;
 }
@@ -1270,8 +1275,13 @@ html[data-rs-theme='light'] .rs-sidebar-expand,
   margin-bottom: 1.5rem;
   padding: 1.5rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 50%, #faf5ff 100%);
-  border: 1px solid rgba(33, 0, 81, 0.08);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--rs-brand-primary) 12%, #ffffff) 0%,
+    #f5f3ff 50%,
+    color-mix(in srgb, var(--rs-brand-accent) 18%, #ffffff) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--rs-brand-primary) 14%, transparent);
 
   .theme--dark & {
     background: linear-gradient(135deg, #15102a 0%, #1f1638 100%);
@@ -1279,12 +1289,28 @@ html[data-rs-theme='light'] .rs-sidebar-expand,
   }
 }
 
+.rs-stagiaire-brand-logo,
+.rs-sidebar-brand-logo {
+  display: block;
+  max-height: 40px;
+  max-width: 180px;
+  width: auto;
+  height: auto;
+  margin-bottom: 0.75rem;
+  object-fit: contain;
+}
+
+.rs-sidebar-brand-logo {
+  max-height: 36px;
+  opacity: 0.98;
+}
+
 .rs-stagiaire-hero-kicker {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #4338ca;
+  color: var(--rs-brand-primary);
   opacity: 0.85;
 
   .theme--dark & { color: #a5b4fc; }
