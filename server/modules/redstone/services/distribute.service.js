@@ -150,6 +150,32 @@ const createDistributeService = ({
     let trainer_access = null
     if (trainerAccess) {
       trainer_access = await trainerAccess.ensureSessionTrainerAccess(updated, options)
+      if (trainer_access?.incomplete && !options.force) {
+        const incompleteSession = await sessionRepo.update(sessionId, {
+          state: transition(updated.state, 'distribute_fail') || 'incomplete'
+        })
+        if (webhooks) {
+          webhooks.emit(WEBHOOK_EVENTS.SESSION_INCOMPLETE, {
+            session_id: sessionId,
+            slug: session.slug,
+            errors: ['trainer_provision']
+          })
+        }
+        if (mondayPush) mondayPush.schedulePush(sessionId)
+        return {
+          ok: false,
+          status: 422,
+          state: 'incomplete',
+          session: incompleteSession,
+          checks: health.checks,
+          projection,
+          trainer_access,
+          error: {
+            code: 'trainer_provision_failed',
+            message: 'Provision formateur échouée (M05) — compte à créer ou email Monday à corriger.'
+          }
+        }
+      }
     }
 
     logger.info(`(REDSTONE/LMS) Distribute OK: ${session.slug}`)

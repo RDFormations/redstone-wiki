@@ -605,8 +605,10 @@ export default {
       }
     },
     editModule (mod) {
-      if (!this.canEdit || !this.useLmsApi) return
-      this.$refs.moduleEditor?.openFor(mod)
+      if (!this.canEdit || !this.useLmsApi || !mod?.stem) return
+      const locale = this.locale || 'fr'
+      const stem = String(mod.stem).replace(/\.md$/, '')
+      window.location.href = `/${locale}/formations/${this.slug}/edit/${encodeURIComponent(stem)}`
     },
     showVersions (mod) {
       if (!this.canEdit || !this.useLmsApi) return

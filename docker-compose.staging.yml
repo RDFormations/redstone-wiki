@@ -1,0 +1,24 @@
+# I01 — Staging LMS RedStone
+#
+# Usage:
+#   cp .env.example .env.staging
+#   # adapter WIKI_SITE_HOST=https://staging.formation.redstoneformations.fr
+#   docker compose -f docker-compose.yml -f docker-compose.staging.yml --env-file .env.staging up -d
+#
+# Ne pas pointer Monday prod ni tokens agents prod.
+
+services:
+  wiki:
+    environment:
+      WIKI_SITE_HOST: ${WIKI_SITE_HOST:-https://staging.formation.redstoneformations.fr}
+      NODE_ENV: staging
+      REDSTONE_LMS_TRAINER_AUTO_PROVISION: ${REDSTONE_LMS_TRAINER_AUTO_PROVISION:-1}
+    ports:
+      - "${STAGING_PORT:-3001}:3000"
+
+  db:
+    volumes:
+      - wiki-staging-db:/var/lib/postgresql/data
+
+volumes:
+  wiki-staging-db:

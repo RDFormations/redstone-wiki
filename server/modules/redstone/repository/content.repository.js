@@ -78,6 +78,7 @@ const createContentRepository = knex => ({
         author: versionRow.author || null,
         parentVersionId: versionRow.parent_version_id || null,
         agentRunId: versionRow.agent_run_id || null,
+        chatMessageId: versionRow.chat_message_id || null,
         contentHash: versionRow.content_hash,
         createdAt: trx.fn.now()
       })
@@ -137,6 +138,7 @@ const createContentRepository = knex => ({
       source: row.source,
       author: row.author,
       agent_run_id: row.agentRunId,
+      chat_message_id: row.chatMessageId || null,
       content_hash: row.contentHash,
       created_at: row.createdAt
     }))
@@ -154,6 +156,7 @@ const createContentRepository = knex => ({
       source: row.source,
       author: row.author,
       agent_run_id: row.agentRunId,
+      chat_message_id: row.chatMessageId || null,
       content_hash: row.contentHash,
       created_at: row.createdAt
     }

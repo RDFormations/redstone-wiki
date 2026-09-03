@@ -65,6 +65,16 @@
               .rs-module-versions-diff-empty(v-else-if='!diffLoading')
                 v-icon(large, color='grey lighten-1') mdi-file-compare
                 p Sélectionnez une version pour comparer avec l'actuelle.
+      v-card-actions(v-if='selectedId && selectedVersion && selectedVersion.version !== currentVersion')
+        v-spacer
+        v-btn(
+          color='primary'
+          depressed
+          :loading='restoring'
+          @click='restoreSelected'
+          )
+          v-icon(left, small) mdi-history
+          | Restaurer cette version
 </template>
 
 <script>
@@ -73,6 +83,7 @@ const SOURCE_LABELS = {
   ui_edit: 'Édition UI',
   chatbot: 'Chatbot',
   import_file: 'Import',
+  import_pdc: 'PDC',
   e2e: 'E2E'
 }
 
@@ -85,6 +96,7 @@ export default {
       open: false,
       loading: false,
       diffLoading: false,
+      restoring: false,
       error: '',
       versions: [],
       currentVersion: null,
@@ -110,6 +122,9 @@ export default {
     filteredVersions () {
       if (this.sourceFilter === 'all') return this.versions
       return this.versions.filter(v => v.source === this.sourceFilter)
+    },
+    selectedVersion () {
+      return this.versions.find(v => v.id === this.selectedId) || null
     }
   },
   methods: {
@@ -192,6 +207,36 @@ export default {
       if (hunk.type === 'add') return '+ '
       if (hunk.type === 'remove') return '- '
       return '  '
+    },
+    async restoreSelected () {
+      if (!this.selectedId || this.restoring) return
+      if (!window.confirm('Restaurer cette version ? Une nouvelle version sera créée.')) return
+      this.restoring = true
+      this.error = ''
+      try {
+        const res = await fetch(
+          `/api/formation/${encodeURIComponent(this.slug)}/content/versions/${encodeURIComponent(this.selectedId)}/restore`,
+          {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: '{}'
+          }
+        )
+        const json = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(json.error?.message || `Erreur ${res.status}`)
+        this.$store.commit('showNotification', {
+          style: 'green',
+          message: `Version restaurée (v${json.version})`,
+          icon: 'check'
+        })
+        this.$emit('restored', { stem: this.activeStem, version: json.version })
+        await this.loadVersions()
+      } catch (e) {
+        this.error = e.message || String(e)
+      } finally {
+        this.restoring = false
+      }
     }
   }
 }

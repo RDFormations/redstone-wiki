@@ -12,6 +12,7 @@ info:
     - `content:import` — import contenu (F03)
     - `session:distribute` — distribution Wiki (F02)
     - `content:publish` — publication stagiaire (T04, formateur uniquement)
+    - `content:edit` — édition modules, chatbot C13, restore F09
 
 servers:
   - url: https://formation.redstoneformations.fr/api/v1
@@ -372,6 +373,140 @@ paths:
                 $ref: '#/components/schemas/NavResponse'
         '404':
           $ref: '#/components/responses/NotFound'
+
+  /sessions/{id}/content/module:
+    get:
+      summary: Lire un module (C12)
+      operationId: getModule
+      tags: [Content]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: path
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Contenu module
+    patch:
+      summary: Éditer un module (C12) — scope content:edit
+      operationId: patchModule
+      tags: [Content]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path, body_md]
+              properties:
+                path: { type: string }
+                body_md: { type: string }
+                source: { type: string, enum: [ui_edit, chatbot, agent_pipeline] }
+                chat_message_id: { type: string }
+      responses:
+        '200':
+          description: Module mis à jour
+
+  /sessions/{id}/content/chatbot/propose:
+    post:
+      summary: C13 — proposer un diff (sans écriture)
+      operationId: chatbotPropose
+      tags: [Content]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path, message]
+              properties:
+                path: { type: string }
+                message: { type: string }
+                proposed_body_md: { type: string }
+      responses:
+        '200':
+          description: Proposition + diff (human-in-the-loop)
+
+  /sessions/{id}/content/chatbot/apply:
+    post:
+      summary: C13 — appliquer une proposition
+      operationId: chatbotApply
+      tags: [Content]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [proposal_id]
+              properties:
+                proposal_id: { type: string, format: uuid }
+      responses:
+        '200':
+          description: ContentVersion source=chatbot
+
+  /sessions/{id}/content/versions/{versionId}/restore:
+    post:
+      summary: F09 — restaurer une version
+      operationId: restoreVersion
+      tags: [Content]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: versionId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Nouvelle version créée depuis N
+
+  /sessions/{id}/pdc:
+    get:
+      summary: C04 — lister PDC client / improved
+      operationId: listPdc
+      tags: [Content]
+    put:
+      summary: C04 — upsert PDC
+      operationId: upsertPdc
+      tags: [Content]
+
+  /sessions/{id}/labs:
+    get:
+      summary: C05 — lister labs session
+      operationId: listLabs
+      tags: [Content]
+    post:
+      summary: C05 — upload lab (base64)
+      operationId: uploadLab
+      tags: [Content]
+
+  /sessions/{id}/export-git:
+    post:
+      summary: C03′ — export MD vers RDF-formations
+      operationId: exportGit
+      tags: [Content]
 
 components:
   securitySchemes:
