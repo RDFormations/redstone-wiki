@@ -5,6 +5,11 @@
 
     template(v-else-if='data')
       header.rs-stagiaire-hero
+        img.rs-stagiaire-brand-logo(
+          v-if='brandLogoUrl'
+          :src='brandLogoUrl'
+          :alt='brandAlt'
+          )
         .rs-stagiaire-hero-kicker Votre formation
         h1.rs-stagiaire-hero-title {{ data.title }}
         p.rs-stagiaire-hero-sub(v-if='data.client') {{ data.client }}
@@ -79,6 +84,13 @@ export default {
     labs () {
       return (this.data && this.data.labs) || []
     },
+    brandLogoUrl () {
+      return (this.data && this.data.branding && this.data.branding.logo_url) || ''
+    },
+    brandAlt () {
+      const key = this.data && this.data.branding && this.data.branding.client_key
+      return key ? `Logo ${key}` : 'Logo client'
+    },
     metaLine () {
       if (!this.data) return ''
       const parts = []
@@ -149,17 +161,30 @@ export default {
         if (res.ok) {
           const payload = await res.json()
           this.data = payload.hub
+          this.applyBranding(payload.hub && payload.hub.branding)
           return
         }
         res = await fetch(`/_assets/stagiaires/${encodeURIComponent(this.slug)}.json`)
         if (!res.ok) throw new Error('Liens session introuvables')
         this.data = await res.json()
+        this.applyBranding(this.data && this.data.branding)
       } catch (e) {
         this.error = e.message || String(e)
         this.data = null
       } finally {
         this.loading = false
       }
+    },
+    applyBranding (branding) {
+      if (!branding || typeof document === 'undefined') return
+      const root = document.documentElement
+      if (branding.primary_color) {
+        root.style.setProperty('--rs-brand-primary', branding.primary_color)
+      }
+      if (branding.accent_color) {
+        root.style.setProperty('--rs-brand-accent', branding.accent_color)
+      }
+      this.$root.$emit('formation-branding', branding)
     }
   }
 }

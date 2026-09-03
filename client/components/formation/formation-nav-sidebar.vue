@@ -21,6 +21,11 @@
       v-icon.mr-2(small) mdi-account-tie
       | Espace formateur
     .rs-sidebar-hero(v-if='heroTitle')
+      img.rs-sidebar-brand-logo(
+        v-if='brandLogoUrl'
+        :src='brandLogoUrl'
+        :alt='brandAlt'
+        )
       .rs-sidebar-hero-badge Formation
       h2.rs-sidebar-hero-title {{ heroTitle }}
       p.rs-sidebar-hero-meta(v-if='moduleCount') {{ moduleCount }} modules · support autonome
@@ -119,6 +124,7 @@ export default {
     return {
       items: [],
       heroTitle: '',
+      branding: null,
       navLoading: false,
       navError: false
     }
@@ -128,6 +134,13 @@ export default {
     locale: get('page/locale'),
     isAuthenticated: get('user/authenticated'),
     permissions: get('user/permissions'),
+    brandLogoUrl () {
+      return (this.branding && this.branding.logo_url) || ''
+    },
+    brandAlt () {
+      const key = this.branding && this.branding.client_key
+      return key ? `Logo ${key}` : 'Logo formation'
+    },
     canSeeUnpublished () {
       if (!this.isAuthenticated) return false
       const elevated = ['manage:system', 'write:pages', 'manage:pages']
@@ -365,6 +378,21 @@ export default {
           : it.published !== false
       }))
       this.heroTitle = data.title || this.slug.replace(/-/g, ' ')
+      if (data.branding) {
+        this.applyBranding(data.branding)
+      }
+    },
+    applyBranding (branding) {
+      if (!branding) return
+      this.branding = branding
+      const root = document.documentElement
+      if (branding.primary_color) {
+        root.style.setProperty('--rs-brand-primary', branding.primary_color)
+      }
+      if (branding.accent_color) {
+        root.style.setProperty('--rs-brand-accent', branding.accent_color)
+      }
+      this.$root.$emit('formation-branding', branding)
     },
     applyPublishedPaths (paths) {
       const publishedSet = new Set(paths || [])

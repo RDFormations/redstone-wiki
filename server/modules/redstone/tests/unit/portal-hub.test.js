@@ -38,6 +38,15 @@ describe('portal-hub domain', () => {
     expect(isPublicHubVisible('draft')).toBe(false)
     expect(isPublicHubVisible('incomplete')).toBe(false)
   })
+  it('expose le branding client (B02) sur le hub', () => {
+    const hub = buildStagiaireHub(
+      { ...session, client: 'Quiris' },
+      { siteHost: 'http://localhost:3000' }
+    )
+    expect(hub.branding).toBeDefined()
+    expect(hub.branding.source).toBe('client_catalog')
+    expect(hub.branding.logo_url).toContain('/_assets/branding/quiris/')
+  })
 })
 
 describe('nav-bundle domain', () => {
@@ -55,5 +64,7 @@ describe('nav-bundle domain', () => {
     expect(bundle.items[0].path).toBe('formations/abc')
     expect(bundle.items[1].path).toBe('formations/abc/module-01-a')
     expect(bundle.items[1].isPublished).toBe(true)
+    expect(bundle.branding).toBeDefined()
+    expect(bundle.branding.logo_url).toContain('redstone-logo')
   })
 })

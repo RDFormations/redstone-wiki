@@ -147,7 +147,13 @@ const CDC_VALIDATED_FEATURES = [
   feature('I02', 'Backup / restore PG', [
     'scripts/backup-pg.sh',
     'scripts/restore-pg.sh'
-  ], ['ops-staging-backup.test.js'])
+  ], ['ops-staging-backup.test.js']),
+  feature('B02', 'Branding client (logo, couleurs)', [
+    'server/modules/redstone/domain/client-branding.js',
+    'client/static/branding/quiris/logo.svg',
+    'client/components/common/nav-header.vue',
+    'client/components/formation/formation-nav-sidebar.vue'
+  ], ['client-branding.test.js', 'session.service.test.js', 'portal-hub.test.js'])
 ]
 
 module.exports = { CDC_VALIDATED_FEATURES, WIKI_ROOT, feature }

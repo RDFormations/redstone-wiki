@@ -1,4 +1,5 @@
 const { wikiPagePath } = require('./publish-policy')
+const { resolveClientBranding } = require('./client-branding')
 
 const stemFromModulePath = path => String(path || '').replace(/\.md$/, '')
 
@@ -19,9 +20,11 @@ const buildNavBundle = (session, nav) => ({
   lang: session.locale_default || 'fr',
   base_slug: session.slug,
   title: session.title,
+  client: session.client,
   wiki_path: session.wiki_path || `/formations/${session.slug}`,
   audience: nav.audience,
   progress: nav.progress,
+  branding: resolveClientBranding(session),
   items: (nav.items || []).map(item => navItemToBundleItem(session, item))
 })
 

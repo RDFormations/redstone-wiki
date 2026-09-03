@@ -92,6 +92,31 @@ const createSessionsRouter = getServices => {
     })
   )
 
+  /** B02 — lire branding résolu */
+  router.get(
+    '/:id/branding',
+    requireScope(SCOPE_READ),
+    asyncHandler(async (req, res) => {
+      const result = await svc().sessions.getBranding(req.params.id)
+      if (!result.ok) return res.status(result.status).json({ error: result.error })
+      return res.status(200).json({ branding: result.branding })
+    })
+  )
+
+  /** B02 — maj logo / couleurs (metadata.branding) */
+  router.put(
+    '/:id/branding',
+    requireScope(SCOPE_CREATE),
+    asyncHandler(async (req, res) => {
+      const result = await svc().sessions.updateBranding(req.params.id, req.body || {})
+      if (!result.ok) return res.status(result.status).json({ error: result.error })
+      return res.status(200).json({
+        branding: result.branding,
+        session: result.session
+      })
+    })
+  )
+
   return router
 }
 

@@ -17,6 +17,19 @@ const createPublicRouter = getServices => {
     })
   )
 
+  /** B02 — branding public (logo + couleurs) pour UI formation */
+  router.get(
+    '/sessions/by-slug/:slug/branding',
+    asyncHandler(async (req, res) => {
+      const result = await svc().sessions.getBranding(req.params.slug, { bySlug: true })
+      if (!result.ok) {
+        return res.status(result.status).json({ error: result.error })
+      }
+      res.set('Cache-Control', 'public, max-age=120')
+      return res.status(200).json({ branding: result.branding })
+    })
+  )
+
   router.get(
     '/sessions/by-slug/:slug/nav',
     asyncHandler(async (req, res) => {

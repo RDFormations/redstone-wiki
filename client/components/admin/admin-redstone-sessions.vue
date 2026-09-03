@@ -135,6 +135,46 @@
           div.mt-4
             .subtitle-2.mb-2 Traçabilité PDC (C04)
             formation-pdc-diff(:session-id='detail.session.id')
+          div.mt-4
+            .subtitle-2.mb-2 Branding client (B02)
+            v-row(dense)
+              v-col(cols='12', md='6')
+                v-text-field(
+                  v-model='brandingForm.logo_url'
+                  label='Logo URL'
+                  dense
+                  outlined
+                  hint='/_assets/branding/... ou https://'
+                  persistent-hint
+                )
+              v-col(cols='6', md='3')
+                v-text-field(
+                  v-model='brandingForm.primary_color'
+                  label='Couleur primaire'
+                  dense
+                  outlined
+                  hint='#RRGGBB'
+                  persistent-hint
+                )
+              v-col(cols='6', md='3')
+                v-text-field(
+                  v-model='brandingForm.accent_color'
+                  label='Accent'
+                  dense
+                  outlined
+                  hint='#RRGGBB'
+                  persistent-hint
+                )
+            v-btn.mt-2(
+              color='primary'
+              depressed
+              small
+              :loading='savingBranding'
+              @click='saveBranding'
+              ) Enregistrer branding
+            .caption.grey--text.mt-2(v-if='resolvedBranding')
+              | Source : {{ resolvedBranding.source }} ·
+              a(:href='resolvedBranding.logo_url', target='_blank') aperçu logo
         v-card-actions
           v-spacer
           v-btn(
@@ -208,6 +248,13 @@ export default {
       distributeErrors: [],
       pushingMonday: false,
       distributing: false,
+      savingBranding: false,
+      brandingForm: {
+        logo_url: '',
+        primary_color: '',
+        accent_color: ''
+      },
+      resolvedBranding: null,
       headers: [
         { text: 'Titre', value: 'title' },
         { text: 'Client', value: 'client' },
@@ -366,9 +413,48 @@ export default {
         if (!res.ok) throw new Error(body.error?.message || `HTTP ${res.status}`)
         this.detail = body
         this.distributeErrors = []
+        this.hydrateBrandingForm(body.session)
         this.detailOpen = true
       } catch (e) {
         this.$store.commit('showNotification', { style: 'red', message: e.message, icon: 'alert' })
+      }
+    },
+    hydrateBrandingForm (session) {
+      const meta = (session && session.metadata && session.metadata.branding) || {}
+      this.brandingForm = {
+        logo_url: meta.logo_url || '',
+        primary_color: meta.primary_color || '',
+        accent_color: meta.accent_color || ''
+      }
+      this.resolvedBranding = (this.detail && this.detail.branding) || null
+    },
+    async saveBranding () {
+      if (!this.detail?.session?.id) return
+      this.savingBranding = true
+      try {
+        const payload = {}
+        if (this.brandingForm.logo_url) payload.logo_url = this.brandingForm.logo_url.trim()
+        if (this.brandingForm.primary_color) payload.primary_color = this.brandingForm.primary_color.trim()
+        if (this.brandingForm.accent_color) payload.accent_color = this.brandingForm.accent_color.trim()
+        const res = await fetch(`/api/admin/sessions/${this.detail.session.id}/branding`, {
+          method: 'PUT',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        const body = await res.json()
+        if (!res.ok) throw new Error(body.error?.message || `HTTP ${res.status}`)
+        this.resolvedBranding = body.branding
+        this.$store.commit('showNotification', {
+          style: 'green',
+          message: `Branding enregistré (${body.branding?.source || 'ok'})`,
+          icon: 'check'
+        })
+        await this.openDetail({ id: this.detail.session.id })
+      } catch (e) {
+        this.$store.commit('showNotification', { style: 'red', message: e.message, icon: 'alert' })
+      } finally {
+        this.savingBranding = false
       }
     },
     async distributeSession () {
