@@ -27,14 +27,49 @@ const createContentRepository = knex => ({
     return rows.map(rowToModule)
   },
 
-  async findBySessionAndPath(sessionId, path) {
-    const row = await knex(TABLE_MODULES).where({ sessionId, path }).first()
+  async findBySessionAndPath(sessionId, path, locale = null) {
+    const q = knex(TABLE_MODULES).where({ sessionId, path })
+    if (locale) {
+      const row = await q.clone().andWhere({ locale }).first()
+      if (row) return rowToModule(row)
+    }
+    const row = await q.orderBy('locale', 'asc').first()
     return rowToModule(row)
+  },
+
+  async findBySessionPathLocale(sessionId, path, locale) {
+    const row = await knex(TABLE_MODULES).where({ sessionId, path, locale }).first()
+    return rowToModule(row)
+  },
+
+  async listBySessionLocale(sessionId, locale, { fallbackLocale = null } = {}) {
+    const all = await this.listBySession(sessionId)
+    if (!locale) return all
+    const preferred = all.filter(m => m.locale === locale)
+    if (!fallbackLocale || preferred.length === all.filter(m => ['module', 'intro', 'exercice', 'correction'].includes(m.kind)).length) {
+      return preferred.length ? preferred : all.filter(m => m.locale === (fallbackLocale || 'fr'))
+    }
+    // Fallback per-path : locale demandée sinon fallback
+    const byPath = new Map()
+    for (const m of all) {
+      const key = m.path
+      const cur = byPath.get(key)
+      if (!cur) {
+        byPath.set(key, m)
+        continue
+      }
+      if (m.locale === locale) byPath.set(key, m)
+      else if (cur.locale !== locale && m.locale === fallbackLocale) byPath.set(key, m)
+    }
+    return [...byPath.values()]
   },
 
   async upsertModule(module, versionRow) {
     await knex.transaction(async trx => {
-      const existing = await trx(TABLE_MODULES).where({ sessionId: module.session_id, path: module.path }).first()
+      const locale = module.locale || 'fr'
+      const existing = await trx(TABLE_MODULES)
+        .where({ sessionId: module.session_id, path: module.path, locale })
+        .first()
       if (existing) {
         await trx(TABLE_MODULES).where({ id: existing.id }).update({
           kind: module.kind,
@@ -45,7 +80,7 @@ const createContentRepository = knex => ({
           contentHash: module.content_hash,
           currentVersion: module.current_version,
           pageId: module.page_id || existing.pageId,
-          locale: module.locale,
+          locale,
           updatedAt: trx.fn.now()
         })
         module.id = existing.id
@@ -62,7 +97,7 @@ const createContentRepository = knex => ({
           contentHash: module.content_hash,
           currentVersion: module.current_version,
           pageId: module.page_id || null,
-          locale: module.locale,
+          locale,
           createdAt: trx.fn.now(),
           updatedAt: trx.fn.now()
         })
@@ -83,7 +118,7 @@ const createContentRepository = knex => ({
         createdAt: trx.fn.now()
       })
     })
-    return this.findBySessionAndPath(module.session_id, module.path)
+    return this.findBySessionAndPath(module.session_id, module.path, module.locale)
   },
 
   async updatePublished(moduleId, published) {

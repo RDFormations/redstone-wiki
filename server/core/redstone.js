@@ -78,10 +78,13 @@ module.exports = {
     const nav = createNavService()
     const health = createHealthService({ sessionRepo, contentRepo, healthRepo })
     const contentNav = createContentNavService({ sessionRepo, contentRepo, navService: nav })
+    const pdc = createPdcService({ sessionRepo, pdcRepo })
+    const labs = createLabsService({ sessionRepo, labsRepo })
     const portal = createPortalService({
       sessionRepo,
       contentRepo,
       navService: nav,
+      labsService: labs,
       getSiteHost: () => WIKI.config?.host || process.env.WIKI_SITE_HOST || 'https://formation.redstoneformations.fr',
       logger: WIKI.logger
     })
@@ -104,8 +107,6 @@ module.exports = {
       proposalRepo,
       logger: WIKI.logger
     })
-    const pdc = createPdcService({ sessionRepo, pdcRepo })
-    const labs = createLabsService({ sessionRepo, labsRepo })
     const exportGit = createExportGitService({
       sessionRepo,
       contentRepo,

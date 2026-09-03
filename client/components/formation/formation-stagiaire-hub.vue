@@ -44,6 +44,22 @@
           .rs-stagiaire-trainer
             v-icon.mr-2(small) mdi-account-tie
             | Formateur : {{ data.trainer }}
+
+        v-col(cols='12', v-if='labs.length')
+          .rs-stagiaire-labs
+            h2.rs-stagiaire-labs-title
+              v-icon.mr-2(small) mdi-folder-zip-outline
+              | Labs / fichiers pratiques
+            a.rs-stagiaire-lab(
+              v-for='lab in labs'
+              :key='lab.id || lab.url'
+              :href='lab.url'
+              target='_blank'
+              rel='noopener'
+              )
+              v-icon.mr-2(small) mdi-download
+              span {{ lab.label || lab.filename }}
+              span.rs-stagiaire-lab-size(v-if='lab.size_bytes')  ({{ formatSize(lab.size_bytes) }})
 </template>
 
 <script>
@@ -60,6 +76,9 @@ export default {
     }
   },
   computed: {
+    labs () {
+      return (this.data && this.data.labs) || []
+    },
     metaLine () {
       if (!this.data) return ''
       const parts = []
@@ -87,6 +106,12 @@ export default {
     slug: { immediate: true, handler () { this.load() } }
   },
   methods: {
+    formatSize (bytes) {
+      const n = Number(bytes) || 0
+      if (n < 1024) return `${n} o`
+      if (n < 1024 * 1024) return `${Math.round(n / 1024)} Ko`
+      return `${(n / (1024 * 1024)).toFixed(1)} Mo`
+    },
     tileClass (link) {
       return {
         'rs-stagiaire-tile--disabled': !link.url

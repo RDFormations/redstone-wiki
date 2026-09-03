@@ -8,6 +8,9 @@
             .headline.primary--text Sessions formations
             .subtitle-1.grey--text Gestion OPS RedStone (F13)
           v-spacer
+          v-btn.mr-2(color='primary', depressed, @click='createOpen = true')
+            v-icon(left, small) mdi-plus
+            | Nouvelle session
           v-btn(icon, outlined, color='grey', @click='load')
             v-icon mdi-refresh
 
@@ -146,6 +149,22 @@
             @click='pushMonday'
             ) Sync Monday (M03)
           v-btn(text, @click='detailOpen = false') Fermer
+
+    v-dialog(v-model='createOpen', max-width='560')
+      v-card
+        v-card-title Nouvelle session (F07)
+        v-card-text
+          v-alert.mb-3(v-if='createError', type='error', dense, outlined) {{ createError }}
+          v-text-field(v-model='createForm.slug', label='Slug *', dense, outlined, hint='ex. quiris-admin-m365')
+          v-text-field(v-model='createForm.title', label='Titre', dense, outlined)
+          v-text-field(v-model='createForm.client', label='Client', dense, outlined)
+          v-text-field(v-model='createForm.monday_item_id', label='Monday item ID *', dense, outlined)
+          v-text-field(v-model='createForm.ref_client', label='Réf. client', dense, outlined)
+          v-select(v-model='createForm.locale_default', :items='["fr", "en"]', label='Locale', dense, outlined)
+        v-card-actions
+          v-spacer
+          v-btn(text, @click='createOpen = false') Annuler
+          v-btn(color='primary', depressed, :loading='creating', @click='createSession') Créer
 </template>
 
 <script>
@@ -170,6 +189,17 @@ export default {
       tableOptions: { page: 1, itemsPerPage: 25, sortBy: [], sortDesc: [] },
       detailOpen: false,
       detail: null,
+      createOpen: false,
+      creating: false,
+      createError: '',
+      createForm: {
+        slug: '',
+        title: '',
+        client: '',
+        monday_item_id: '',
+        ref_client: '',
+        locale_default: 'fr'
+      },
       distributeErrors: [],
       pushingMonday: false,
       distributing: false,
@@ -286,6 +316,42 @@ export default {
         })
       } finally {
         this.loading = false
+      }
+    },
+    async createSession () {
+      this.creating = true
+      this.createError = ''
+      try {
+        const payload = {
+          slug: String(this.createForm.slug || '').trim().toLowerCase(),
+          title: this.createForm.title || this.createForm.slug,
+          client: this.createForm.client || 'Client',
+          monday_item_id: this.createForm.monday_item_id,
+          ref_client: this.createForm.ref_client || null,
+          locale_default: this.createForm.locale_default || 'fr'
+        }
+        const res = await fetch('/api/admin/sessions', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        const body = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(body.error?.message || body.error?.code || `HTTP ${res.status}`)
+        this.createOpen = false
+        this.createForm = {
+          slug: '', title: '', client: '', monday_item_id: '', ref_client: '', locale_default: 'fr'
+        }
+        this.$store.commit('showNotification', {
+          style: 'green',
+          message: `Session créée : ${body.session?.slug || payload.slug}`,
+          icon: 'check'
+        })
+        await this.load()
+      } catch (e) {
+        this.createError = e.message || String(e)
+      } finally {
+        this.creating = false
       }
     },
     async openDetail (item) {

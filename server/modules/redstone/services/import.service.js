@@ -62,7 +62,10 @@ const createImportService = ({
       }
 
       const contentHash = hashContent(mod.body_md, mod.frontmatter)
-      const existing = await contentRepo.findBySessionAndPath(sessionId, mod.path)
+      const locale = mod.locale || session.locale_default || 'fr'
+      const existing = await contentRepo.findBySessionPathLocale
+        ? await contentRepo.findBySessionPathLocale(sessionId, mod.path, locale)
+        : await contentRepo.findBySessionAndPath(sessionId, mod.path, locale)
 
       if (existing && existing.content_hash === contentHash) {
         imported.push(existing)
@@ -84,7 +87,7 @@ const createImportService = ({
         content_hash: contentHash,
         current_version: version,
         page_id: existing?.page_id || null,
-        locale: mod.locale || session.locale_default || 'fr'
+        locale
       }
 
       const versionRow = {

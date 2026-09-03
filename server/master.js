@@ -158,7 +158,8 @@ module.exports = async () => {
       company: WIKI.config.company,
       contentLicense: WIKI.config.contentLicense,
       footerOverride: WIKI.config.footerOverride,
-      logoUrl: WIKI.config.logoUrl
+      logoUrl: WIKI.config.logoUrl,
+      formationMode: process.env.REDSTONE_SITE_MODE === 'formation'
     }
     res.locals.langs = await WIKI.models.locales.getNavLocales({ cache: true })
     res.locals.analyticsCode = await WIKI.models.analytics.getCode({ cache: true })

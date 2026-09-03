@@ -11,10 +11,11 @@
           v-list-item(to='/sessions', color='primary', v-if='hasPermission(`manage:system`)')
             v-list-item-avatar(size='24', tile): v-icon mdi-school
             v-list-item-title Sessions formations
-          v-list-item(to='/dashboard', color='primary')
-            v-list-item-avatar(size='24', tile): v-icon mdi-view-dashboard-variant
-            v-list-item-title {{ $t('admin:dashboard.title') }}
-          template(v-if='hasPermission([`manage:system`, `manage:navigation`, `write:pages`, `manage:pages`, `delete:pages`])')
+          template(v-if='!formationMode')
+            v-list-item(to='/dashboard', color='primary')
+              v-list-item-avatar(size='24', tile): v-icon mdi-view-dashboard-variant
+              v-list-item-title {{ $t('admin:dashboard.title') }}
+          template(v-if='!formationMode && hasPermission([`manage:system`, `manage:navigation`, `write:pages`, `manage:pages`, `delete:pages`])')
             v-divider.my-2
             v-subheader.pl-4 {{ $t('admin:nav.site') }}
             v-list-item(to='/general', color='primary', v-if='hasPermission(`manage:system`)')
@@ -56,7 +57,7 @@
               v-list-item-action(style='min-width:auto;')
                 v-chip(x-small, :color='$vuetify.theme.dark ? `grey darken-3-d4` : `grey lighten-4`')
                   .caption.grey--text {{ info.usersTotal }}
-          template(v-if='hasPermission(`manage:system`)')
+          template(v-if='!formationMode && hasPermission(`manage:system`)')
             v-divider.my-2
             v-subheader.pl-4 {{ $t('admin:nav.modules') }}
             v-list-item(to='/analytics', color='primary')
@@ -77,7 +78,7 @@
             v-list-item(to='/storage', color='primary')
               v-list-item-avatar(size='24', tile): v-icon mdi-harddisk
               v-list-item-title {{ $t('admin:storage.title') }}
-          template(v-if='hasPermission([`manage:system`, `manage:api`])')
+          template(v-if='!formationMode && hasPermission([`manage:system`, `manage:api`])')
             v-divider.my-2
             v-subheader.pl-4 {{ $t('admin:nav.system') }}
             v-list-item(to='/api', v-if='hasPermission([`manage:system`, `manage:api`])')
@@ -111,12 +112,8 @@
                 v-list-item-title {{ $t('admin:dev.flags.title') }}
               v-list-item(href='/graphql', color='primary')
                 v-list-item-title GraphQL
-              //- v-list-item(to='/dev-graphiql')
-              //-   v-list-item-title {{ $t('admin:dev.graphiql.title') }}
-              //- v-list-item(to='/dev-voyager')
-              //-   v-list-item-title {{ $t('admin:dev.voyager.title') }}
             v-divider.my-2
-          v-list-item(to='/contribute', color='primary')
+          v-list-item(v-if='!formationMode', to='/contribute', color='primary')
             v-list-item-avatar(size='24', tile): v-icon mdi-heart-outline
             v-list-item-title {{ $t('admin:contribute.title') }}
 
@@ -212,7 +209,15 @@ export default {
   },
   computed: {
     info: sync('admin/info'),
-    permissions: get('user/permissions')
+    permissions: get('user/permissions'),
+    formationMode () {
+      /* global siteConfig */
+      try {
+        return Boolean(siteConfig && siteConfig.formationMode)
+      } catch (e) {
+        return false
+      }
+    }
   },
   router,
   created() {
