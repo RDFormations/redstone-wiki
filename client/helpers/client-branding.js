@@ -18,8 +18,18 @@ export const CLIENT_BRANDING_DEFAULTS = Object.freeze({
   },
   m2i: {
     logo_url: '/_assets/branding/m2i/logo.svg',
-    primary_color: '#C8102E',
-    accent_color: '#EF4444'
+    primary_color: '#E30613',
+    accent_color: '#FF4D57'
+  },
+  m2iformation: {
+    logo_url: '/_assets/branding/m2i/logo.svg',
+    primary_color: '#E30613',
+    accent_color: '#FF4D57'
+  },
+  m2iformations: {
+    logo_url: '/_assets/branding/m2i/logo.svg',
+    primary_color: '#E30613',
+    accent_color: '#FF4D57'
   },
   dawan: {
     logo_url: '/_assets/branding/dawan/logo.svg',
@@ -61,17 +71,29 @@ export const normalizeClientKey = (client) =>
     .replace(/[^a-z0-9]+/g, '')
     .trim()
 
+export const CLIENT_KEY_ALIASES = Object.freeze({
+  m2iformation: 'm2i',
+  m2iformations: 'm2i',
+  humanbooster: 'hb'
+})
+
 export const resolveCatalogFromKey = (rawKey) => {
   const key = normalizeClientKey(rawKey)
   if (!key) return null
+  const canonical = CLIENT_KEY_ALIASES[key] || key
+  if (CLIENT_BRANDING_DEFAULTS[canonical]) {
+    return { client_key: canonical, ...CLIENT_BRANDING_DEFAULTS[canonical], source: 'client_catalog' }
+  }
   if (CLIENT_BRANDING_DEFAULTS[key]) {
     return { client_key: key, ...CLIENT_BRANDING_DEFAULTS[key], source: 'client_catalog' }
   }
   const hit = Object.keys(CLIENT_BRANDING_DEFAULTS).find(
-    (k) => key.startsWith(k) || k.startsWith(key) || key.includes(k)
+    (k) => key.startsWith(k) || k.startsWith(key) || key.includes(k) || canonical.startsWith(k)
   )
   if (!hit) return null
-  return { client_key: hit, ...CLIENT_BRANDING_DEFAULTS[hit], source: 'client_catalog' }
+  const hitCanonical = CLIENT_KEY_ALIASES[hit] || hit
+  const catalog = CLIENT_BRANDING_DEFAULTS[hitCanonical] || CLIENT_BRANDING_DEFAULTS[hit]
+  return { client_key: hitCanonical, ...catalog, source: 'client_catalog' }
 }
 
 /** Déduit un branding depuis slug formation (ex. quiris-admin-m365) ou nom client. */

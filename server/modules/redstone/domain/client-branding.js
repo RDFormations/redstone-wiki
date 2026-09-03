@@ -19,8 +19,18 @@ const CLIENT_BRANDING_DEFAULTS = Object.freeze({
   },
   m2i: {
     logo_url: '/_assets/branding/m2i/logo.svg',
-    primary_color: '#C8102E',
-    accent_color: '#EF4444'
+    primary_color: '#E30613',
+    accent_color: '#FF4D57'
+  },
+  m2iformation: {
+    logo_url: '/_assets/branding/m2i/logo.svg',
+    primary_color: '#E30613',
+    accent_color: '#FF4D57'
+  },
+  m2iformations: {
+    logo_url: '/_assets/branding/m2i/logo.svg',
+    primary_color: '#E30613',
+    accent_color: '#FF4D57'
   },
   dawan: {
     logo_url: '/_assets/branding/dawan/logo.svg',
@@ -74,23 +84,50 @@ const isSafeLogoUrl = url => {
 
 const isHexColor = value => typeof value === 'string' && HEX_RE.test(value.trim())
 
+const CLIENT_KEY_ALIASES = Object.freeze({
+  m2iformation: 'm2i',
+  m2iformations: 'm2i',
+  humanbooster: 'hb'
+})
+
 const resolveCatalogEntry = key => {
   if (!key) return { key: null, catalog: {} }
+  const canonical = CLIENT_KEY_ALIASES[key] || key
+  if (CLIENT_BRANDING_DEFAULTS[canonical]) {
+    return { key: canonical, catalog: CLIENT_BRANDING_DEFAULTS[canonical] }
+  }
   if (CLIENT_BRANDING_DEFAULTS[key]) {
     return { key, catalog: CLIENT_BRANDING_DEFAULTS[key] }
   }
   const hit = Object.keys(CLIENT_BRANDING_DEFAULTS).find(
-    k => key.startsWith(k) || k.startsWith(key)
+    k => key.startsWith(k) || k.startsWith(key) || canonical.startsWith(k)
   )
-  return hit
-    ? { key: hit, catalog: CLIENT_BRANDING_DEFAULTS[hit] }
-    : { key, catalog: {} }
+  if (!hit) return { key, catalog: {} }
+  const hitCanonical = CLIENT_KEY_ALIASES[hit] || hit
+  return {
+    key: hitCanonical,
+    catalog: CLIENT_BRANDING_DEFAULTS[hitCanonical] || CLIENT_BRANDING_DEFAULTS[hit]
+  }
 }
 
 const resolveClientBranding = session => {
   const meta = (session && session.metadata && session.metadata.branding) || {}
-  const rawKey = normalizeClientKey(meta.client_key || (session && session.client))
-  const { key, catalog } = resolveCatalogEntry(rawKey)
+  const rawKey = normalizeClientKey(
+    meta.client_key || (session && session.client) || (session && session.slug)
+  )
+  let { key, catalog } = resolveCatalogEntry(rawKey)
+  // Slug type m2i-… / bourbon sans client OF → cherche un segment catalogue
+  if (!catalog.logo_url && session && session.slug) {
+    const parts = String(session.slug).toLowerCase().split(/[-_/]/)
+    for (const part of parts) {
+      const hit = resolveCatalogEntry(part)
+      if (hit.catalog && hit.catalog.logo_url) {
+        key = hit.key
+        catalog = hit.catalog
+        break
+      }
+    }
+  }
 
   const logoUrl = isSafeLogoUrl(meta.logo_url)
     ? meta.logo_url.trim()

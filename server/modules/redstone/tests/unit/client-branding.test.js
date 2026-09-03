@@ -21,6 +21,25 @@ describe('client-branding (B02)', () => {
     expect(branding.client_key).toBe('m2i')
   })
 
+  it('résout le client Monday M2I et la couleur rouge marque', () => {
+    const branding = resolveClientBranding({ client: 'M2I', metadata: {} })
+    expect(branding.source).toBe('client_catalog')
+    expect(branding.client_key).toBe('m2i')
+    expect(branding.primary_color).toBe('#E30613')
+    expect(branding.logo_url).toBe('/_assets/branding/m2i/logo.svg')
+  })
+
+  it('résout un slug m2i-* même si client métier ≠ OF', () => {
+    const branding = resolveClientBranding({
+      client: 'Bourbon',
+      slug: 'm2i-bourbon-python-fabric',
+      metadata: {}
+    })
+    expect(branding.source).toBe('client_catalog')
+    expect(branding.client_key).toBe('m2i')
+    expect(branding.logo_url).toContain('/branding/m2i/')
+  })
+
   it('accepte logos /_assets et https uniquement', () => {
     expect(isSafeLogoUrl('/_assets/branding/quiris/logo.svg')).toBe(true)
     expect(isSafeLogoUrl('https://cdn.example/logo.svg')).toBe(true)
