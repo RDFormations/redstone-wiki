@@ -42,14 +42,8 @@
               )
               span.rs-nav-badge(v-if='block.badge') {{ block.badge }}
               span.rs-nav-link-text {{ block.module.shortTitle }}
-            span.rs-nav-link.rs-nav-link--pending(
-              v-else-if='block.module'
-              :title='"Module bientôt disponible"'
-              )
-              span.rs-nav-badge(v-if='block.badge') {{ block.badge }}
-              span.rs-nav-link-text {{ block.module.shortTitle }}
             .rs-nav-practice(
-              v-if='block.practice'
+              v-if='blockHasVisiblePractice(block)'
               :aria-label='practiceAriaLabel(block)'
               )
               a.rs-nav-practice-link(
@@ -85,12 +79,6 @@
               :class='{ "rs-nav-link--active": isActive(item.href) }'
               :href='item.href'
               @click='onNavigate'
-              )
-              span.rs-nav-badge(v-if='item.badge') {{ item.badge }}
-              span.rs-nav-link-text {{ item.shortTitle }}
-            span.rs-nav-link.rs-nav-link--pending(
-              v-else
-              :title='"Page bientôt disponible"'
               )
               span.rs-nav-badge(v-if='item.badge') {{ item.badge }}
               span.rs-nav-link-text {{ item.shortTitle }}
@@ -200,10 +188,16 @@ export default {
         return g.items.length > 0
       }).map(g => {
         if (g.id === 'modules') {
-          return { ...g, blocks: this.buildModuleBlocks(g.items), items: [] }
+          const blocks = this.buildModuleBlocks(g.items).filter(b => this.blockVisible(b))
+          return { ...g, blocks, items: [] }
         }
-        g.items.sort((a, b) => a.title.localeCompare(b.title, 'fr'))
-        return g
+        // Stagiaire : ne jamais lister les pages non publiées (pas de placeholder)
+        const visibleItems = g.items.filter(it => this.linkVisible(it))
+        visibleItems.sort((a, b) => a.title.localeCompare(b.title, 'fr'))
+        return { ...g, items: visibleItems }
+      }).filter(g => {
+        if (g.id === 'modules') return g.blocks.length > 0
+        return g.items.length > 0
       })
     },
     hasNavContent () {
@@ -229,6 +223,17 @@ export default {
   methods: {
     linkVisible (item) {
       return item && (item.isPublished !== false || this.canSeeUnpublished)
+    },
+    blockVisible (block) {
+      if (!block) return false
+      if (block.module && this.linkVisible(block.module)) return true
+      return this.blockHasVisiblePractice(block)
+    },
+    blockHasVisiblePractice (block) {
+      const pr = block && block.practice
+      if (!pr) return false
+      return (pr.exercice && this.linkVisible(pr.exercice)) ||
+        (pr.correction && this.linkVisible(pr.correction))
     },
     moduleNum (path) {
       const m = (path || '').match(/(?:module|exercice|correction)-(\d+)/i)
@@ -354,16 +359,22 @@ export default {
         path: it.path,
         title: it.title,
         href: it.href || '/' + it.path,
-        isPublished: it.isPublished !== false
+        // LMS API envoie `isPublished` (bundle) ; tolère aussi `published`
+        isPublished: it.isPublished != null
+          ? it.isPublished !== false
+          : it.published !== false
       }))
       this.heroTitle = data.title || this.slug.replace(/-/g, ' ')
     },
     applyPublishedPaths (paths) {
       const publishedSet = new Set(paths || [])
-      this.items = this.items.map(it => ({
-        ...it,
-        isPublished: publishedSet.has(it.path)
-      }))
+      this.items = this.items
+        .map(it => ({
+          ...it,
+          isPublished: publishedSet.has(it.path)
+        }))
+        // Stagiaire : retirer totalement les non publiés (pas de ligne grisée)
+        .filter(it => it.isPublished || this.canSeeUnpublished)
     },
     async fetchJson (url, timeoutMs = 6000) {
       const fetchPromise = fetch(url, { cache: 'reload' }).then(res => {
