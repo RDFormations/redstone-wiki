@@ -251,6 +251,7 @@ import { get, sync } from 'vuex-pathify'
 import _ from 'lodash'
 
 import movePageMutation from 'gql/common/common-pages-mutation-move.gql'
+import { applyBrandCssVars, resolveBrandingHint } from '../../helpers/client-branding'
 
 /* global siteConfig, siteLangs */
 
@@ -394,17 +395,7 @@ export default {
   methods: {
     onFormationBranding (branding) {
       this.formationBranding = branding || null
-      this.applyBrandCss(branding)
-    },
-    applyBrandCss (branding) {
-      if (!branding || typeof document === 'undefined') return
-      const root = document.documentElement
-      if (branding.primary_color) {
-        root.style.setProperty('--rs-brand-primary', branding.primary_color)
-      }
-      if (branding.accent_color) {
-        root.style.setProperty('--rs-brand-accent', branding.accent_color)
-      }
+      applyBrandCssVars(branding)
     },
     async loadFormationBranding (slug) {
       if (!slug) {
@@ -416,13 +407,18 @@ export default {
           `/api/v1/public/sessions/by-slug/${encodeURIComponent(slug)}/branding`,
           { cache: 'no-store' }
         )
-        if (!res.ok) return
-        const body = await res.json()
-        this.formationBranding = body.branding || null
-        this.applyBrandCss(body.branding)
+        if (res.ok) {
+          const body = await res.json()
+          this.formationBranding = body.branding || null
+          applyBrandCssVars(body.branding)
+          return
+        }
       } catch (e) {
-        // branding optionnel — logo RedStone par défaut
+        // fallback catalogue ci-dessous
       }
+      const hint = resolveBrandingHint({ slug })
+      this.formationBranding = hint
+      applyBrandCssVars(hint)
     },
     searchFocus () {
       this.searchIsFocused = true

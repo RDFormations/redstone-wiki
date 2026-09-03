@@ -150,6 +150,7 @@ const CDC_VALIDATED_FEATURES = [
   ], ['ops-staging-backup.test.js']),
   feature('B02', 'Branding client (logo, couleurs)', [
     'server/modules/redstone/domain/client-branding.js',
+    'client/helpers/client-branding.js',
     'client/static/branding/quiris/logo.svg',
     'client/components/common/nav-header.vue',
     'client/components/formation/formation-nav-sidebar.vue'

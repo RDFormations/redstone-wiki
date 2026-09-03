@@ -68,6 +68,8 @@
 </template>
 
 <script>
+import { applyBrandCssVars, resolveBrandingHint } from '../../helpers/client-branding'
+
 export default {
   props: {
     slug: { type: String, required: true },
@@ -167,7 +169,10 @@ export default {
         res = await fetch(`/_assets/stagiaires/${encodeURIComponent(this.slug)}.json`)
         if (!res.ok) throw new Error('Liens session introuvables')
         this.data = await res.json()
-        this.applyBranding(this.data && this.data.branding)
+        this.applyBranding(
+          (this.data && this.data.branding) ||
+          resolveBrandingHint({ slug: this.slug, client: this.data && this.data.client })
+        )
       } catch (e) {
         this.error = e.message || String(e)
         this.data = null
@@ -176,14 +181,11 @@ export default {
       }
     },
     applyBranding (branding) {
-      if (!branding || typeof document === 'undefined') return
-      const root = document.documentElement
-      if (branding.primary_color) {
-        root.style.setProperty('--rs-brand-primary', branding.primary_color)
+      if (!branding) return
+      if (this.data && !this.data.branding) {
+        this.data = { ...this.data, branding }
       }
-      if (branding.accent_color) {
-        root.style.setProperty('--rs-brand-accent', branding.accent_color)
-      }
+      applyBrandCssVars(branding)
       this.$root.$emit('formation-branding', branding)
     }
   }

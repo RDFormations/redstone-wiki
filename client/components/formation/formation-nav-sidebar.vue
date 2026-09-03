@@ -93,6 +93,7 @@
 import gql from 'graphql-tag'
 import _ from 'lodash'
 import { get } from 'vuex-pathify'
+import { applyBrandCssVars, resolveBrandingHint } from '../../helpers/client-branding'
 
 const SECTIONS = [
   { id: 'formateur', label: 'Formateur', icon: '★', match: (p) => /\/formateur$/i.test('/' + p) },
@@ -385,14 +386,15 @@ export default {
     applyBranding (branding) {
       if (!branding) return
       this.branding = branding
-      const root = document.documentElement
-      if (branding.primary_color) {
-        root.style.setProperty('--rs-brand-primary', branding.primary_color)
-      }
-      if (branding.accent_color) {
-        root.style.setProperty('--rs-brand-accent', branding.accent_color)
-      }
+      applyBrandCssVars(branding)
       this.$root.$emit('formation-branding', branding)
+    },
+    ensureBrandingFallback () {
+      if (this.branding && this.branding.logo_url) return
+      this.applyBranding(resolveBrandingHint({
+        slug: this.slug,
+        client: this.branding && this.branding.client_key
+      }))
     },
     applyPublishedPaths (paths) {
       const publishedSet = new Set(paths || [])
@@ -530,6 +532,7 @@ export default {
           this.navError = true
         }
       } finally {
+        this.ensureBrandingFallback()
         this.navLoading = false
       }
     },
