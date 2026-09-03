@@ -78,4 +78,24 @@ router.post('/sessions/:id/distribute', async (req, res) => {
   return res.status(200).json({ ok: true, ...result })
 })
 
+/** C04 — liste PDC client / improved (cookie OPS) */
+router.get('/sessions/:id/pdc', async (req, res) => {
+  if (!isOps(req)) return deny(res, 403, 'Accès OPS requis.')
+  if (!WIKI.redstone?.pdc) return res.status(503).json({ ok: false, error: { message: 'LMS indisponible.' } })
+
+  const result = await WIKI.redstone.pdc.list(req.params.id)
+  if (!result.ok) return res.status(result.status).json({ ok: false, error: result.error })
+  return res.status(200).json(result)
+})
+
+/** C04 — diff PDC client vs improved (UI admin) */
+router.get('/sessions/:id/pdc/diff', async (req, res) => {
+  if (!isOps(req)) return deny(res, 403, 'Accès OPS requis.')
+  if (!WIKI.redstone?.pdc) return res.status(503).json({ ok: false, error: { message: 'LMS indisponible.' } })
+
+  const result = await WIKI.redstone.pdc.diff(req.params.id)
+  if (!result.ok) return res.status(result.status).json({ ok: false, error: result.error })
+  return res.status(200).json(result)
+})
+
 module.exports = router

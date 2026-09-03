@@ -98,7 +98,7 @@
               v-btn(icon, small, @click='openDetail(item)', title='Détail')
                 v-icon(small) mdi-information-outline
 
-    v-dialog(v-model='detailOpen', max-width='720')
+    v-dialog(v-model='detailOpen', max-width='880')
       v-card(v-if='detail')
         v-card-title {{ detail.session.title }}
         v-card-subtitle {{ detail.session.client }} · {{ detail.session.slug }}
@@ -132,6 +132,9 @@
             ul
               li(v-for='check in detail.health_checks', :key='check.id || check.checkId')
                 | {{ check.checkId }} — {{ check.level }}: {{ check.message }}
+          div.mt-4
+            .subtitle-2.mb-2 Traçabilité PDC (C04)
+            formation-pdc-diff(:session-id='detail.session.id')
         v-card-actions
           v-spacer
           v-btn(
@@ -170,6 +173,7 @@
 <script>
 import _ from 'lodash'
 import { get } from 'vuex-pathify'
+import FormationPdcDiff from '../formation/formation-pdc-diff.vue'
 
 const DEFAULT_FILTERS = () => ({
   q: '',
@@ -180,6 +184,7 @@ const DEFAULT_FILTERS = () => ({
 })
 
 export default {
+  components: { FormationPdcDiff },
   data () {
     return {
       loading: false,

@@ -492,6 +492,19 @@ paths:
       operationId: upsertPdc
       tags: [Content]
 
+  /sessions/{id}/pdc/diff:
+    get:
+      summary: C04 — diff ligne à ligne PDC client vs improved
+      operationId: diffPdc
+      tags: [Content]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Diff + summary + versions client/improved
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /sessions/{id}/labs:
     get:
       summary: C05 — lister labs session
