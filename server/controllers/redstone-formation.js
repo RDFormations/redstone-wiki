@@ -175,4 +175,58 @@ router.get('/:slug/content/versions/:versionId/diff', async (req, res) => {
   return res.status(200).json(body)
 })
 
+router.post('/:slug/content/versions/:versionId/restore', express.json(), async (req, res) => {
+  if (!isAuthenticated(req)) return deny(res, 401, 'Connexion requise.')
+  const slug = String(req.params.slug || '').trim().toLowerCase()
+  if (!slug) return deny(res, 400, 'Slug invalide.')
+  if (!canPublishFormation(req, slug)) return deny(res, 403, 'Restauration refusée.')
+  if (!WIKI.redstone?.contentVersions) return res.status(503).json({ ok: false, error: { message: 'LMS indisponible.' } })
+
+  const sessionId = await resolveSessionId(slug, res)
+  if (!sessionId) return undefined
+
+  const result = await WIKI.redstone.contentVersions.restoreVersion(sessionId, req.params.versionId, {
+    author: req.user.name || req.user.email || 'formateur'
+  })
+  if (!result.ok) return res.status(result.status).json({ ok: false, error: result.error })
+  const { ok: _ok, status: _status, ...body } = result
+  return res.status(200).json(body)
+})
+
+router.post('/:slug/content/chatbot/propose', express.json(), async (req, res) => {
+  if (!isAuthenticated(req)) return deny(res, 401, 'Connexion requise.')
+  const slug = String(req.params.slug || '').trim().toLowerCase()
+  if (!slug) return deny(res, 400, 'Slug invalide.')
+  if (!canPublishFormation(req, slug)) return deny(res, 403, 'Chatbot refusé.')
+  if (!WIKI.redstone?.chatbot) return res.status(503).json({ ok: false, error: { message: 'LMS indisponible.' } })
+
+  const sessionId = await resolveSessionId(slug, res)
+  if (!sessionId) return undefined
+
+  const result = await WIKI.redstone.chatbot.propose(sessionId, req.body || {}, {
+    author: req.user.name || req.user.email || 'formateur'
+  })
+  if (!result.ok) return res.status(result.status).json({ ok: false, error: result.error })
+  const { ok: _ok, status: _status, ...body } = result
+  return res.status(200).json(body)
+})
+
+router.post('/:slug/content/chatbot/apply', express.json(), async (req, res) => {
+  if (!isAuthenticated(req)) return deny(res, 401, 'Connexion requise.')
+  const slug = String(req.params.slug || '').trim().toLowerCase()
+  if (!slug) return deny(res, 400, 'Slug invalide.')
+  if (!canPublishFormation(req, slug)) return deny(res, 403, 'Application refusée.')
+  if (!WIKI.redstone?.chatbot) return res.status(503).json({ ok: false, error: { message: 'LMS indisponible.' } })
+
+  const sessionId = await resolveSessionId(slug, res)
+  if (!sessionId) return undefined
+
+  const result = await WIKI.redstone.chatbot.apply(sessionId, req.body || {}, {
+    author: req.user.name || req.user.email || 'formateur'
+  })
+  if (!result.ok) return res.status(result.status).json({ ok: false, error: result.error })
+  const { ok: _ok, status: _status, ...body } = result
+  return res.status(200).json(body)
+})
+
 module.exports = router

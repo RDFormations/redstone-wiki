@@ -3,6 +3,10 @@ const { validateCreatePayload, buildWikiPath } = require('../domain/session-vali
 const { INITIAL_STATE } = require('../domain/session-state')
 const { parseSessionListFilters } = require('../domain/session-filters')
 const { enrichSessionStatus } = require('../domain/session-status')
+const {
+  resolveClientBranding,
+  sanitizeBrandingPatch
+} = require('../domain/client-branding')
 
 const DUPLICATE_MESSAGES = {
   slug: 'Une session avec ce slug existe déjà.',
@@ -116,6 +120,63 @@ const createSessionService = ({ repo, logger = console }) => ({
       total: result.total,
       limit: result.limit,
       offset: result.offset
+    }
+  },
+
+  /** B02 — logo / couleurs client (metadata.branding). */
+  async updateBranding(sessionId, patch = {}) {
+    const session = await repo.findById(sessionId)
+    if (!session) {
+      return {
+        ok: false,
+        status: 404,
+        error: { code: 'session_not_found', message: 'Session introuvable.' }
+      }
+    }
+
+    const sanitized = sanitizeBrandingPatch(patch)
+    if (!sanitized.ok) {
+      return {
+        ok: false,
+        status: 422,
+        error: {
+          code: 'invalid_branding',
+          message: sanitized.errors.join('; '),
+          errors: sanitized.errors
+        }
+      }
+    }
+
+    const branding = {
+      ...((session.metadata && session.metadata.branding) || {}),
+      ...sanitized.value
+    }
+    const updated = await repo.update(sessionId, { metadata: { branding } })
+    const resolved = resolveClientBranding(updated)
+    logger.info(`(REDSTONE/LMS) Branding B02 mis à jour: ${updated.slug} (${resolved.source})`)
+    return {
+      ok: true,
+      status: 200,
+      session: { ...updated, ...enrichSessionStatus(updated) },
+      branding: resolved
+    }
+  },
+
+  async getBranding(sessionIdOrSlug, { bySlug = false } = {}) {
+    const session = bySlug
+      ? await repo.findBySlug(String(sessionIdOrSlug || '').trim().toLowerCase())
+      : await repo.findById(sessionIdOrSlug)
+    if (!session) {
+      return {
+        ok: false,
+        status: 404,
+        error: { code: 'session_not_found', message: 'Session introuvable.' }
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
+      branding: resolveClientBranding(session)
     }
   }
 })

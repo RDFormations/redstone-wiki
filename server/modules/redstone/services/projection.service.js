@@ -270,6 +270,12 @@ const createProjectionService = ({ knex, logger = console }) => {
           title: 'Espace formateur',
           body_md: hubBodyMarkdown('formateur', session),
           published_stagiaire: false
+        },
+        {
+          path: 'edit',
+          title: 'Édition module',
+          body_md: hubBodyMarkdown('edit', session),
+          published_stagiaire: false
         }
       ]
       const results = []

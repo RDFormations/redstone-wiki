@@ -152,4 +152,48 @@ describe('session.service', () => {
       })
     })
   })
+
+  describe('updateBranding (B02)', () => {
+    it('persiste metadata.branding et renvoie le branding résolu', async () => {
+      const existing = {
+        id: 'sess-1',
+        slug: 'quiris-admin-m365',
+        client: 'Quiris',
+        metadata: {},
+        state: 'distributed'
+      }
+      const updated = {
+        ...existing,
+        metadata: { branding: { primary_color: '#112233' } }
+      }
+      const repo = createMockRepo({
+        findById: jest.fn().mockResolvedValue(existing),
+        update: jest.fn().mockResolvedValue(updated)
+      })
+      const service = createSessionService({ repo, logger: { info: jest.fn() } })
+
+      const result = await service.updateBranding('sess-1', { primary_color: '#112233' })
+
+      expect(result.ok).toBe(true)
+      expect(result.branding.primary_color).toBe('#112233')
+      expect(result.branding.source).toBe('session')
+      expect(repo.update).toHaveBeenCalledWith('sess-1', {
+        metadata: { branding: { primary_color: '#112233' } }
+      })
+    })
+
+    it('rejette une couleur invalide', async () => {
+      const repo = createMockRepo({
+        findById: jest.fn().mockResolvedValue({ id: '1', metadata: {} }),
+        update: jest.fn()
+      })
+      const service = createSessionService({ repo, logger: { info: jest.fn() } })
+
+      const result = await service.updateBranding('1', { primary_color: 'rouge' })
+
+      expect(result.ok).toBe(false)
+      expect(result.status).toBe(422)
+      expect(repo.update).not.toHaveBeenCalled()
+    })
+  })
 })

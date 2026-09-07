@@ -51,15 +51,24 @@
           )
           v-icon(left, small) mdi-content-save-outline
           | Enregistrer
+      .rs-module-editor-chat(v-if='open && activeStem')
+        formation-module-chatbot(
+          :slug='slug'
+          :path='activeStem'
+          :body-md='bodyMd'
+          @applied='onChatApplied'
+          )
 </template>
 
 <script>
 import MarkdownIt from 'markdown-it'
 import { enhanceMermaidDiagrams } from '../../helpers/mermaid.js'
+import FormationModuleChatbot from './formation-module-chatbot.vue'
 
 const md = new MarkdownIt({ html: false, linkify: true, breaks: true })
 
 export default {
+  components: { FormationModuleChatbot },
   props: {
     slug: { type: String, required: true }
   },
@@ -169,6 +178,14 @@ export default {
       } finally {
         this.saving = false
       }
+    },
+    onChatApplied ({ body_md, version }) {
+      if (body_md != null) {
+        this.bodyMd = body_md
+        this.initialBody = body_md
+      }
+      if (version) this.currentVersion = version
+      this.$emit('saved', { stem: this.activeStem, version: this.currentVersion })
     }
   }
 }

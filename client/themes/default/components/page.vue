@@ -375,7 +375,7 @@
                     span {{$t('common:header.delete')}}
               span {{$t('common:page.editPage')}}
             v-alert.mb-5(
-              v-if='!displayPublished && !showFormateurHub && !showStagiaireHub && !showUnpublishedFriendly'
+              v-if='!displayPublished && !showFormateurHub && !showStagiaireHub && !showModuleEditPage && !showUnpublishedFriendly'
               color='red'
               outlined
               icon='mdi-minus-circle'
@@ -396,12 +396,18 @@
               :slug='formationSlug'
               :locale='locale'
               )
+            formation-module-edit-page(
+              v-if='showModuleEditPage'
+              :slug='formationSlug'
+              :module-stem='formationEditModule'
+              :locale='locale'
+              )
             formation-unpublished-friendly(
               v-if='showUnpublishedFriendly'
               :slug='formationSlug'
               :locale='locale'
               )
-            .contents(ref='container', v-show='!showFormateurHub && !showStagiaireHub && !showUnpublishedFriendly')
+            .contents(ref='container', v-show='!showFormateurHub && !showStagiaireHub && !showModuleEditPage && !showUnpublishedFriendly')
               slot(name='contents')
             .comments-container#discussion(v-if='commentsEnabled && commentsPerms.read && !printView')
               .comments-header
@@ -440,6 +446,7 @@ import FormationNavSidebar from '../../../components/formation/formation-nav-sid
 import FormationFormateurHub from '../../../components/formation/formation-formateur-hub.vue'
 import FormationStagiaireHub from '../../../components/formation/formation-stagiaire-hub.vue'
 import FormationUnpublishedFriendly from '../../../components/formation/formation-unpublished-friendly.vue'
+import FormationModuleEditPage from '../../../components/formation/formation-module-edit-page.vue'
 import Prism from 'prismjs'
 import { get, sync } from 'vuex-pathify'
 import _ from 'lodash'
@@ -529,6 +536,7 @@ export default {
     FormationFormateurHub,
     FormationStagiaireHub,
     FormationUnpublishedFriendly,
+    FormationModuleEditPage,
     StatusIndicator
   },
   props: {
@@ -707,6 +715,13 @@ export default {
     isStagiaireHubPath () {
       return /\/stagiaire$/i.test(this.path)
     },
+    isModuleEditPath () {
+      return /^formations\/[^/]+\/edit(?:\/|$)/i.test(this.path)
+    },
+    formationEditModule () {
+      const m = String(this.path || '').match(/^formations\/[^/]+\/edit\/([^/]+)/i)
+      return m ? decodeURIComponent(m[1]).replace(/\.md$/i, '') : ''
+    },
     canTogglePublish () {
       if (!this.isAuthenticated || !this.isFormationPage) return false
       const elevated = ['manage:system', 'write:pages', 'manage:pages']
@@ -721,6 +736,9 @@ export default {
     showStagiaireHub () {
       return this.isFormationPage && this.isStagiaireHubPath
     },
+    showModuleEditPage () {
+      return this.isFormationPage && this.isModuleEditPath && this.canSeeFormateur
+    },
     showUnpublishedFriendly () {
       if (this.formationUnpublishedFriendly) return true
       return this.isFormationPage &&
@@ -728,7 +746,8 @@ export default {
         !this.displayPublished &&
         !this.canTogglePublish &&
         !this.showFormateurHub &&
-        !this.showStagiaireHub
+        !this.showStagiaireHub &&
+        !this.showModuleEditPage
     },
     displayPublished () {
       if (this.localPublished !== null) return this.localPublished

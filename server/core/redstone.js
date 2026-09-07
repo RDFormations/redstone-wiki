@@ -25,6 +25,7 @@ module.exports = {
     const { createContentRepository } = require(path.join(base, 'repository/content.repository'))
     const { createHealthRepository } = require(path.join(base, 'repository/health.repository'))
     const { createWebhookOutboxRepository } = require(path.join(base, 'repository/webhook-outbox.repository'))
+    const { createChatbotProposalRepository } = require(path.join(base, 'repository/chatbot-proposal.repository'))
     const { createSessionService } = require(path.join(base, 'services/session.service'))
     const { createImportService } = require(path.join(base, 'services/import.service'))
     const { createDistributeService } = require(path.join(base, 'services/distribute.service'))
@@ -41,6 +42,10 @@ module.exports = {
     const { createAdminSessionsService } = require(path.join(base, 'services/admin-sessions.service'))
     const { createContentVersionsService } = require(path.join(base, 'services/content-versions.service'))
     const { createContentEditService } = require(path.join(base, 'services/content-edit.service'))
+    const { createChatbotService } = require(path.join(base, 'services/chatbot.service'))
+    const { createPdcRepository, createPdcService } = require(path.join(base, 'services/pdc.service'))
+    const { createLabsRepository, createLabsService } = require(path.join(base, 'services/labs.service'))
+    const { createExportGitService } = require(path.join(base, 'services/export-git.service'))
     const { createLegalPagesService } = require(path.join(base, 'services/legal-pages.service'))
     const { createPortalService } = require(path.join(base, 'services/portal.service'))
     const { fetchMissionItem } = require(path.join(base, 'infrastructure/monday-client'))
@@ -51,6 +56,9 @@ module.exports = {
     const contentRepo = createContentRepository(knex)
     const healthRepo = createHealthRepository(knex)
     const webhookOutboxRepo = createWebhookOutboxRepository(knex)
+    const proposalRepo = createChatbotProposalRepository(knex)
+    const pdcRepo = createPdcRepository(knex)
+    const labsRepo = createLabsRepository(knex)
     const webhooks = createWebhooksService({
       outboxRepo: webhookOutboxRepo,
       logger: WIKI.logger
@@ -70,19 +78,38 @@ module.exports = {
     const nav = createNavService()
     const health = createHealthService({ sessionRepo, contentRepo, healthRepo })
     const contentNav = createContentNavService({ sessionRepo, contentRepo, navService: nav })
+    const pdc = createPdcService({ sessionRepo, pdcRepo })
+    const labs = createLabsService({ sessionRepo, labsRepo })
     const portal = createPortalService({
       sessionRepo,
       contentRepo,
       navService: nav,
+      labsService: labs,
       getSiteHost: () => WIKI.config?.host || process.env.WIKI_SITE_HOST || 'https://formation.redstoneformations.fr',
       logger: WIKI.logger
     })
     const adminSessions = createAdminSessionsService({ sessionRepo, contentRepo, healthRepo })
-    const contentVersions = createContentVersionsService({ sessionRepo, contentRepo })
     const contentEdit = createContentEditService({
       sessionRepo,
       contentRepo,
       projectionService: projection,
+      logger: WIKI.logger
+    })
+    const contentVersions = createContentVersionsService({
+      sessionRepo,
+      contentRepo,
+      contentEdit
+    })
+    const chatbot = createChatbotService({
+      sessionRepo,
+      contentRepo,
+      contentEdit,
+      proposalRepo,
+      logger: WIKI.logger
+    })
+    const exportGit = createExportGitService({
+      sessionRepo,
+      contentRepo,
       logger: WIKI.logger
     })
     const legalPages = createLegalPagesService({ knex, logger: WIKI.logger })
@@ -134,6 +161,10 @@ module.exports = {
       adminSessions,
       contentVersions,
       contentEdit,
+      chatbot,
+      pdc,
+      labs,
+      exportGit,
       legalPages,
       health,
       contentNav,
@@ -159,7 +190,7 @@ module.exports = {
       })
     })
 
-    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — F01–F13, M03, S01/M01, T01/T02, E01/E02/E07, O02/O03, T04, C12/C14')
+    WIKI.logger.info('(REDSTONE/LMS) Module initialisé — C13/C04/C05/C03′/M05/F06/F09')
   },
   validateLmsConfig
 }

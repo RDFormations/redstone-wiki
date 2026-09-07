@@ -251,6 +251,7 @@ import { get, sync } from 'vuex-pathify'
 import _ from 'lodash'
 
 import movePageMutation from 'gql/common/common-pages-mutation-move.gql'
+import { applyBrandCssVars, resolveBrandingHint } from '../../helpers/client-branding'
 
 /* global siteConfig, siteLangs */
 
@@ -280,10 +281,19 @@ export default {
       convertPageModal: false,
       deletePageModal: false,
       locales: siteLangs,
+      formationBranding: null,
       duplicateOpts: {
         locale: 'en',
         path: 'new-page',
         modal: false
+      }
+    }
+  },
+  watch: {
+    formationSlug: {
+      immediate: true,
+      handler (slug) {
+        this.loadFormationBranding(slug)
       }
     }
   },
@@ -296,8 +306,15 @@ export default {
     isLoading: get('isLoading'),
     title: get('site/title'),
     logoUrl: get('site/logoUrl'),
+    formationSlug () {
+      const m = String(this.path || '').match(/^formations\/([^/]+)/)
+      return m ? m[1] : null
+    },
     effectiveLogoUrl () {
-      // Toujours le logo RedStone — ignore toute marque tierce (Wiki.js, Cursor…).
+      // B02 — logo client sur pages formation ; sinon RedStone.
+      if (this.formationBranding && this.formationBranding.logo_url) {
+        return this.formationBranding.logo_url
+      }
       return '/_assets/svg/redstone-logo.svg'
     },
     path: get('page/path'),
@@ -349,6 +366,7 @@ export default {
     }
   },
   mounted () {
+    this.$root.$on('formation-branding', this.onFormationBranding)
     this.$root.$on('pageEdit', () => {
       this.pageEdit()
     })
@@ -371,7 +389,37 @@ export default {
       this.pageDelete()
     })
   },
+  beforeDestroy () {
+    this.$root.$off('formation-branding', this.onFormationBranding)
+  },
   methods: {
+    onFormationBranding (branding) {
+      this.formationBranding = branding || null
+      applyBrandCssVars(branding)
+    },
+    async loadFormationBranding (slug) {
+      if (!slug) {
+        this.formationBranding = null
+        return
+      }
+      try {
+        const res = await fetch(
+          `/api/v1/public/sessions/by-slug/${encodeURIComponent(slug)}/branding`,
+          { cache: 'no-store' }
+        )
+        if (res.ok) {
+          const body = await res.json()
+          this.formationBranding = body.branding || null
+          applyBrandCssVars(body.branding)
+          return
+        }
+      } catch (e) {
+        // fallback catalogue ci-dessous
+      }
+      const hint = resolveBrandingHint({ slug })
+      this.formationBranding = hint
+      applyBrandCssVars(hint)
+    },
     searchFocus () {
       this.searchIsFocused = true
     },

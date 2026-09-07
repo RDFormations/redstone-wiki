@@ -1,5 +1,6 @@
 const { messageFor } = require('./session-state')
 const { qrSvgForUrl } = require('./qr-svg')
+const { resolveClientBranding } = require('./client-branding')
 
 const PUBLIC_HUB_STATES = new Set(['draft_ready', 'distributed', 'live', 'archived'])
 
@@ -91,7 +92,8 @@ const buildStagiaireHub = (session, options = {}) => {
       supportUrl: `${host}${portalPath}`
     }),
     labs: meta.labs || [],
-    qrSvg: qrSvgForUrl(`${host}/${locale}${stagiairePath}`)
+    qrSvg: qrSvgForUrl(`${host}/${locale}${stagiairePath}`),
+    branding: resolveClientBranding(session)
   }
 }
 

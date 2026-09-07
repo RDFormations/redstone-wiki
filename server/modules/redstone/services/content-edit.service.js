@@ -102,6 +102,7 @@ const createContentEditService = ({
       author: options.author || payload.author || 'formateur',
       parent_version_id: existing.id,
       agent_run_id: options.agent_run_id || payload.agent_run_id || null,
+      chat_message_id: options.chat_message_id || payload.chat_message_id || null,
       content_hash: contentHash
     }
 
