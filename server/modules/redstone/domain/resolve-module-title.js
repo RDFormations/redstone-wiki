@@ -20,13 +20,18 @@ const titleFromBody = (bodyMd, stem) => {
 const resolveModuleTitle = (mod) => {
   const stem = String(mod.path || '').replace(/\.md$/, '')
   const stored = String(mod.title || '').trim()
+  let resolved = stored
   if (stored && stored !== stem && !STEM_LIKE_TITLE_RE.test(stored)) {
-    return stored
+    resolved = stored
+  } else if (mod.frontmatter?.title) {
+    resolved = String(mod.frontmatter.title).trim()
+  } else {
+    resolved = titleFromBody(mod.body_md, stem) || stored || stem
   }
-  if (mod.frontmatter?.title) {
-    return String(mod.frontmatter.title).trim()
+  if (stem === '00-introduction' && (!resolved || /^00-introduction$/i.test(resolved))) {
+    return 'Introduction'
   }
-  return titleFromBody(mod.body_md, stem) || stored || stem
+  return resolved
 }
 
 module.exports = { resolveModuleTitle, titleFromBody, STEM_LIKE_TITLE_RE }

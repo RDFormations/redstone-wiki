@@ -260,6 +260,9 @@ export default {
     },
     displayTitle (title, path) {
       let shortTitle = String(title || '').trim()
+      if (formationRelativeStem(path) === '00-introduction' || /^00-introduction$/i.test(shortTitle)) {
+        return 'Introduction'
+      }
       const stem = (path || '').split('/').pop().replace(/\.md$/, '')
       const mod = shortTitle.match(/^Module\s+\d+\s*[—–-]\s*(.+)$/i)
       if (mod) return mod[1].trim()
@@ -274,6 +277,14 @@ export default {
         }
       }
       return shortTitle || stem
+    },
+    preferNavTitle (wikiTitle, navTitle) {
+      const w = String(wikiTitle || '').trim()
+      const n = String(navTitle || '').trim()
+      if (!w) return n
+      if (!n) return w
+      if (/^00-introduction$/i.test(w)) return n
+      return w
     },
     resolveItemHref (item) {
       const raw = item.href || item.path
@@ -543,7 +554,7 @@ export default {
           this.items = this.items.map(it => ({
             ...it,
             title: publishedByPath.has(it.path)
-              ? (list.find(p => p.path === it.path) || {}).title || it.title
+              ? this.preferNavTitle((list.find(p => p.path === it.path) || {}).title, it.title)
               : it.title,
             isPublished: publishedByPath.has(it.path)
               ? publishedByPath.get(it.path)
