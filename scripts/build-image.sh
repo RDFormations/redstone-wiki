@@ -39,6 +39,10 @@ else
     echo "REDSTONE_WIKI_ROOT=$ROOT" | sudo tee -a "$WIKI_ROOT/.env" >/dev/null
 fi
 
+if [[ -x "$ROOT/scripts/ensure-chatbot-env.sh" ]]; then
+  bash "$ROOT/scripts/ensure-chatbot-env.sh"
+fi
+
 cd "$WIKI_ROOT"
 sudo -E docker compose build wiki
 sudo docker tag redstone-wiki:2.5-redstone redstone-wiki:deps 2>/dev/null || true

@@ -37,6 +37,10 @@ sudo cp "$ROOT/deploy/docker-compose.prod.yml" "$WIKI_ROOT/docker-compose.yml"
 grep -q '^REDSTONE_WIKI_ROOT=' "$WIKI_ROOT/.env" 2>/dev/null || \
   echo "REDSTONE_WIKI_ROOT=$ROOT" | sudo tee -a "$WIKI_ROOT/.env" >/dev/null
 
+if [[ -x "$ROOT/scripts/ensure-chatbot-env.sh" ]]; then
+  bash "$ROOT/scripts/ensure-chatbot-env.sh"
+fi
+
 cd "$WIKI_ROOT"
 
 build_fast() {
