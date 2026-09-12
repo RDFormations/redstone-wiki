@@ -4,6 +4,7 @@
  */
 
 const crypto = require('crypto')
+const { chatbotUrl, chatbotToken } = require('../config/chatbot-config')
 
 const REDSTONE_RULES = [
   'Ne publie jamais côté stagiaire — brouillon uniquement.',
@@ -94,7 +95,8 @@ const proposeHeuristic = ({ body_md = '', message = '' }) => {
  * Corps attendu : { proposed_body_md, summary? }
  */
 const proposeViaHttp = async ({ body_md, message, context }, fetchImpl) => {
-  const url = process.env.REDSTONE_CHATBOT_URL || process.env.LMS_CHATBOT_URL
+  const url = chatbotUrl()
+  const token = chatbotToken()
   if (!url) {
     throw new Error('REDSTONE_CHATBOT_URL non configuré sur le serveur wiki.')
   }
@@ -107,9 +109,7 @@ const proposeViaHttp = async ({ body_md, message, context }, fetchImpl) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...(process.env.REDSTONE_CHATBOT_TOKEN
-        ? { Authorization: `Bearer ${process.env.REDSTONE_CHATBOT_TOKEN}` }
-        : {})
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
     },
     body: JSON.stringify({
       message,
