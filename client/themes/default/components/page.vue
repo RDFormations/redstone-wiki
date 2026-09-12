@@ -98,7 +98,11 @@
             .caption.red--text {{$t('common:page.unpublished')}}
             status-indicator.ml-3(negative, pulse)
         v-divider
-      v-container.grey.pa-0(fluid, :class='$vuetify.theme.dark ? `darken-4-l3` : `lighten-4`')
+      v-container.grey.pa-0(
+        v-if='!hideFormationPageHeader'
+        fluid
+        :class='$vuetify.theme.dark ? `darken-4-l3` : `lighten-4`'
+        )
         v-row.page-header-section(no-gutters, align-content='center', style='height: 90px;')
           v-col.page-col-content.is-page-header(
             :offset-xl='tocPosition === `left` ? 2 : 0'
@@ -109,8 +113,8 @@
             :class='$vuetify.rtl ? `pr-4` : `pl-4`'
             )
             .page-header-headings
-              .headline.grey--text(:class='$vuetify.theme.dark ? `text--lighten-2` : `text--darken-3`') {{title}}
-              .caption.grey--text.text--darken-1 {{description}}
+              .headline.grey--text(:class='$vuetify.theme.dark ? `text--lighten-2` : `text--darken-3`') {{ formationPageHeadline }}
+              .caption.grey--text.text--darken-1(v-if='description') {{description}}
             .page-edit-shortcuts(
               v-if='editShortcutsObj.editMenuBar'
               :class='tocPosition === `right` ? `is-right` : ``'
@@ -132,8 +136,8 @@
                 )
                 v-icon.mr-2(small) {{ editShortcutsObj.editMenuExternalIcon }}
                 span.text-none {{$t(`common:page.editExternal`, { name: editShortcutsObj.editMenuExternalName })}}
-      v-divider
-      v-container.pl-5.pt-4(fluid, grid-list-xl)
+      v-divider(v-if='!hideFormationPageHeader')
+      v-container.pl-5.pt-4(fluid, grid-list-xl, :class='{ "rs-formation-content-only": hideFormationPageHeader }')
         v-layout(row)
           v-flex.page-col-sd(
             v-if='tocPosition !== `off` && $vuetify.breakpoint.lgAndUp'
@@ -684,6 +688,26 @@ export default {
     isFormationRestrictedStem () {
       return /^(module|exercice|correction)-/.test(this.formationStem)
     },
+    /** Masque le bandeau Wiki (titre slug) — le H1 du MD fait office de titre. */
+    hideFormationPageHeader () {
+      if (!this.isFormationPage) return false
+      if (this.showFormateurHub || this.showStagiaireHub || this.showModuleEditPage) return false
+      if (this.showUnpublishedFriendly) return false
+      return (
+        this.isFormationRestrictedStem ||
+        /^annexe-/i.test(this.formationStem) ||
+        !this.formationStem
+      )
+    },
+    formationPageHeadline () {
+      const t = String(this.title || '').trim()
+      const stem = this.formationStem
+      if (stem && (t === stem || /^(module|exercice|correction|annexe)-\d+/i.test(t))) {
+        const toc = this.tocDecoded
+        if (toc && toc[0] && toc[0].title) return toc[0].title
+      }
+      return t
+    },
     formationDrawerClass () {
       const classes = []
       if (this.isFormationPage) {
@@ -772,6 +796,21 @@ export default {
       }
     },
     breadcrumbs() {
+      if (this.isFormationPage && this.formationSlug) {
+        const items = [{ path: '/', name: 'Home' }]
+        const base = `/${this.locale}/formations/${this.formationSlug}`
+        items.push({
+          path: `${base}/stagiaire`,
+          name: this.formationSlug.replace(/-/g, ' ')
+        })
+        if (this.formationStem) {
+          items.push({
+            path: `${base}/${this.formationStem}`,
+            name: this.formationPageHeadline
+          })
+        }
+        return items
+      }
       return [{ path: '/', name: 'Home' }].concat(
         _.reduce(this.path.split('/'), (result, value) => {
           result.push({
