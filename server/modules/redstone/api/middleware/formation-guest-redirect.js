@@ -21,6 +21,7 @@ const createFormationIntroRewrite = () => (req, res, next) => {
   const locale = match[1] || 'fr'
   const slug = match[2]
   const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''
+  req.redstoneFormationIntro = true
   req.url = `/${locale}/formations/${slug}${query}`
   return next()
 }
@@ -29,6 +30,7 @@ const createFormationGuestRedirect = (isPublicSession = async () => false) => {
   return async (req, res, next) => {
     if (req.method !== 'GET' && req.method !== 'HEAD') return next()
     if (!isGuestUser(req)) return next()
+    if (req.redstoneFormationIntro) return next()
 
     const match = FORMATION_ROOT_RE.exec(req.path)
     if (!match) return next()

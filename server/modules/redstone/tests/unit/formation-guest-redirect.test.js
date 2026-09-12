@@ -31,6 +31,26 @@ describe('formation-guest-redirect', () => {
     expect(req.url).toBe('/fr/formations/quiris-admin-m365?x=1')
   })
 
+  it('intro rewrite ne déclenche pas le redirect hub stagiaire', async () => {
+    const intro = createFormationIntroRewrite()
+    const guest = createFormationGuestRedirect(async () => true)
+    const req = mockReq('/fr/formations/quiris-admin-m365/00-introduction')
+    const res = { redirect: jest.fn() }
+    const next = jest.fn()
+    await new Promise((resolve, reject) => {
+      intro(req, res, err => {
+        if (err) return reject(err)
+        guest(req, res, (...args) => {
+          next(...args)
+          resolve()
+        })
+      })
+    })
+    expect(req.redstoneFormationIntro).toBe(true)
+    expect(res.redirect).not.toHaveBeenCalled()
+    expect(next).toHaveBeenCalled()
+  })
+
   it('redirect invité racine formation vers hub stagiaire', async () => {
     const mw = createFormationGuestRedirect(async () => true)
     const req = mockReq('/fr/formations/quiris-admin-m365')
