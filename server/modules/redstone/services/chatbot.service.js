@@ -2,7 +2,6 @@ const { sessionNotFound, fail } = require('../domain/api-result')
 const { normalizePath } = require('./content-versions.service')
 const { diffLines, summarizeDiff } = require('../domain/text-diff')
 const {
-  proposeHeuristic,
   proposeViaHttp,
   buildChatMessageId,
   buildProposalId,
@@ -63,11 +62,19 @@ const createChatbotService = ({
           fetchImpl
         )
       } catch (err) {
-        logger.warn(`(REDSTONE/LMS) Chatbot HTTP fallback: ${err.message}`)
-        proposal = null
+        logger.warn(`(REDSTONE/LMS) Chatbot indisponible: ${err.message}`)
+        return fail(
+          502,
+          'chatbot_failed',
+          err.message || 'Assistant édition indisponible — réessayez dans un instant.'
+        )
       }
       if (!proposal) {
-        proposal = proposeHeuristic({ body_md: mod.body_md, message })
+        return fail(
+          503,
+          'chatbot_not_configured',
+          'Assistant édition non configuré (REDSTONE_CHATBOT_URL manquant).'
+        )
       }
 
       if (payload.proposed_body_md != null) {

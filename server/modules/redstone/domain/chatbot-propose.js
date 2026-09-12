@@ -95,9 +95,13 @@ const proposeHeuristic = ({ body_md = '', message = '' }) => {
  */
 const proposeViaHttp = async ({ body_md, message, context }, fetchImpl) => {
   const url = process.env.REDSTONE_CHATBOT_URL || process.env.LMS_CHATBOT_URL
-  if (!url) return null
+  if (!url) {
+    throw new Error('REDSTONE_CHATBOT_URL non configuré sur le serveur wiki.')
+  }
   const fetchFn = fetchImpl || globalThis.fetch
-  if (typeof fetchFn !== 'function') return null
+  if (typeof fetchFn !== 'function') {
+    throw new Error('fetch indisponible pour l’assistant édition.')
+  }
 
   const res = await fetchFn(url, {
     method: 'POST',
@@ -116,11 +120,18 @@ const proposeViaHttp = async ({ body_md, message, context }, fetchImpl) => {
   })
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    throw new Error(`Chatbot HTTP ${res.status}: ${text.slice(0, 200)}`)
+    let detail = text.slice(0, 300)
+    try {
+      const parsed = JSON.parse(text)
+      detail = parsed?.error?.message || detail
+    } catch (_) {
+      /* raw text */
+    }
+    throw new Error(`Assistant édition (${res.status}) : ${detail}`)
   }
   const json = await res.json()
   if (!json || json.proposed_body_md == null) {
-    throw new Error('Réponse chatbot invalide (proposed_body_md manquant).')
+    throw new Error('Réponse assistant invalide (proposed_body_md manquant).')
   }
   return {
     proposed_body_md: String(json.proposed_body_md),

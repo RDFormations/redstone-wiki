@@ -52,6 +52,15 @@ describe('chatbot.service', () => {
 
   it('propose sans écrire (human-in-the-loop)', async () => {
     const created = []
+    const prevUrl = process.env.REDSTONE_CHATBOT_URL
+    process.env.REDSTONE_CHATBOT_URL = 'http://chatbot.test/propose'
+    const fetchImpl = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        proposed_body_md: '# Avant\n\n## exercices\n',
+        summary: 'Ajout section exercices'
+      })
+    })
     const svc = createChatbotService({
       sessionRepo: { findById: async () => session },
       contentRepo: {
@@ -64,16 +73,47 @@ describe('chatbot.service', () => {
           created.push(row)
           return row
         }
-      }
+      },
+      fetchImpl
     })
     const result = await svc.propose('s1', {
       path: 'module-01-a',
       message: 'ajoute une section exercices'
     })
+    if (prevUrl) process.env.REDSTONE_CHATBOT_URL = prevUrl
+    else delete process.env.REDSTONE_CHATBOT_URL
     expect(result.ok).toBe(true)
     expect(result.applied).toBe(false)
     expect(result.proposed_body_md).toContain('## exercices')
     expect(created).toHaveLength(1)
+  })
+
+  it('échoue sans fallback heuristique si le chatbot HTTP échoue', async () => {
+    const prevUrl = process.env.REDSTONE_CHATBOT_URL
+    process.env.REDSTONE_CHATBOT_URL = 'http://chatbot.test/propose'
+    const fetchImpl = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 502,
+      text: async () => '{"error":{"message":"agent timeout"}}'
+    })
+    const svc = createChatbotService({
+      sessionRepo: { findById: async () => session },
+      contentRepo: {
+        findBySessionAndPath: async () => mod,
+        listBySession: async () => [mod]
+      },
+      contentEdit: { updateModule: jest.fn() },
+      proposalRepo: { create: jest.fn() },
+      fetchImpl
+    })
+    const result = await svc.propose('s1', {
+      path: 'module-01-a',
+      message: 'enrichis le module'
+    })
+    if (prevUrl) process.env.REDSTONE_CHATBOT_URL = prevUrl
+    else delete process.env.REDSTONE_CHATBOT_URL
+    expect(result.ok).toBe(false)
+    expect(result.error.code).toBe('chatbot_failed')
   })
 
   it('apply écrit avec source chatbot + chat_message_id', async () => {
