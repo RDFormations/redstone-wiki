@@ -457,6 +457,13 @@ import { enhanceMermaidDiagrams } from '../../../helpers/mermaid.js'
 
 /* global siteLangs */
 
+/** SSR Wiki.js passe les booléens en attributs HTML ("false" = chaîne non vide → vrai en Vue 2). */
+const coerceBool = (v) => {
+  if (v === false || v === 'false' || v === null || v === undefined) return false
+  if (v === true || v === 'true' || v === '') return true
+  return Boolean(v)
+}
+
 const PAGE_BY_PATH = gql`
   query PageByPath($path: String!, $locale: String!) {
     pages {
@@ -740,7 +747,7 @@ export default {
       return this.isFormationPage && this.isModuleEditPath && this.canSeeFormateur
     },
     showUnpublishedFriendly () {
-      if (this.formationUnpublishedFriendly) return true
+      if (coerceBool(this.formationUnpublishedFriendly)) return true
       return this.isFormationPage &&
         this.isFormationRestrictedStem &&
         !this.displayPublished &&
@@ -751,7 +758,7 @@ export default {
     },
     displayPublished () {
       if (this.localPublished !== null) return this.localPublished
-      return this.isPublished
+      return coerceBool(this.isPublished)
     },
     commentsCount: get('page/commentsCount'),
     commentsPerms: get('page/effectivePermissions@comments'),
