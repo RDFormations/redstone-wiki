@@ -38,6 +38,10 @@ services:
       REDSTONE_LMS_FORMATEUR_TOKEN: ${REDSTONE_LMS_FORMATEUR_TOKEN:-}
       REDSTONE_LMS_OPS_TOKEN: ${REDSTONE_LMS_OPS_TOKEN:-}
       REDSTONE_LMS_TRAINER_AUTO_PROVISION: ${REDSTONE_LMS_TRAINER_AUTO_PROVISION:-1}
+      REDSTONE_CHATBOT_URL: ${REDSTONE_CHATBOT_URL:-}
+      REDSTONE_CHATBOT_TOKEN: ${REDSTONE_CHATBOT_TOKEN:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./data/wiki:/wiki/data
       - ${RDF_FORMATIONS_ROOT:-/home/ubuntu/RDF-formations}:/repo:ro
