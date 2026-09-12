@@ -1,4 +1,4 @@
-const { pageKind } = require('./publish-policy')
+const { pageKind, formationIntroNavHref } = require('./publish-policy')
 const { isoDate, siteBase } = require('./portal-hub')
 const { qrSvgForUrl } = require('./qr-svg')
 const { evaluateSessionIndicators } = require('./session-readiness')
@@ -35,7 +35,7 @@ const buildStemRow = (stem, modules, session) => {
     stem,
     kind: mod.kind || pageKind(stem),
     title: mod?.title || stem.replace(/-/g, ' '),
-    href: stem === '00-introduction' ? `/formations/${slug}` : `/formations/${slug}/${stem}`,
+    href: stem === '00-introduction' ? formationIntroNavHref(slug) : `/formations/${slug}/${stem}`,
     path: `formations/${slug}/${stem}`,
     isPublished: isStemPublished(stem, modules),
     moduleNum: moduleNum(stem)

@@ -41,6 +41,12 @@ describe('nav.service', () => {
     expect(nav.progress.published_modules).toBe(1)
   })
 
+  it('intro href pointe vers /00-introduction (pas la racine session)', () => {
+    const nav = createNavService().getNav(session, modules, 'stagiaire')
+    const intro = nav.items.find(i => i.path === '00-introduction')
+    expect(intro.href).toBe('/fr/formations/test-slug/00-introduction')
+  })
+
   it('F08 — fallback locale path-par-path', () => {
     const bilingual = [
       { path: 'module-01-a', kind: 'module', title: 'M1 FR', published_stagiaire: true, locale: 'fr' },

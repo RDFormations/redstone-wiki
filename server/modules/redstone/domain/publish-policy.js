@@ -52,6 +52,12 @@ const wikiPagePath = (formationSlug, stem) => {
   return `formations/${formationSlug}/${stem}`
 }
 
+/** URL nav intro — évite la racine /formations/{slug} (redirect invité → hub stagiaire). */
+const formationIntroNavHref = (formationSlug, locale) => {
+  const prefix = locale ? `/${locale}` : ''
+  return `${prefix}/formations/${formationSlug}/00-introduction`
+}
+
 const pairedStem = (stem, frontmatter = {}) => {
   if (frontmatter.paired) {
     return String(frontmatter.paired).trim()
@@ -73,5 +79,6 @@ module.exports = {
   agentMaySetPublished,
   defaultPublishedStagiaire,
   wikiPagePath,
+  formationIntroNavHref,
   pairedStem
 }

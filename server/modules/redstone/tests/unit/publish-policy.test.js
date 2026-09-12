@@ -3,6 +3,7 @@ const {
   defaultPublishedStagiaire,
   agentMaySetPublished,
   wikiPagePath,
+  formationIntroNavHref,
   pairedStem
 } = require('../../domain/publish-policy')
 
@@ -25,6 +26,11 @@ describe('publish-policy', () => {
   it('wikiPagePath', () => {
     expect(wikiPagePath('my-slug', '00-introduction')).toBe('formations/my-slug')
     expect(wikiPagePath('my-slug', 'module-01')).toBe('formations/my-slug/module-01')
+  })
+
+  it('formationIntroNavHref évite la racine session', () => {
+    expect(formationIntroNavHref('my-slug', 'fr')).toBe('/fr/formations/my-slug/00-introduction')
+    expect(formationIntroNavHref('my-slug')).toBe('/formations/my-slug/00-introduction')
   })
 
   it('pairedStem exercice/correction', () => {

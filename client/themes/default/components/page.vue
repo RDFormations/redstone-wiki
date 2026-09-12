@@ -696,6 +696,7 @@ export default {
       return (
         this.isFormationRestrictedStem ||
         /^annexe-/i.test(this.formationStem) ||
+        this.formationStem === '00-introduction' ||
         !this.formationStem
       )
     },

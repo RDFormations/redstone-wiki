@@ -275,6 +275,12 @@ export default {
       }
       return shortTitle || stem
     },
+    resolveItemHref (item) {
+      const raw = item.href || item.path
+      if (!raw) return ''
+      if (raw.startsWith('/')) return raw
+      return '/' + this.locale + '/' + String(raw).replace(/^\//, '')
+    },
     decorate (item) {
       const num = this.moduleNum(item.path)
       let shortTitle = this.displayTitle(item.title, item.path)
@@ -283,7 +289,7 @@ export default {
       }
       return {
         ...item,
-        href: '/' + this.locale + '/' + item.path,
+        href: this.resolveItemHref(item),
         shortTitle,
         badge: num < 90 ? String(num).padStart(2, '0') : null,
         moduleNum: num
