@@ -95,10 +95,15 @@ import _ from 'lodash'
 import { get } from 'vuex-pathify'
 import { applyBrandCssVars, resolveBrandingHint } from '../../helpers/client-branding'
 
+const formationRelativeStem = (path) => {
+  const rel = String(path || '').replace(/^formations\/[^/]+\/?/, '')
+  return rel.replace(/\.md$/, '') || '00-introduction'
+}
+
 const SECTIONS = [
   { id: 'formateur', label: 'Formateur', icon: '★', match: (p) => /\/formateur$/i.test('/' + p) },
   { id: 'session', label: 'Session', icon: '◎', match: (p) => /\/stagiaire$/i.test('/' + p) },
-  { id: 'intro', label: 'Introduction', icon: '◆', match: (p, t) => !p.replace(/^formations\/[^/]+\/?/, '') || /introduction/i.test(t) },
+  { id: 'intro', label: 'Introduction', icon: '◆', match: (p) => formationRelativeStem(p) === '00-introduction' },
   { id: 'modules', label: 'Modules', icon: '▸', match: (p) => /\/(module|exercice|correction)-\d+/i.test('/' + p) },
   { id: 'annexes', label: 'Annexes', icon: '◇', match: (p) => /\/annexe-/i.test('/' + p) },
   { id: 'other', label: 'Ressources', icon: '•', match: () => true }
@@ -420,16 +425,11 @@ export default {
       if (!this.slug) return
       const prefix = 'formations/' + this.slug
       this.navError = false
+      this.navLoading = true
 
-      // Bundle webpack = fallback immédiat ; le réseau prime toujours
-      // (évite une nav figée après ajout de modules sans rebuild thème).
+      // Bundle webpack = fallback seulement si l'API LMS est indisponible
+      // (évite d'afficher toute la nav puis de la réduire au filtre stagiaire).
       const bundled = this.readBundledNav(this.slug)
-      if (bundled) {
-        this.applyNavData(bundled)
-        this.navLoading = false
-      } else {
-        this.navLoading = true
-      }
 
       try {
         const audience = this.canSeeUnpublished ? 'formateur' : 'stagiaire'
@@ -441,6 +441,7 @@ export default {
               encodeURIComponent(this.slug) +
               '/nav?audience=' +
               audience +
+              (this.locale ? '&locale=' + encodeURIComponent(this.locale) : '') +
               '&t=' +
               Date.now()
           )
@@ -450,6 +451,10 @@ export default {
           }
         } catch (e) {
           // fallback assets statiques ci-dessous
+        }
+
+        if (!this.items.length && bundled) {
+          this.applyNavData(bundled)
         }
 
         if (!this.items.length) {
