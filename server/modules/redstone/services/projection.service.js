@@ -4,6 +4,7 @@ const _ = require('lodash')
 const { DEFAULT_EDITOR_KEY, resolveContentType, resolveFromWikiEditors } = require('../domain/wiki-editor')
 const { isStaleMarkdownRender } = require('../domain/wiki-render')
 const { hubBodyMarkdown } = require('../domain/hub-shell')
+const { resolveModuleTitle } = require('../domain/resolve-module-title')
 
 const resolveEditorKey = mod =>
   mod.editor_key || mod.frontmatter?.editor || mod.frontmatter?.editor_key || DEFAULT_EDITOR_KEY
@@ -48,7 +49,7 @@ const createProjectionService = ({ knex, logger = console }) => {
     const { wikiPagePath } = require('../domain/publish-policy')
     const pagePath = wikiPagePath(session.slug, stem)
     const locale = mod.locale || session.locale_default || 'fr'
-    const title = mod.title || stem
+    const title = resolveModuleTitle(mod)
     const content = mod.body_md || ''
     const isPublished = Boolean(mod.published_stagiaire)
     const editorKey = resolveEditorKey(mod)

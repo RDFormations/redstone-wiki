@@ -128,6 +128,13 @@ const createContentRepository = knex => ({
     })
   },
 
+  async updateTitle(moduleId, title) {
+    await knex(TABLE_MODULES).where({ id: moduleId }).update({
+      title,
+      updatedAt: knex.fn.now()
+    })
+  },
+
   async updatePageId(moduleId, pageId) {
     await knex(TABLE_MODULES).where({ id: moduleId }).update({
       pageId,

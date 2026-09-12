@@ -1,4 +1,5 @@
 const { pageKind } = require('../domain/publish-policy')
+const { resolveModuleTitle } = require('../domain/resolve-module-title')
 
 const KIND_ORDER = { module: 0, exercice: 1, correction: 2, intro: -1, annexe: 3, hub: -2, other: 4 }
 
@@ -51,7 +52,7 @@ const createNavService = () => ({
       return {
         path: m.path,
         kind: m.kind,
-        title: m.title || stem,
+        title: resolveModuleTitle(m),
         published: m.published_stagiaire,
         locale: m.locale || locale,
         href: stem === '00-introduction'

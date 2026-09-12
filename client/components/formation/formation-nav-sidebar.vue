@@ -258,11 +258,26 @@ export default {
       const m = (path || '').match(/(?:module|exercice|correction)-(\d+)/i)
       return m ? parseInt(m[1], 10) : 99
     },
+    displayTitle (title, path) {
+      let shortTitle = String(title || '').trim()
+      const stem = (path || '').split('/').pop().replace(/\.md$/, '')
+      const mod = shortTitle.match(/^Module\s+\d+\s*[—–-]\s*(.+)$/i)
+      if (mod) return mod[1].trim()
+      const ex = shortTitle.match(/^Exercices?\s+\d+\s*[—–-]\s*(.+)$/i)
+      if (ex) return ex[1].trim()
+      const corr = shortTitle.match(/^Correction\s+\d+\s*[—–-]\s*(.+)$/i)
+      if (corr) return corr[1].trim()
+      if (!shortTitle || shortTitle === stem || /^(module|exercice|correction)-\d+/i.test(shortTitle)) {
+        const slugPart = stem.replace(/^(module|exercice|correction)-\d+-/, '')
+        if (slugPart) {
+          return slugPart.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+        }
+      }
+      return shortTitle || stem
+    },
     decorate (item) {
       const num = this.moduleNum(item.path)
-      let shortTitle = item.title
-      const mod = shortTitle.match(/^Module\s+\d+\s*[—–-]\s*(.+)$/i)
-      if (mod) shortTitle = mod[1]
+      let shortTitle = this.displayTitle(item.title, item.path)
       if (/^annexe-/i.test(item.path.split('/').pop())) {
         shortTitle = shortTitle.replace(/^Annexe\s*[—–-]\s*/i, '')
       }

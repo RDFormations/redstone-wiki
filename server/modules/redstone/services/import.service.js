@@ -68,7 +68,12 @@ const createImportService = ({
         : await contentRepo.findBySessionAndPath(sessionId, mod.path, locale)
 
       if (existing && existing.content_hash === contentHash) {
-        imported.push(existing)
+        if (mod.title && mod.title !== existing.title) {
+          await contentRepo.updateTitle(existing.id, mod.title)
+          imported.push({ ...existing, title: mod.title })
+        } else {
+          imported.push(existing)
+        }
         continue
       }
 
