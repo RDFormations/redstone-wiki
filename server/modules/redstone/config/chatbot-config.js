@@ -7,7 +7,9 @@ const ENV_FILES = [
   path.join(process.cwd(), 'data', 'redstone-chatbot.env')
 ].filter(Boolean)
 
-const DEFAULT_URL = 'http://172.17.0.1:9474/lms/chatbot'
+const DEFAULT_LOCAL_URL = 'http://172.17.0.1:9474/lms/chatbot'
+const DEFAULT_OPS_URL = 'https://ops.redstoneformations.fr/agent-gateway/lms/chatbot'
+const DEFAULT_URL = DEFAULT_OPS_URL
 
 const readEnvFile = (filePath, key) => {
   try {
@@ -46,7 +48,8 @@ const chatbotUrl = () => {
   const candidates = [
     readKey('REDSTONE_CHATBOT_URL'),
     readKey('LMS_CHATBOT_URL'),
-    DEFAULT_URL,
+    DEFAULT_OPS_URL,
+    DEFAULT_LOCAL_URL,
     'http://host.docker.internal:9474/lms/chatbot'
   ]
   for (const candidate of candidates) {
@@ -58,4 +61,10 @@ const chatbotUrl = () => {
 
 const chatbotToken = () => readKey('REDSTONE_CHATBOT_TOKEN')
 
-module.exports = { chatbotUrl, chatbotToken, DEFAULT_URL }
+module.exports = {
+  chatbotUrl,
+  chatbotToken,
+  DEFAULT_URL,
+  DEFAULT_OPS_URL,
+  DEFAULT_LOCAL_URL
+}
