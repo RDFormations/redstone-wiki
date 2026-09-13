@@ -35,4 +35,28 @@ describe('http-json-client', () => {
   it('rejette une URL invalide', async () => {
     await expect(postJson('not-a-url', { body: {} })).rejects.toThrow(/URL chatbot invalide/)
   })
+
+  it('transmet les headers Authorization', async () => {
+    const received = []
+    const server2 = http.createServer((req, res) => {
+      received.push(req.headers.authorization)
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end('{"ok":true}')
+    })
+    await new Promise((resolve, reject) => {
+      server2.listen(0, '127.0.0.1', async () => {
+        try {
+          const p = server2.address().port
+          await postJson(`http://127.0.0.1:${p}/auth`, {
+            headers: { Authorization: 'Bearer test' },
+            body: { x: 1 }
+          })
+          expect(received[0]).toBe('Bearer test')
+          server2.close(resolve)
+        } catch (e) {
+          server2.close(() => reject(e))
+        }
+      })
+    })
+  })
 })

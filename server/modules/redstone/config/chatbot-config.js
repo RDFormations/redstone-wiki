@@ -1,3 +1,15 @@
+/**
+ * C13 — configuration chatbot (URL + token).
+ *
+ * Responsabilité :
+ * - Résoudre REDSTONE_CHATBOT_URL / REDSTONE_CHATBOT_TOKEN depuis process.env puis fichiers .env
+ * - Garantir que le wiki prod n'appelle jamais un gateway docker local (172.17.0.1) par erreur
+ *
+ * Points prod critiques (ne pas casser — voir chatbot-prod-regression.test.js) :
+ * - agent-gateway est sur ops.redstoneformations.fr (VPS ops), PAS sur le serveur wiki
+ * - DEFAULT_OPS_URL est le fallback si l'env contient encore une URL docker bridge héritée
+ * - chatbotToken() doit rester synchronisé avec WEBHOOK_SECRET de l'agent-gateway ops
+ */
 const fs = require('fs')
 const path = require('path')
 

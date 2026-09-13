@@ -1,3 +1,14 @@
+/**
+ * Client HTTP JSON pour appels sortants LMS (chatbot, webhooks).
+ *
+ * Responsabilité :
+ * - POST JSON via modules Node http/https (pas fetch/undici — instable en conteneur wiki)
+ * - Messages d'erreur explicites (URL invalide, ECONNREFUSED, timeout)
+ *
+ * Points prod critiques :
+ * - Ne pas réintroduire globalThis.fetch dans chatbot-propose (régression fetch invalid)
+ * - timeoutMs long (180s) : cursor-sdk / agent-gateway peut prendre ~30–60s
+ */
 const http = require('http')
 const https = require('https')
 

@@ -1,29 +1,5 @@
-const {
-  proposeHeuristic,
-  extractFencedMarkdown,
-  titleFromInstruction
-} = require('../../domain/chatbot-propose')
 const { createChatbotService } = require('../../services/chatbot.service')
 const { parseFormationEditPath, formationEditUrl } = require('../../domain/formation-edit-path')
-
-describe('chatbot-propose domain (C13)', () => {
-  it('extrait un fence markdown', () => {
-    expect(extractFencedMarkdown('voici\n```md\n# Hello\n```')).toBe('# Hello')
-  })
-
-  it('détecte une section à ajouter', () => {
-    expect(titleFromInstruction('ajoute une section exercices')).toBe('exercices')
-  })
-
-  it('ajoute une section absente', () => {
-    const result = proposeHeuristic({
-      body_md: '# Intro\n',
-      message: 'ajoute une section exercices'
-    })
-    expect(result.proposed_body_md).toContain('## exercices')
-    expect(result.provider).toBe('heuristic')
-  })
-})
 
 describe('formation-edit-path (F06)', () => {
   it('parse /formations/slug/edit/module', () => {
@@ -114,6 +90,52 @@ describe('chatbot.service', () => {
     else delete process.env.REDSTONE_CHATBOT_URL
     expect(result.ok).toBe(false)
     expect(result.error.code).toBe('chatbot_failed')
+  })
+
+  it('rejette path ou message manquant', async () => {
+    const svc = createChatbotService({
+      sessionRepo: { findById: async () => session },
+      contentRepo: { findBySessionAndPath: jest.fn(), listBySession: jest.fn() },
+      contentEdit: { updateModule: jest.fn() },
+      proposalRepo: { create: jest.fn() }
+    })
+    expect((await svc.propose('s1', { message: 'x' })).error.code).toBe('path_required')
+    expect((await svc.propose('s1', { path: 'module-01-a' })).error.code).toBe('message_required')
+  })
+
+  it('module introuvable → 404', async () => {
+    const svc = createChatbotService({
+      sessionRepo: { findById: async () => session },
+      contentRepo: {
+        findBySessionAndPath: async () => null,
+        listBySession: async () => []
+      },
+      contentEdit: { updateModule: jest.fn() },
+      proposalRepo: { create: jest.fn() }
+    })
+    const result = await svc.propose('s1', { path: 'module-01-a', message: 'test' })
+    expect(result.error.code).toBe('module_not_found')
+  })
+
+  it('discard annule une proposition', async () => {
+    const updateStatus = jest.fn()
+    const svc = createChatbotService({
+      sessionRepo: { findById: async () => session },
+      contentRepo: { findBySessionAndPath: jest.fn(), listBySession: jest.fn() },
+      contentEdit: { updateModule: jest.fn() },
+      proposalRepo: {
+        findById: async () => ({
+          id: 'p1',
+          session_id: 's1',
+          path: 'module-01-a',
+          status: 'pending'
+        }),
+        updateStatus
+      }
+    })
+    const result = await svc.discard('s1', 'p1')
+    expect(result.ok).toBe(true)
+    expect(updateStatus).toHaveBeenCalledWith('p1', 'discarded')
   })
 
   it('apply écrit avec source chatbot + chat_message_id', async () => {

@@ -1,6 +1,16 @@
 /**
  * C13 — proposition de patch MD (human-in-the-loop).
- * Provider heuristique déterministe (tests / sans clé LLM) + hook HTTP optionnel.
+ *
+ * Responsabilité :
+ * - proposeViaHttp : appelle agent-gateway (ops) et parse { proposed_body_md, summary }
+ * - proposeHeuristic : helpers déterministes pour tests unitaires UNIQUEMENT (pas en prod)
+ * - extractFencedMarkdown / titleFromInstruction : parsing consignes formateur
+ *
+ * Points prod critiques :
+ * - chatbot.service appelle UNIQUEMENT proposeViaHttp (jamais proposeHeuristic)
+ * - Pas de fallback silencieux : toute erreur HTTP remonte au service → 502 chatbot_failed
+ * - Payload inclut REDSTONE_RULES + context (session, module, adjacent)
+ * - fetchImpl injectable pour tests ; sinon postJson (http-json-client)
  */
 
 const crypto = require('crypto')

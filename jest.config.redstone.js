@@ -8,6 +8,8 @@ module.exports = {
   collectCoverageFrom: [
     'server/modules/redstone/domain/**/*.js',
     'server/modules/redstone/services/**/*.js',
+    'server/modules/redstone/config/**/*.js',
+    'server/modules/redstone/infrastructure/**/*.js',
     'server/modules/redstone/api/middleware/**/*.js',
     '!**/*.test.js'
   ],

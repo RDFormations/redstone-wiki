@@ -12,6 +12,7 @@
     "watch": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config dev/webpack/webpack.dev.js",
     "test": "eslint --format codeframe --ext .js,.vue . && pug-lint server/views && jest",
     "test:redstone": "jest --config jest.config.redstone.js --testPathPattern=tests/unit --coverage=false",
+    "test:redstone:chatbot": "jest --config jest.config.redstone.js --testPathPattern='chatbot|http-json-client' --coverage=false",
     "test:redstone:integration": "cross-env LMS_E2E_FORCE=1 jest --config jest.config.redstone.js --testPathPattern=tests/integration --runInBand --testTimeout=120000 --coverage=false",
     "test:redstone:e2e": "cross-env LMS_E2E_FORCE=1 jest --config jest.config.redstone.js --testPathPattern=tests/e2e --runInBand --testTimeout=120000 --coverage=false",
     "test:redstone:all": "bash scripts/test-redstone.sh --all",

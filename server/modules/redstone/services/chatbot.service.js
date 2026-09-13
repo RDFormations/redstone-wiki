@@ -1,3 +1,16 @@
+/**
+ * C13 — orchestration assistant édition (human-in-the-loop).
+ *
+ * Responsabilité :
+ * - propose : charge module + contexte, appelle agent distant, persiste proposition pending
+ * - apply : écrit body_md via contentEdit (source chatbot) après validation formateur
+ * - discard : annule une proposition sans toucher au contenu publié
+ *
+ * Points prod critiques :
+ * - propose retourne applied:false — rien n'est écrit sans apply explicite
+ * - Échec agent → 502 chatbot_failed (PAS de fallback heuristique / Note assistant)
+ * - proposalRepo.create avec expires_at 1h — proposition éphémère
+ */
 const { sessionNotFound, fail } = require('../domain/api-result')
 const { normalizePath } = require('./content-versions.service')
 const { diffLines, summarizeDiff } = require('../domain/text-diff')

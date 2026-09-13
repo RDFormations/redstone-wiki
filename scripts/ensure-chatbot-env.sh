@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
-# Garantit REDSTONE_CHATBOT_URL + TOKEN dans /opt/redstone-wiki/.env (prod).
+# C13 — Garantit REDSTONE_CHATBOT_URL + TOKEN dans /opt/redstone-wiki/.env (prod).
+#
+# Responsabilité :
+# - Résoudre l'URL chatbot (local gateway vs ops distant)
+# - Forcer ops.redstoneformations.fr si le gateway docker local (172.17.0.1) est injoignable
+# - Synchroniser REDSTONE_CHATBOT_TOKEN depuis WEBHOOK_SECRET agent-gateway
+#
+# Points prod critiques (voir chatbot-prod-regression.test.js) :
+# - Wiki prod (51.83.68.215) n'héberge PAS agent-gateway → URL ops obligatoire
+# - Ne jamais laisser REDSTONE_CHATBOT_URL sur 172.17.0.1 en prod wiki
 set -euo pipefail
 
 WIKI_ROOT="${WIKI_ROOT:-/opt/redstone-wiki}"
