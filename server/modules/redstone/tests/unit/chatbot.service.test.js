@@ -143,13 +143,15 @@ describe('chatbot.service', () => {
       ok: true,
       status: 200,
       version: 3,
-      path: 'module-01-a'
+      path: 'module-01-a',
+      locale: 'fr'
     })
     const svc = createChatbotService({
-      sessionRepo: { findById: async () => session },
+      sessionRepo: { findById: async () => ({ ...session, locale_default: 'fr' }) },
       contentRepo: {
         findBySessionAndPath: async () => mod,
-        listBySession: async () => [mod]
+        listBySession: async () => [mod],
+        listBySessionPath: async () => [{ ...mod, locale: 'fr' }]
       },
       contentEdit: { updateModule },
       proposalRepo: {
@@ -165,18 +167,75 @@ describe('chatbot.service', () => {
         updateStatus: jest.fn()
       }
     })
-    const result = await svc.apply('s1', { proposal_id: 'p1' })
+    const result = await svc.apply('s1', { proposal_id: 'p1', locale: 'fr' })
     expect(result.ok).toBe(true)
     expect(result.applied).toBe(true)
     expect(updateModule).toHaveBeenCalledWith(
       's1',
-      { path: 'module-01-a', body_md: '# Après', locale: null },
+      { path: 'module-01-a', body_md: '# Après', locale: 'fr' },
       expect.objectContaining({
         source: 'chatbot',
-        chat_message_id: 'chat_abc',
-        sync_all_locales: true
+        chat_message_id: 'chat_abc'
       })
     )
+  })
+
+  it('apply traduit les autres locales via agent', async () => {
+    const modFr = { ...mod, id: 'm-fr', locale: 'fr' }
+    const modEn = { ...mod, id: 'm-en', locale: 'en' }
+    const updateModule = jest.fn()
+      .mockResolvedValueOnce({ ok: true, status: 200, version: 3, locale: 'fr', unchanged: false })
+      .mockResolvedValueOnce({ ok: true, status: 200, version: 3, locale: 'en', unchanged: false })
+    const translateImpl = jest.fn().mockResolvedValue({
+      translated_body_md: '# After\n',
+      provider: 'http'
+    })
+    const svc = createChatbotService({
+      sessionRepo: { findById: async () => ({ ...session, locale_default: 'fr' }) },
+      contentRepo: {
+        listBySession: async () => [modFr, modEn],
+        listBySessionPath: async () => [modFr, modEn]
+      },
+      contentEdit: { updateModule },
+      translateImpl,
+      proposalRepo: {
+        findById: async () => ({
+          id: 'p1',
+          session_id: 's1',
+          path: 'module-01-a',
+          chat_message_id: 'chat_abc',
+          proposed_body_md: '# Après',
+          status: 'pending',
+          author: 'ops'
+        }),
+        updateStatus: jest.fn()
+      }
+    })
+    const result = await svc.apply('s1', { proposal_id: 'p1', locale: 'fr' })
+    expect(result.ok).toBe(true)
+    expect(translateImpl).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body_md: '# Après',
+        source_locale: 'fr',
+        target_locale: 'en'
+      }),
+      undefined
+    )
+    expect(updateModule).toHaveBeenCalledTimes(2)
+    expect(updateModule).toHaveBeenNthCalledWith(
+      1,
+      's1',
+      { path: 'module-01-a', body_md: '# Après', locale: 'fr' },
+      expect.any(Object)
+    )
+    expect(updateModule).toHaveBeenNthCalledWith(
+      2,
+      's1',
+      { path: 'module-01-a', body_md: '# After\n', locale: 'en' },
+      expect.any(Object)
+    )
+    expect(result.translated_locales).toEqual(['en'])
+    expect(result.synced_locales).toEqual(['fr', 'en'])
   })
 
   it('propose charge le module de la locale demandée', async () => {

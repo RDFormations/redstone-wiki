@@ -101,18 +101,34 @@ const proposeHeuristic = ({ body_md = '', message = '' }) => {
   }
 }
 
-/**
- * Appel HTTP optionnel vers un agent LLM (REDSTONE_CHATBOT_URL).
- * Corps attendu : { proposed_body_md, summary? }
- */
-const proposeViaHttp = async ({ body_md, message, context }, fetchImpl) => {
-  const url = chatbotUrl()
-  const token = chatbotToken()
-  if (!url) {
-    throw new Error('REDSTONE_CHATBOT_URL non configuré sur le serveur wiki.')
-  }
+const LOCALE_LABELS = {
+  fr: 'français',
+  en: 'anglais'
+}
 
-  const payload = { message, body_md, context, rules: REDSTONE_RULES }
+const localeLabel = code => LOCALE_LABELS[code] || String(code || '')
+
+const translateUrl = () => {
+  const base = chatbotUrl()
+  if (!base) return ''
+  const normalized = base.replace(/\/$/, '')
+  if (normalized.endsWith('/chatbot')) {
+    return `${normalized}/translate`
+  }
+  return `${normalized}/translate`
+}
+
+const parseAgentBody = (json, fieldNames) => {
+  for (const field of fieldNames) {
+    if (json && json[field] != null) {
+      return String(json[field])
+    }
+  }
+  return null
+}
+
+const postAgentJson = async ({ url, payload, fetchImpl, errorLabel }) => {
+  const token = chatbotToken()
   const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
   let res
@@ -145,14 +161,34 @@ const proposeViaHttp = async ({ body_md, message, context }, fetchImpl) => {
     } catch (_) {
       /* raw text */
     }
-    throw new Error(`Assistant édition (${res.status}) : ${detail}`)
+    throw new Error(`${errorLabel} (${res.status}) : ${detail}`)
   }
-  const json = JSON.parse(res.body)
-  if (!json || json.proposed_body_md == null) {
+
+  return JSON.parse(res.body)
+}
+
+/**
+ * Appel HTTP optionnel vers un agent LLM (REDSTONE_CHATBOT_URL).
+ * Corps attendu : { proposed_body_md, summary? }
+ */
+const proposeViaHttp = async ({ body_md, message, context }, fetchImpl) => {
+  const url = chatbotUrl()
+  if (!url) {
+    throw new Error('REDSTONE_CHATBOT_URL non configuré sur le serveur wiki.')
+  }
+
+  const json = await postAgentJson({
+    url,
+    payload: { message, body_md, context, rules: REDSTONE_RULES },
+    fetchImpl,
+    errorLabel: 'Assistant édition'
+  })
+  const proposed = parseAgentBody(json, ['proposed_body_md'])
+  if (!proposed) {
     throw new Error('Réponse assistant invalide (proposed_body_md manquant).')
   }
   return {
-    proposed_body_md: String(json.proposed_body_md),
+    proposed_body_md: proposed,
     provider: 'http',
     summary: json.summary || 'Proposition agent distant.'
   }
@@ -162,12 +198,62 @@ const buildChatMessageId = () => `chat_${crypto.randomUUID()}`
 
 const buildProposalId = () => crypto.randomUUID()
 
+/**
+ * Traduction Markdown via agent (REDSTONE_CHATBOT_URL/translate).
+ * Corps attendu : { translated_body_md } ou { proposed_body_md }
+ */
+const translateViaHttp = async (
+  { body_md, source_locale, target_locale, context },
+  fetchImpl
+) => {
+  const url = translateUrl()
+  if (!url) {
+    throw new Error('REDSTONE_CHATBOT_URL non configuré sur le serveur wiki.')
+  }
+
+  const fromLabel = localeLabel(source_locale)
+  const toLabel = localeLabel(target_locale)
+  const payload = {
+    mode: 'translate',
+    body_md,
+    source_locale,
+    target_locale,
+    context,
+    rules: REDSTONE_RULES,
+    message: [
+      `Traduis ce contenu de cours du ${fromLabel} vers le ${toLabel}.`,
+      'Conserve le frontmatter YAML, la structure Markdown, les blocs Mermaid,',
+      'les callouts et les identifiants techniques (chemins, slugs, noms de fichiers).'
+    ].join(' ')
+  }
+
+  const json = await postAgentJson({
+    url,
+    payload,
+    fetchImpl,
+    errorLabel: 'Assistant traduction'
+  })
+  const translated = parseAgentBody(json, ['translated_body_md', 'proposed_body_md'])
+  if (!translated) {
+    throw new Error('Réponse assistant invalide (translated_body_md manquant).')
+  }
+
+  return {
+    translated_body_md: translated,
+    provider: 'http',
+    summary: json.summary || `Traduction ${source_locale} → ${target_locale}.`
+  }
+}
+
 module.exports = {
   REDSTONE_RULES,
   extractFencedMarkdown,
   titleFromInstruction,
   proposeHeuristic,
   proposeViaHttp,
+  translateViaHttp,
+  translateUrl,
+  localeLabel,
   buildChatMessageId,
   buildProposalId
 }

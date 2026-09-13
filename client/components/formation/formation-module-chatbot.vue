@@ -146,10 +146,14 @@ export default {
           version: json.version,
           chat_message_id: json.chat_message_id
         })
-        const locales = Array.isArray(json.synced_locales) ? json.synced_locales : []
-        const localeHint = locales.length > 1
-          ? ` — ${locales.join(', ')}`
-          : ''
+        const synced = Array.isArray(json.synced_locales) ? json.synced_locales : []
+        const translated = Array.isArray(json.translated_locales) ? json.translated_locales : []
+        let localeHint = ''
+        if (synced.length > 1) {
+          localeHint = translated.length
+            ? ` — ${synced.join(', ')} (traduit : ${translated.join(', ')})`
+            : ` — ${synced.join(', ')}`
+        }
         this.$store.commit('showNotification', {
           style: 'green',
           message: `Modification chatbot appliquée (v${json.version})${localeHint}`,

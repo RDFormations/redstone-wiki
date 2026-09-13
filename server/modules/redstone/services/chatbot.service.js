@@ -16,10 +16,13 @@ const { normalizePath } = require('./content-versions.service')
 const { diffLines, summarizeDiff } = require('../domain/text-diff')
 const {
   proposeViaHttp,
+  translateViaHttp,
   buildChatMessageId,
   buildProposalId,
   REDSTONE_RULES
 } = require('../domain/chatbot-propose')
+
+const resolveLocale = (mod, session) => mod.locale || session.locale_default || 'fr'
 
 const createChatbotService = ({
   sessionRepo,
@@ -27,6 +30,7 @@ const createChatbotService = ({
   contentEdit,
   proposalRepo,
   fetchImpl,
+  translateImpl = translateViaHttp,
   logger = console
 }) => {
   const loadContext = async (session, path) => {
@@ -153,30 +157,86 @@ const createChatbotService = ({
         return fail(409, 'proposal_discarded', 'Proposition annulée.')
       }
 
-      const result = await contentEdit.updateModule(
-        sessionId,
-        {
-          path: proposal.path,
-          body_md: proposal.proposed_body_md,
-          locale: payload.locale || options.locale || null
-        },
-        {
-          source: 'chatbot',
-          author: options.author || proposal.author || 'formateur',
-          chat_message_id: proposal.chat_message_id,
-          agent_run_id: options.agent_run_id || null,
-          sync_all_locales: true
-        }
-      )
+      const sourceLocale = payload.locale || options.locale || session.locale_default || 'fr'
+      const allModules = await contentRepo.listBySessionPath(sessionId, proposal.path)
+      if (!allModules.length) {
+        return fail(404, 'module_not_found', `Module introuvable : ${proposal.path}`)
+      }
 
-      if (!result.ok) return result
+      const context = await loadContext(session, proposal.path)
+      const localeBodies = new Map()
+      const translatedLocales = []
+
+      for (const mod of allModules) {
+        const targetLocale = resolveLocale(mod, session)
+        if (targetLocale === sourceLocale) {
+          localeBodies.set(targetLocale, proposal.proposed_body_md)
+          continue
+        }
+        try {
+          const translated = await translateImpl(
+            {
+              body_md: proposal.proposed_body_md,
+              source_locale: sourceLocale,
+              target_locale: targetLocale,
+              context
+            },
+            fetchImpl
+          )
+          localeBodies.set(targetLocale, translated.translated_body_md)
+          translatedLocales.push(targetLocale)
+        } catch (err) {
+          logger.warn(`(REDSTONE/LMS) Traduction chatbot ${sourceLocale}→${targetLocale}: ${err.message}`)
+          return fail(
+            502,
+            'chatbot_translate_failed',
+            err.message || 'Traduction assistant indisponible — réessayez dans un instant.'
+          )
+        }
+      }
+
+      const results = []
+      for (const mod of allModules) {
+        const targetLocale = resolveLocale(mod, session)
+        const body_md = localeBodies.get(targetLocale)
+        const result = await contentEdit.updateModule(
+          sessionId,
+          {
+            path: proposal.path,
+            body_md,
+            locale: targetLocale
+          },
+          {
+            source: 'chatbot',
+            author: options.author || proposal.author || 'formateur',
+            chat_message_id: proposal.chat_message_id,
+            agent_run_id: options.agent_run_id || null
+          }
+        )
+        results.push(result)
+        if (!result.ok) return result
+      }
+
+      const syncedLocales = results
+        .filter(r => r.ok && !r.unchanged)
+        .map(r => r.locale)
+        .filter(Boolean)
+      const primary = results.find(r => r.locale === sourceLocale)
+        || results.find(r => r.ok && !r.unchanged)
+        || results[0]
 
       await proposalRepo.updateStatus(proposalId, 'applied')
       return {
-        ...result,
+        ...primary,
         proposal_id: proposalId,
         chat_message_id: proposal.chat_message_id,
-        applied: true
+        applied: true,
+        source_locale: sourceLocale,
+        synced_locales: syncedLocales.length
+          ? syncedLocales
+          : results.map(r => r.locale).filter(Boolean),
+        translated_locales: translatedLocales,
+        locale_results: results
       }
     },
 

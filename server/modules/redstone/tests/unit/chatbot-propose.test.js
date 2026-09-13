@@ -4,6 +4,8 @@ const {
   titleFromInstruction,
   proposeHeuristic,
   proposeViaHttp,
+  translateViaHttp,
+  translateUrl,
   buildChatMessageId,
   buildProposalId
 } = require('../../domain/chatbot-propose')
@@ -132,6 +134,45 @@ describe('chatbot-propose — proposeViaHttp', () => {
     const fetchImpl = mockFetch({ proposed_body_md: '# OK\n' })
     await proposeViaHttp({ body_md: '# A', message: 'x', context: {} }, fetchImpl)
     expect(fetchImpl.mock.calls[0][0]).toBe(DEFAULT_OPS_URL)
+  })
+})
+
+describe('chatbot-propose — translateViaHttp', () => {
+  const prevEnv = { ...process.env }
+
+  afterEach(() => {
+    process.env = { ...prevEnv }
+  })
+
+  it('dérive l’URL /translate depuis REDSTONE_CHATBOT_URL', () => {
+    process.env.REDSTONE_CHATBOT_URL = 'https://ops.example.com/lms/chatbot'
+    expect(translateUrl()).toBe('https://ops.example.com/lms/chatbot/translate')
+  })
+
+  it('envoie source_locale, target_locale et mode translate', async () => {
+    process.env.REDSTONE_CHATBOT_URL = 'https://chatbot.test/lms/chatbot'
+    const fetchImpl = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ translated_body_md: '# Hello\n' })
+    })
+    const result = await translateViaHttp(
+      {
+        body_md: '# Bonjour\n',
+        source_locale: 'fr',
+        target_locale: 'en',
+        context: { session: { slug: 'demo' } }
+      },
+      fetchImpl
+    )
+    expect(result.translated_body_md).toBe('# Hello\n')
+    const [url, opts] = fetchImpl.mock.calls[0]
+    expect(url).toBe('https://chatbot.test/lms/chatbot/translate')
+    const payload = JSON.parse(opts.body)
+    expect(payload.mode).toBe('translate')
+    expect(payload.source_locale).toBe('fr')
+    expect(payload.target_locale).toBe('en')
+    expect(payload.rules).toEqual(REDSTONE_RULES)
   })
 })
 
