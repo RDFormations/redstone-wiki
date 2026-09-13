@@ -37,6 +37,10 @@ ensure_line() {
 [[ -f "$ENV_FILE" ]] || { echo "Fichier $ENV_FILE absent" >&2; exit 1; }
 
 CHATBOT_URL="$(resolve_chatbot_url)"
+# Toujours forcer l'URL ops si le gateway local ne répond pas (wiki prod ≠ VPS ops)
+if [[ "$CHATBOT_URL" == "$LOCAL_CHATBOT_URL" ]]; then
+  CHATBOT_URL="$OPS_CHATBOT_URL"
+fi
 ensure_line REDSTONE_CHATBOT_URL "$CHATBOT_URL"
 echo "==> REDSTONE_CHATBOT_URL=$CHATBOT_URL"
 

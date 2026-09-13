@@ -32,6 +32,13 @@ const readKey = key => {
   return ''
 }
 
+const LOCAL_GATEWAY_HOSTS = new Set([
+  '127.0.0.1',
+  '172.17.0.1',
+  'host.docker.internal',
+  'localhost'
+])
+
 const normalizeUrl = raw => {
   const value = String(raw || '').trim()
   if (!value) return ''
@@ -44,19 +51,26 @@ const normalizeUrl = raw => {
   }
 }
 
-const chatbotUrl = () => {
-  const candidates = [
-    readKey('REDSTONE_CHATBOT_URL'),
-    readKey('LMS_CHATBOT_URL'),
-    DEFAULT_OPS_URL,
-    DEFAULT_LOCAL_URL,
-    'http://host.docker.internal:9474/lms/chatbot'
-  ]
-  for (const candidate of candidates) {
-    const url = normalizeUrl(candidate)
-    if (url) return url
+const isLocalDockerGateway = url => {
+  try {
+    return LOCAL_GATEWAY_HOSTS.has(new URL(url).hostname)
+  } catch (_) {
+    return false
   }
-  return DEFAULT_URL
+}
+
+/**
+ * agent-gateway tourne sur ops.redstoneformations.fr (VPS ops), pas sur le wiki prod.
+ * Ignorer les URLs docker bridge héritées (172.17.0.1) encore présentes dans .env.
+ */
+const chatbotUrl = () => {
+  const configured =
+    normalizeUrl(readKey('REDSTONE_CHATBOT_URL')) ||
+    normalizeUrl(readKey('LMS_CHATBOT_URL'))
+  if (configured && !isLocalDockerGateway(configured)) {
+    return configured
+  }
+  return DEFAULT_OPS_URL
 }
 
 const chatbotToken = () => readKey('REDSTONE_CHATBOT_TOKEN')
