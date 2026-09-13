@@ -189,6 +189,53 @@ describe('content-edit.service', () => {
     expect(upsertModule).toHaveBeenCalled()
   })
 
+  it('sync_all_locales met à jour chaque variante locale', async () => {
+    const modFr = { ...mod, id: 'mod-fr', locale: 'fr', content_hash: 'hash-fr' }
+    const modEn = {
+      ...mod,
+      id: 'mod-en',
+      locale: 'en',
+      content_hash: 'hash-en',
+      page_id: 99
+    }
+    const upsertModule = jest.fn()
+      .mockResolvedValueOnce({ ...modFr, body_md: '# Après', current_version: 2 })
+      .mockResolvedValueOnce({ ...modEn, body_md: '# Après', current_version: 2 })
+    const projectModule = jest.fn().mockResolvedValue({ ok: true, page_id: 99 })
+    const svc = createContentEditService({
+      sessionRepo: { findById: jest.fn().mockResolvedValue(session) },
+      contentRepo: {
+        listBySessionPath: jest.fn().mockResolvedValue([modFr, modEn]),
+        upsertModule,
+        updatePageId: jest.fn()
+      },
+      projectionService: { projectModule },
+      logger: { warn: jest.fn(), info: jest.fn() }
+    })
+    const result = await svc.updateModule('sess-1', {
+      path: 'module-01-a',
+      body_md: '# Après'
+    }, { source: 'chatbot', sync_all_locales: true })
+    expect(result.ok).toBe(true)
+    expect(result.synced_locales).toEqual(['fr', 'en'])
+    expect(upsertModule).toHaveBeenCalledTimes(2)
+    expect(upsertModule.mock.calls[0][0].locale).toBe('fr')
+    expect(upsertModule.mock.calls[1][0].locale).toBe('en')
+    expect(projectModule).toHaveBeenCalledTimes(1)
+  })
+
+  it('getModule respecte la locale demandée', async () => {
+    const findBySessionPathLocale = jest.fn().mockResolvedValue({ ...mod, locale: 'en' })
+    const svc = createContentEditService({
+      sessionRepo: { findById: jest.fn().mockResolvedValue(session) },
+      contentRepo: { findBySessionPathLocale }
+    })
+    const result = await svc.getModule('sess-1', 'module-01-a', 'en')
+    expect(result.ok).toBe(true)
+    expect(result.locale).toBe('en')
+    expect(findBySessionPathLocale).toHaveBeenCalledWith('sess-1', 'module-01-a', 'en')
+  })
+
   it('met à jour title et frontmatter', async () => {
     const upsertModule = jest.fn().mockResolvedValue({
       ...mod,

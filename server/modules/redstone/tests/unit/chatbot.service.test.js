@@ -170,8 +170,37 @@ describe('chatbot.service', () => {
     expect(result.applied).toBe(true)
     expect(updateModule).toHaveBeenCalledWith(
       's1',
-      { path: 'module-01-a', body_md: '# Après' },
-      expect.objectContaining({ source: 'chatbot', chat_message_id: 'chat_abc' })
+      { path: 'module-01-a', body_md: '# Après', locale: null },
+      expect.objectContaining({
+        source: 'chatbot',
+        chat_message_id: 'chat_abc',
+        sync_all_locales: true
+      })
     )
+  })
+
+  it('propose charge le module de la locale demandée', async () => {
+    const prevUrl = process.env.REDSTONE_CHATBOT_URL
+    process.env.REDSTONE_CHATBOT_URL = 'http://chatbot.test/propose'
+    const findBySessionPathLocale = jest.fn().mockResolvedValue({ ...mod, locale: 'en', body_md: '# EN\n' })
+    const fetchImpl = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ proposed_body_md: '# EN\n\n## section\n', summary: 'ok' })
+    })
+    const svc = createChatbotService({
+      sessionRepo: { findById: async () => session },
+      contentRepo: {
+        findBySessionPathLocale,
+        findBySessionAndPath: jest.fn(),
+        listBySession: async () => [mod]
+      },
+      contentEdit: { updateModule: jest.fn() },
+      proposalRepo: { create: jest.fn() },
+      fetchImpl
+    })
+    await svc.propose('s1', { path: 'module-01-a', message: 'test', locale: 'en' })
+    if (prevUrl) process.env.REDSTONE_CHATBOT_URL = prevUrl
+    else delete process.env.REDSTONE_CHATBOT_URL
+    expect(findBySessionPathLocale).toHaveBeenCalledWith('s1', 'module-01-a', 'en')
   })
 })

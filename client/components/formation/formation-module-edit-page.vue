@@ -45,6 +45,7 @@
           formation-module-chatbot(
             :slug='slug'
             :path='moduleStem'
+            :locale='locale'
             :body-md='bodyMd'
             @applied='onChatApplied'
             )
@@ -117,7 +118,7 @@ export default {
       this.error = ''
       try {
         const res = await fetch(
-          `/api/formation/${encodeURIComponent(this.slug)}/content/module?path=${encodeURIComponent(this.moduleStem)}`,
+          `/api/formation/${encodeURIComponent(this.slug)}/content/module?path=${encodeURIComponent(this.moduleStem)}&locale=${encodeURIComponent(this.locale)}`,
           { credentials: 'same-origin', cache: 'no-store' }
         )
         const json = await res.json().catch(() => ({}))

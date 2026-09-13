@@ -109,7 +109,8 @@ router.get('/:slug/content/module', async (req, res) => {
   const sessionId = await resolveSessionId(slug, res)
   if (!sessionId) return undefined
 
-  const result = await WIKI.redstone.contentEdit.getModule(sessionId, path)
+  const locale = req.query.locale ? String(req.query.locale).trim() : null
+  const result = await WIKI.redstone.contentEdit.getModule(sessionId, path, locale)
   if (!result.ok) return res.status(result.status).json({ ok: false, error: result.error })
   const { ok: _ok, status: _status, ...body } = result
   return res.status(200).json(body)

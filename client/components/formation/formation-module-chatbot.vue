@@ -68,6 +68,7 @@ export default {
   props: {
     slug: { type: String, required: true },
     path: { type: String, required: true },
+    locale: { type: String, default: 'fr' },
     bodyMd: { type: String, default: '' }
   },
   data () {
@@ -108,7 +109,7 @@ export default {
           method: 'POST',
           credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ path: this.path, message })
+          body: JSON.stringify({ path: this.path, message, locale: this.locale })
         })
         const json = await res.json().catch(() => ({}))
         if (!res.ok) throw new Error(json.error?.message || `Erreur ${res.status}`)
@@ -136,7 +137,7 @@ export default {
           method: 'POST',
           credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ proposal_id: this.proposal.proposal_id })
+          body: JSON.stringify({ proposal_id: this.proposal.proposal_id, locale: this.locale })
         })
         const json = await res.json().catch(() => ({}))
         if (!res.ok) throw new Error(json.error?.message || `Erreur ${res.status}`)
@@ -145,9 +146,13 @@ export default {
           version: json.version,
           chat_message_id: json.chat_message_id
         })
+        const locales = Array.isArray(json.synced_locales) ? json.synced_locales : []
+        const localeHint = locales.length > 1
+          ? ` — ${locales.join(', ')}`
+          : ''
         this.$store.commit('showNotification', {
           style: 'green',
-          message: `Modification chatbot appliquée (v${json.version})`,
+          message: `Modification chatbot appliquée (v${json.version})${localeHint}`,
           icon: 'check'
         })
         this.proposal = null

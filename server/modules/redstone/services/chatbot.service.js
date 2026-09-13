@@ -62,7 +62,10 @@ const createChatbotService = ({
       const message = String(payload.message || '').trim()
       if (!message) return fail(422, 'message_required', 'message requis.')
 
-      const mod = await contentRepo.findBySessionAndPath(sessionId, path)
+      const locale = payload.locale || options.locale || null
+      const mod = locale
+        ? await contentRepo.findBySessionPathLocale(sessionId, path, locale)
+        : await contentRepo.findBySessionAndPath(sessionId, path)
       if (!mod) {
         return fail(404, 'module_not_found', `Module introuvable : ${path}`)
       }
@@ -154,13 +157,15 @@ const createChatbotService = ({
         sessionId,
         {
           path: proposal.path,
-          body_md: proposal.proposed_body_md
+          body_md: proposal.proposed_body_md,
+          locale: payload.locale || options.locale || null
         },
         {
           source: 'chatbot',
           author: options.author || proposal.author || 'formateur',
           chat_message_id: proposal.chat_message_id,
-          agent_run_id: options.agent_run_id || null
+          agent_run_id: options.agent_run_id || null,
+          sync_all_locales: true
         }
       )
 

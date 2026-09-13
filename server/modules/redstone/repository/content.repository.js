@@ -42,6 +42,11 @@ const createContentRepository = knex => ({
     return rowToModule(row)
   },
 
+  async listBySessionPath(sessionId, path) {
+    const rows = await knex(TABLE_MODULES).where({ sessionId, path }).orderBy('locale', 'asc')
+    return rows.map(rowToModule)
+  },
+
   async listBySessionLocale(sessionId, locale, { fallbackLocale = null } = {}) {
     const all = await this.listBySession(sessionId)
     if (!locale) return all
