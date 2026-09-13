@@ -1,5 +1,5 @@
 const { MONDAY_COLUMNS, LMS_PUSH_COLUMNS } = require('../domain/monday-columns')
-const { buildMondayColumnPatch } = require('../domain/monday-push')
+const { buildMondayColumnPatch, patchFingerprint } = require('../domain/monday-push')
 const { runHealthChecks } = require('../domain/health-checks')
 const {
   DEFAULT_BOARD_ID,
@@ -89,6 +89,20 @@ const createMondayPushService = ({
         health,
         siteHost: getSiteHost()
       })
+      const fingerprint = patchFingerprint(patch)
+      const previousFingerprint = session.metadata?.monday?.lms_push?.fingerprint
+      if (!options.force && previousFingerprint === fingerprint) {
+        logger.info(`(REDSTONE/LMS) Monday push ${session.slug}: inchangé (idempotent)`)
+        return {
+          ok: true,
+          status: 200,
+          skipped: true,
+          reason: 'unchanged',
+          session,
+          patch,
+          fingerprint
+        }
+      }
 
       try {
         const result = await pushColumns(token, session.monday_item_id, patch)
@@ -97,6 +111,7 @@ const createMondayPushService = ({
             monday: {
               lms_push: {
                 ...patch,
+                fingerprint,
                 updated_columns: result.updated,
                 skipped_columns: result.skipped,
                 pushed_at: new Date().toISOString()
@@ -112,6 +127,7 @@ const createMondayPushService = ({
           status: 200,
           session: merged,
           patch,
+          fingerprint,
           monday: result
         }
       } catch (err) {

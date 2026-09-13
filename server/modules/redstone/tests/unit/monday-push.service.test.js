@@ -49,4 +49,30 @@ describe('monday-push.service', () => {
     expect(result.ok).toBe(false)
     expect(result.status).toBe(404)
   })
+
+  it('skip push si fingerprint inchangé (M04 idempotent)', async () => {
+    const { buildMondayColumnPatch, patchFingerprint } = require('../../domain/monday-push')
+    const { runHealthChecks } = require('../../domain/health-checks')
+    const deps = baseDeps()
+    const modules = []
+    const health = runHealthChecks(session, modules)
+    const moduleStats = { total_modules: 0, published_modules: 0 }
+    const patch = buildMondayColumnPatch({
+      session,
+      moduleStats,
+      health,
+      siteHost: 'https://formation.redstoneformations.fr'
+    })
+    const fingerprint = patchFingerprint(patch)
+    deps.sessionRepo.findById.mockResolvedValue({
+      ...session,
+      metadata: { monday: { lms_push: { fingerprint } } }
+    })
+    const svc = createMondayPushService(deps)
+    const result = await svc.pushSession('s1', { modules, health })
+    expect(result.ok).toBe(true)
+    expect(result.skipped).toBe(true)
+    expect(result.reason).toBe('unchanged')
+    expect(deps.sessionRepo.update).not.toHaveBeenCalled()
+  })
 })

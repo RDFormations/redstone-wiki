@@ -39,6 +39,7 @@ module.exports = {
     const { createHealthService } = require(path.join(base, 'services/health.service'))
     const { createContentNavService } = require(path.join(base, 'services/content-nav.service'))
     const { createMondayPushService } = require(path.join(base, 'services/monday-push.service'))
+    const { wireMondayPushBridge } = require(path.join(base, 'services/monday-webhook-bridge'))
     const { createAdminSessionsService } = require(path.join(base, 'services/admin-sessions.service'))
     const { createContentVersionsService } = require(path.join(base, 'services/content-versions.service'))
     const { createContentEditService } = require(path.join(base, 'services/content-edit.service'))
@@ -121,6 +122,7 @@ module.exports = {
       getSiteHost: () => WIKI.config?.host || process.env.WIKI_SITE_HOST || 'https://formation.redstoneformations.fr',
       logger: WIKI.logger
     })
+    wireMondayPushBridge(webhooks, mondayPush, WIKI.logger)
 
     WIKI.redstone = {
       sessions: createSessionService({ repo: sessionRepo, logger: WIKI.logger }),
@@ -140,7 +142,6 @@ module.exports = {
         contentRepo,
         healthRepo,
         webhooks,
-        mondayPush,
         logger: WIKI.logger
       }),
       distribute: createDistributeService({
@@ -151,7 +152,6 @@ module.exports = {
         guestAccess,
         trainerAccess,
         webhooks,
-        mondayPush,
         getSiteHost: () => WIKI.config?.host || process.env.WIKI_SITE_HOST || 'https://formation.redstoneformations.fr',
         logger: WIKI.logger
       }),
@@ -173,6 +173,7 @@ module.exports = {
         contentRepo,
         projectionService: projection,
         webhooks,
+        mondayPush,
         logger: WIKI.logger
       }),
       nav,

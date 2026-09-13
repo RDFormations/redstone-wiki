@@ -49,6 +49,20 @@ describe('publish.service', () => {
     expect(result.status).toBe(404)
   })
 
+  it('déclenche push Monday après dépublication (M04)', async () => {
+    const mocks = createMocks()
+    const mondayPush = { schedulePush: jest.fn() }
+    const svc = createPublishService({ ...mocks, mondayPush })
+    const result = await svc.publish('sess-1', {
+      action: 'module',
+      path: 'module-01-a.md',
+      published: false
+    })
+    expect(result.ok).toBe(true)
+    expect(result.unpublished).toEqual(['module-01-a'])
+    expect(mondayPush.schedulePush).toHaveBeenCalledWith('sess-1')
+  })
+
   it('publie un module seul (sans exercice ni correction)', async () => {
     const mocks = createMocks()
     const svc = createPublishService(mocks)

@@ -73,6 +73,10 @@ const CDC_VALIDATED_FEATURES = [
   feature('M03', 'Colonnes Monday LMS', [
     'server/modules/redstone/domain/monday-columns.js'
   ], ['monday-columns.test.js', 'monday-push.test.js']),
+  feature('M04', 'Webhook Monday bidirectionnel', [
+    'server/modules/redstone/services/monday-webhook-bridge.js',
+    'server/modules/redstone/services/monday-push.service.js'
+  ], ['monday-webhook-bridge.test.js', 'monday-push.service.test.js']),
   feature('M05', 'Provision formateur', [
     'server/modules/redstone/services/trainer-access.service.js'
   ], ['trainer-m05.test.js']),

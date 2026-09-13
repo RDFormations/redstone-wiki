@@ -15,7 +15,6 @@ const createDistributeService = ({
   guestAccess,
   trainerAccess,
   webhooks,
-  mondayPush,
   getSiteHost = () => 'https://formation.redstoneformations.fr',
   logger = console
 }) => ({
@@ -43,7 +42,6 @@ const createDistributeService = ({
           errors: blocking.map(c => c.checkId)
         })
       }
-      if (mondayPush) mondayPush.schedulePush(sessionId)
       return {
         ok: false,
         status: 422,
@@ -77,7 +75,6 @@ const createDistributeService = ({
         errorCode: 'projection_failed',
         errorMessage: 'Échec projection vers Wiki.js.'
       })
-      if (mondayPush) mondayPush.schedulePush(sessionId)
       return outcome
     }
 
@@ -94,7 +91,6 @@ const createDistributeService = ({
         errorCode: 'hub_projection_failed',
         errorMessage: 'Échec projection hubs stagiaire/formateur.'
       })
-      if (mondayPush) mondayPush.schedulePush(sessionId)
       return outcome
     }
 
@@ -111,7 +107,6 @@ const createDistributeService = ({
         errorCode: 'render_invalid',
         errorMessage: `${verify.stale.length} page(s) sans rendu HTML valide après projection.`
       })
-      if (mondayPush) mondayPush.schedulePush(sessionId)
       return outcome
     }
     if (verify.repaired) {
@@ -161,7 +156,6 @@ const createDistributeService = ({
             errors: ['trainer_provision']
           })
         }
-        if (mondayPush) mondayPush.schedulePush(sessionId)
         return {
           ok: false,
           status: 422,
@@ -190,8 +184,6 @@ const createDistributeService = ({
         support_ready: statusFlags.support_ready
       })
     }
-    if (mondayPush) mondayPush.schedulePush(sessionId)
-
     return {
       ok: true,
       status: 200,

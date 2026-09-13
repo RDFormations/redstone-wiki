@@ -1,4 +1,6 @@
+const crypto = require('crypto')
 const { supportReady } = require('./session-status')
+const { siteBase } = require('./portal-hub')
 
 const PORTAL_STATUS = Object.freeze({
   LIVE: 'Live',
@@ -22,14 +24,14 @@ const portalStatusLabel = session => {
   return PORTAL_STATUS.ABSENT
 }
 
+/** O03 — « Support prêt » = distribué live + health OK ; Partiel = publication stagiaire partielle. */
 const supportReadyLabel = (session, moduleStats = {}, healthOk = true) => {
   if (!supportReady(session) || !healthOk) return SUPPORT_LABEL.NO
   const total = moduleStats.total_modules || 0
   const published = moduleStats.published_modules || 0
-  if (total === 0) return SUPPORT_LABEL.NO
+  if (total === 0 || published === 0) return SUPPORT_LABEL.YES
   if (published >= total) return SUPPORT_LABEL.YES
-  if (published > 0) return SUPPORT_LABEL.PARTIAL
-  return SUPPORT_LABEL.NO
+  return SUPPORT_LABEL.PARTIAL
 }
 
 const errorDetail = (session, health) => {
@@ -39,10 +41,11 @@ const errorDetail = (session, health) => {
   return blocking.map(c => c.message).join(' · ')
 }
 
-const portalUrl = (session, siteHost = 'https://formation.redstoneformations.fr') => {
-  const host = String(siteHost).replace(/\/$/, '')
-  const path = session.wiki_path || `/formations/${session.slug}`
-  return `${host}${path}`
+/** M01 — URL canonique stagiaire (Monday + convocation). */
+const stagiaireUrl = (session, siteHost = 'https://formation.redstoneformations.fr') => {
+  const locale = session.locale_default || 'fr'
+  const host = siteBase(siteHost)
+  return `${host}/${locale}/formations/${session.slug}/stagiaire`
 }
 
 const buildMondayColumnPatch = ({ session, moduleStats, health, siteHost }) => {
@@ -54,10 +57,25 @@ const buildMondayColumnPatch = ({ session, moduleStats, health, siteHost }) => {
     session_state: session.state,
     last_sync: syncedAt.slice(0, 10),
     error_detail: errorDetail(session, health),
-    portail_formation_url: portalUrl(session, siteHost),
+    portail_formation_url: stagiaireUrl(session, siteHost),
     synced_at: syncedAt
   }
 }
+
+/** Empreinte stable pour idempotence M04 (hors last_sync). */
+const patchFingerprint = patch =>
+  crypto
+    .createHash('sha256')
+    .update(
+      JSON.stringify({
+        portal_status: patch.portal_status,
+        support_ready: patch.support_ready,
+        session_state: patch.session_state,
+        error_detail: patch.error_detail || '',
+        portail_formation_url: patch.portail_formation_url || ''
+      })
+    )
+    .digest('hex')
 
 module.exports = {
   PORTAL_STATUS,
@@ -65,6 +83,7 @@ module.exports = {
   portalStatusLabel,
   supportReadyLabel,
   errorDetail,
-  portalUrl,
-  buildMondayColumnPatch
+  stagiaireUrl,
+  buildMondayColumnPatch,
+  patchFingerprint
 }

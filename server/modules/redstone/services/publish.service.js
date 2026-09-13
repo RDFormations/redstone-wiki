@@ -22,6 +22,7 @@ const createPublishService = ({
   contentRepo,
   projectionService,
   webhooks,
+  mondayPush,
   logger = console
 }) => ({
   async publish(sessionId, payload) {
@@ -123,6 +124,8 @@ const createPublishService = ({
         count: published.length,
         by: payload.by || 'formateur'
       })
+    } else if (mondayPush && !wantPublished && unpublished.length) {
+      mondayPush.schedulePush(sessionId)
     }
 
     return {

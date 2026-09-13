@@ -23,12 +23,15 @@ describe('monday-push domain M03', () => {
     expect(portalStatusLabel({ ...baseSession, state: 'incomplete' })).toBe(PORTAL_STATUS.ERROR)
   })
 
-  it('supportReadyLabel — Oui / Partiel / Non', () => {
+  it('supportReadyLabel — Oui / Partiel / Non (O03)', () => {
     expect(supportReadyLabel(baseSession, { total_modules: 2, published_modules: 2 }, true)).toBe(
       SUPPORT_LABEL.YES
     )
     expect(supportReadyLabel(baseSession, { total_modules: 2, published_modules: 1 }, true)).toBe(
       SUPPORT_LABEL.PARTIAL
+    )
+    expect(supportReadyLabel(baseSession, { total_modules: 2, published_modules: 0 }, true)).toBe(
+      SUPPORT_LABEL.YES
     )
     expect(supportReadyLabel({ ...baseSession, distributed_at: null }, {}, true)).toBe(SUPPORT_LABEL.NO)
   })
@@ -43,6 +46,6 @@ describe('monday-push domain M03', () => {
     expect(patch.portal_status).toBe('Live')
     expect(patch.support_ready).toBe('Partiel')
     expect(patch.session_state).toBe('distributed')
-    expect(patch.portail_formation_url).toContain('/formations/test')
+    expect(patch.portail_formation_url).toBe('http://localhost:3000/fr/formations/test/stagiaire')
   })
 })
