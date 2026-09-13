@@ -15,6 +15,7 @@
     "test:redstone:chatbot": "jest --config jest.config.redstone.js --testPathPattern='chatbot|http-json-client' --coverage=false",
     "test:redstone:integration": "cross-env LMS_E2E_FORCE=1 jest --config jest.config.redstone.js --testPathPattern=tests/integration --runInBand --testTimeout=120000 --coverage=false",
     "test:redstone:e2e": "cross-env LMS_E2E_FORCE=1 jest --config jest.config.redstone.js --testPathPattern=tests/e2e --runInBand --testTimeout=120000 --coverage=false",
+    "test:redstone:playwright": "playwright test",
     "test:redstone:all": "bash scripts/test-redstone.sh --all",
     "cypress:open": "cypress open",
     "postinstall": "patch-package"
@@ -214,6 +215,7 @@
     "@babel/preset-env": "^7.12.1",
     "@mdi/font": "5.8.55",
     "@panter/vue-i18next": "0.15.2",
+    "@playwright/test": "1.49.1",
     "@requarks/ckeditor5": "19.0.1-wiki.2",
     "@vue/babel-preset-app": "4.5.15",
     "animate-sass": "0.8.2",

@@ -152,6 +152,10 @@ const CDC_VALIDATED_FEATURES = [
     'scripts/backup-pg.sh',
     'scripts/restore-pg.sh'
   ], ['ops-staging-backup.test.js']),
+  feature('I04', 'E2E Playwright', [
+    'playwright.config.js',
+    'server/modules/redstone/tests/playwright/i04-journey.spec.js'
+  ], ['i04-journey.spec.js']),
   feature('B02', 'Branding client (logo, couleurs)', [
     'server/modules/redstone/domain/client-branding.js',
     'client/helpers/client-branding.js',

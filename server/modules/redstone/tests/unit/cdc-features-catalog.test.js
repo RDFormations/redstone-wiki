@@ -4,9 +4,12 @@ const { CDC_VALIDATED_FEATURES, WIKI_ROOT } = require('../../domain/cdc-features
 
 const unitDir = path.join(WIKI_ROOT, 'server/modules/redstone/tests/unit')
 const e2eDir = path.join(WIKI_ROOT, 'server/modules/redstone/tests/e2e')
+const playwrightDir = path.join(WIKI_ROOT, 'server/modules/redstone/tests/playwright')
 
 const testExists = name =>
-  fs.existsSync(path.join(unitDir, name)) || fs.existsSync(path.join(e2eDir, name))
+  fs.existsSync(path.join(unitDir, name)) ||
+  fs.existsSync(path.join(e2eDir, name)) ||
+  fs.existsSync(path.join(playwrightDir, name))
 
 describe('CDC Validé — catalogue features (preuve + test)', () => {
   it('registre non vide (≥ 38 Validé)', () => {

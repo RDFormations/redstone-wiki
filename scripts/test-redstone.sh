@@ -71,6 +71,14 @@ if [[ "$RUN_E2E" -eq 1 ]]; then
   echo "==> Tests integration + e2e LMS"
   npm run test:redstone:integration
   npm run test:redstone:e2e
+
+  if [[ ! -d node_modules/@playwright/test ]]; then
+    echo "ERREUR: @playwright/test manquant — yarn install ou npm install" >&2
+    exit 1
+  fi
+  echo "==> Tests Playwright I04"
+  npx playwright install chromium
+  npm run test:redstone:playwright
 fi
 
 echo "==> OK — tests RedStone LMS terminés"

@@ -14,6 +14,8 @@ on:
       - 'scripts/test-redstone.sh'
       - 'scripts/ci-wiki-*.sh'
       - 'jest.config.redstone.js'
+      - 'playwright.config.js'
+      - 'server/modules/redstone/tests/playwright/**'
       - '.github/workflows/redstone-lms.yml'
   pull_request:
     branches:
@@ -58,7 +60,10 @@ jobs:
       - name: Bootstrap Wiki.js (Docker)
         run: bash scripts/ci-wiki-up.sh
 
-      - name: Run integration + e2e
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Run integration + e2e + Playwright
         env:
           LMS_E2E_FORCE: '1'
         run: bash scripts/test-redstone.sh --e2e
