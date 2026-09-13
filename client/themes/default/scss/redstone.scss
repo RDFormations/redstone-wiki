@@ -2201,3 +2201,160 @@ body.rs-mermaid-fs-active {
 .rs-module-editor-preview .rs-mermaid {
   margin: 1.5rem 0;
 }
+
+.rs-mes-sessions {
+  max-width: 1100px;
+  margin: 0 auto 2rem;
+}
+
+.rs-mes-sessions-hero {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem 1.75rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 45%, #f8fafc 100%);
+  border: 1px solid rgba(30, 41, 59, 0.08);
+  box-shadow: 0 4px 20px rgba(30, 41, 59, 0.06);
+
+  .theme--dark & {
+    background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+  }
+}
+
+.rs-mes-sessions-kicker {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(30, 41, 59, 0.65);
+
+  .theme--dark & { color: rgba(255, 255, 255, 0.65); }
+}
+
+.rs-mes-sessions-title {
+  margin: 0.35rem 0 0.5rem;
+  font-size: 1.85rem;
+  line-height: 1.15;
+}
+
+.rs-mes-sessions-sub {
+  margin: 0;
+  color: rgba(30, 41, 59, 0.75);
+
+  .theme--dark & { color: rgba(255, 255, 255, 0.75); }
+}
+
+.rs-mes-sessions-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.rs-mes-sessions-card {
+  border: 1px solid rgba(30, 41, 59, 0.08);
+  border-radius: 14px;
+  background: #fff;
+
+  .theme--dark & {
+    background: #111827;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.rs-mes-sessions-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.rs-mes-sessions-card-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.2rem;
+}
+
+.rs-mes-sessions-card-client,
+.rs-mes-sessions-card-meta {
+  margin: 0;
+  color: rgba(30, 41, 59, 0.72);
+  font-size: 0.92rem;
+
+  .theme--dark & { color: rgba(255, 255, 255, 0.72); }
+}
+
+.rs-mes-sessions-state {
+  flex-shrink: 0;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.12);
+  color: #4338ca;
+}
+
+.rs-mes-sessions-state--incomplete {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+
+.rs-mes-sessions-state--distributed,
+.rs-mes-sessions-state--live {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+}
+
+.rs-mes-sessions-indicators {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.rs-mes-sessions-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.rs-mes-sessions-indicator--ok {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+}
+
+.rs-mes-sessions-indicator--missing {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+
+.rs-mes-sessions-progress-head,
+.rs-mes-sessions-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+}
+
+.rs-mes-sessions-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.rs-mes-sessions-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(30, 41, 59, 0.12);
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.rs-mes-sessions-btn--primary {
+  background: #4338ca;
+  border-color: #4338ca;
+  color: #fff;
+}
