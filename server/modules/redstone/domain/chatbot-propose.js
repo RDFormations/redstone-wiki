@@ -108,15 +108,8 @@ const LOCALE_LABELS = {
 
 const localeLabel = code => LOCALE_LABELS[code] || String(code || '')
 
-const translateUrl = () => {
-  const base = chatbotUrl()
-  if (!base) return ''
-  const normalized = base.replace(/\/$/, '')
-  if (normalized.endsWith('/chatbot')) {
-    return `${normalized}/translate`
-  }
-  return `${normalized}/translate`
-}
+/** Même gateway que propose ; le champ mode distingue traduction vs édition. */
+const translateUrl = () => chatbotUrl()
 
 const parseAgentBody = (json, fieldNames) => {
   for (const field of fieldNames) {
@@ -199,7 +192,7 @@ const buildChatMessageId = () => `chat_${crypto.randomUUID()}`
 const buildProposalId = () => crypto.randomUUID()
 
 /**
- * Traduction Markdown via agent (REDSTONE_CHATBOT_URL/translate).
+ * Traduction Markdown via agent (REDSTONE_CHATBOT_URL, mode: translate).
  * Corps attendu : { translated_body_md } ou { proposed_body_md }
  */
 const translateViaHttp = async (

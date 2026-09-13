@@ -144,9 +144,9 @@ describe('chatbot-propose — translateViaHttp', () => {
     process.env = { ...prevEnv }
   })
 
-  it('dérive l’URL /translate depuis REDSTONE_CHATBOT_URL', () => {
+  it('utilise la même URL que propose (REDSTONE_CHATBOT_URL)', () => {
     process.env.REDSTONE_CHATBOT_URL = 'https://ops.example.com/lms/chatbot'
-    expect(translateUrl()).toBe('https://ops.example.com/lms/chatbot/translate')
+    expect(translateUrl()).toBe('https://ops.example.com/lms/chatbot')
   })
 
   it('envoie source_locale, target_locale et mode translate', async () => {
@@ -167,7 +167,7 @@ describe('chatbot-propose — translateViaHttp', () => {
     )
     expect(result.translated_body_md).toBe('# Hello\n')
     const [url, opts] = fetchImpl.mock.calls[0]
-    expect(url).toBe('https://chatbot.test/lms/chatbot/translate')
+    expect(url).toBe('https://chatbot.test/lms/chatbot')
     const payload = JSON.parse(opts.body)
     expect(payload.mode).toBe('translate')
     expect(payload.source_locale).toBe('fr')
