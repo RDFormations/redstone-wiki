@@ -1,35 +1,65 @@
 <template lang="pug">
   .rs-mes-sessions
     v-alert.mb-4(v-if='error', type='error', dense, outlined) {{ error }}
-    v-skeleton-loader(v-if='loading', type='article, table-row@4')
+    v-skeleton-loader(v-if='loading', type='article, table-row@3')
 
     template(v-else)
       header.rs-mes-sessions-hero
-        .rs-mes-sessions-kicker Espace formateur
-        h1.rs-mes-sessions-title Mes sessions
-        p.rs-mes-sessions-sub
-          | Retrouvez vos formations en cours et à venir — dates, état, publication et indicateurs.
+        .rs-mes-sessions-hero-top
+          div
+            .rs-mes-sessions-kicker Espace formateur
+            h1.rs-mes-sessions-title Mes sessions
+            p.rs-mes-sessions-sub
+              | Vue d’ensemble de vos formations — dates, état, publication et indicateurs de préparation.
+          .rs-mes-sessions-hero-badge(v-if='sessions.length')
+            v-icon.mr-2(color='primary') mdi-calendar-multiselect
+            strong {{ sessions.length }}
+            span session{{ sessions.length > 1 ? 's' : '' }}
 
-      v-alert.mb-4(v-if='!sessions.length', type='info', outlined, dense, icon='mdi-information-outline')
-        | Aucune session assignée pour le moment. Contactez RedStone si vous attendez une formation.
+        .rs-mes-sessions-hero-stats(v-if='sessions.length')
+          .rs-mes-sessions-stat
+            strong {{ summary.upcoming }}
+            span à venir / en cours
+          .rs-mes-sessions-stat
+            strong {{ summary.avgPublication }}%
+            span publication moyenne
+          .rs-mes-sessions-stat(:class='{ "rs-mes-sessions-stat--alert": summary.alerts > 0 }')
+            strong {{ summary.alerts }}
+            span alerte{{ summary.alerts > 1 ? 's' : '' }} J-48 h
 
-      .rs-mes-sessions-grid(v-else)
-        v-card.rs-mes-sessions-card(
+      .rs-mes-sessions-empty(v-if='!sessions.length')
+        v-icon.rs-mes-sessions-empty-icon(color='primary', large) mdi-calendar-blank-outline
+        h2.rs-mes-sessions-empty-title Aucune session pour le moment
+        p.rs-mes-sessions-empty-text
+          | Vos formations apparaîtront ici dès qu’une session vous sera assignée (compte formateur ou email Monday).
+        p.rs-mes-sessions-empty-hint Contactez RedStone si vous attendez un accès.
+
+      v-row.rs-mes-sessions-grid(v-else, dense)
+        v-col(
           v-for='item in sessions'
           :key='item.sessionId'
-          flat
+          cols='12'
+          lg='6'
           )
-          v-card-text
+          article.rs-mes-sessions-card(:class='cardStateClass(item)')
             .rs-mes-sessions-card-head
               .rs-mes-sessions-card-main
-                h2.rs-mes-sessions-card-title {{ item.title }}
-                p.rs-mes-sessions-card-client(v-if='item.client') {{ item.client }}
+                .rs-mes-sessions-card-title-row
+                  h2.rs-mes-sessions-card-title {{ item.title }}
+                  span.rs-formateur-badge(:class='stateBadgeClass(item.state)') {{ item.state_label }}
+                p.rs-mes-sessions-card-client(v-if='item.client')
+                  v-icon.mr-1(x-small) mdi-domain
+                  | {{ item.client }}
                 p.rs-mes-sessions-card-meta
+                  v-icon.mr-1(x-small) mdi-calendar-range
                   span {{ item.dates.label }}
-                  span(v-if='item.location') · {{ item.location }}
-                  span(v-if='item.modality') · {{ item.modality }}
-                  span(v-if='item.reference') · Réf. {{ item.reference }}
-              span.rs-mes-sessions-state(:class='stateClass(item.state)') {{ item.state_label }}
+                p.rs-mes-sessions-card-meta(v-if='item.location || item.modality || item.reference')
+                  v-icon.mr-1(x-small) mdi-map-marker-outline
+                  span
+                    template(v-if='item.location') {{ item.location }}
+                    template(v-if='item.modality') {{ item.location ? ' · ' : '' }}{{ item.modality }}
+                    template(v-if='item.reference') {{ (item.location || item.modality) ? ' · ' : '' }}Réf. {{ item.reference }}
+                p.rs-mes-sessions-card-hint(v-if='item.state_hint') {{ item.state_hint }}
 
             v-alert.mt-3.mb-0(
               v-if='item.indicators?.readiness?.alert'
@@ -40,8 +70,8 @@
               icon='mdi-alert-circle-outline'
               ) {{ item.indicators.readiness.message }}
 
-            .rs-mes-sessions-indicators.mt-3(v-if='item.indicators')
-              span.rs-mes-sessions-indicator(
+            .rs-formateur-indicators.mt-3(v-if='item.indicators')
+              span.rs-formateur-indicator(
                 v-for='ind in indicatorItems(item)'
                 :key='ind.id'
                 :class='indicatorClass(ind)'
@@ -49,9 +79,9 @@
                 v-icon.mr-1(x-small) {{ ind.icon }}
                 | {{ ind.label }}
 
-            .rs-mes-sessions-progress.mt-4(v-if='item.publication?.total')
-              .rs-mes-sessions-progress-head
-                span Publication
+            .rs-formateur-hero-progress.mt-4(v-if='item.publication?.total')
+              .rs-formateur-hero-progress-head
+                span Publication stagiaire
                 strong {{ item.publication_percent }}%
               v-progress-linear(
                 :value='item.publication_percent'
@@ -59,7 +89,7 @@
                 height='8'
                 rounded
                 )
-              .rs-mes-sessions-progress-meta
+              .rs-formateur-hero-progress-meta
                 span {{ item.publication.published }} / {{ item.publication.total }} modules publiés
                 span(v-if='item.publication.draft') · {{ item.publication.draft }} brouillon(s)
 
@@ -73,6 +103,8 @@
 </template>
 
 <script>
+const ACTIVE_STATES = new Set(['draft_ready', 'distributed', 'live', 'incomplete'])
+
 export default {
   props: {
     locale: { type: String, default: 'fr' }
@@ -82,6 +114,18 @@ export default {
       loading: true,
       error: '',
       sessions: []
+    }
+  },
+  computed: {
+    summary () {
+      const list = this.sessions || []
+      const upcoming = list.filter(s => ACTIVE_STATES.has(s.state)).length
+      const alerts = list.filter(s => s.indicators?.readiness?.alert).length
+      const withPub = list.filter(s => s.publication?.total > 0)
+      const avgPublication = withPub.length
+        ? Math.round(withPub.reduce((sum, s) => sum + (s.publication_percent || 0), 0) / withPub.length)
+        : 0
+      return { upcoming, alerts, avgPublication }
     }
   },
   async mounted () {
@@ -95,8 +139,19 @@ export default {
       if (href.startsWith('/')) return `/${this.locale}${href}`
       return `/${this.locale}/${href}`
     },
-    stateClass (state) {
-      return `rs-mes-sessions-state--${state || 'draft'}`
+    cardStateClass (item) {
+      return `rs-mes-sessions-card--${item.state || 'draft'}`
+    },
+    stateBadgeClass (state) {
+      const map = {
+        distributed: 'rs-mes-sessions-badge--ok',
+        live: 'rs-mes-sessions-badge--ok',
+        draft_ready: 'rs-mes-sessions-badge--ready',
+        incomplete: 'rs-mes-sessions-badge--warn',
+        archived: 'rs-mes-sessions-badge--muted',
+        draft: 'rs-mes-sessions-badge--muted'
+      }
+      return map[state] || 'rs-mes-sessions-badge--muted'
     },
     indicatorItems (item) {
       const ind = item.indicators || {}
@@ -106,7 +161,7 @@ export default {
       ]
     },
     indicatorClass (item) {
-      return item.ok ? 'rs-mes-sessions-indicator--ok' : 'rs-mes-sessions-indicator--missing'
+      return item.ok ? 'rs-formateur-indicator--ok' : 'rs-formateur-indicator--missing'
     },
     async load () {
       this.loading = true
