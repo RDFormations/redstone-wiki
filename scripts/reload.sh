@@ -41,6 +41,10 @@ if [[ -x "$ROOT/scripts/ensure-chatbot-env.sh" ]]; then
   bash "$ROOT/scripts/ensure-chatbot-env.sh"
 fi
 
+if [[ -x "$ROOT/scripts/ensure-monday-lms-env.sh" ]]; then
+  bash "$ROOT/scripts/ensure-monday-lms-env.sh"
+fi
+
 cd "$WIKI_ROOT"
 
 build_fast() {
