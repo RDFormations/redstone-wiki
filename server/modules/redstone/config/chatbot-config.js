@@ -30,9 +30,30 @@ const readKey = key => {
   return ''
 }
 
+const normalizeUrl = raw => {
+  const value = String(raw || '').trim()
+  if (!value) return ''
+  try {
+    const parsed = new URL(value)
+    if (!parsed.protocol.startsWith('http')) return ''
+    return parsed.toString()
+  } catch (_) {
+    return ''
+  }
+}
+
 const chatbotUrl = () => {
-  const url = readKey('REDSTONE_CHATBOT_URL') || readKey('LMS_CHATBOT_URL')
-  return url || DEFAULT_URL
+  const candidates = [
+    readKey('REDSTONE_CHATBOT_URL'),
+    readKey('LMS_CHATBOT_URL'),
+    DEFAULT_URL,
+    'http://host.docker.internal:9474/lms/chatbot'
+  ]
+  for (const candidate of candidates) {
+    const url = normalizeUrl(candidate)
+    if (url) return url
+  }
+  return DEFAULT_URL
 }
 
 const chatbotToken = () => readKey('REDSTONE_CHATBOT_TOKEN')

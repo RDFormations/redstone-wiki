@@ -5,6 +5,7 @@
 
 const crypto = require('crypto')
 const { chatbotUrl, chatbotToken } = require('../config/chatbot-config')
+const { postJson } = require('../infrastructure/http-json-client')
 
 const REDSTONE_RULES = [
   'Ne publie jamais côté stagiaire — brouillon uniquement.',
@@ -100,36 +101,43 @@ const proposeViaHttp = async ({ body_md, message, context }, fetchImpl) => {
   if (!url) {
     throw new Error('REDSTONE_CHATBOT_URL non configuré sur le serveur wiki.')
   }
-  const fetchFn = fetchImpl || globalThis.fetch
-  if (typeof fetchFn !== 'function') {
-    throw new Error('fetch indisponible pour l’assistant édition.')
+
+  const payload = { message, body_md, context, rules: REDSTONE_RULES }
+  const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
+  let res
+  if (fetchImpl) {
+    const fetchRes = await fetchImpl(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      body: JSON.stringify(payload)
+    })
+    if (typeof fetchRes.text === 'function') {
+      res = { status: fetchRes.status, body: await fetchRes.text() }
+    } else if (typeof fetchRes.json === 'function') {
+      const json = await fetchRes.json()
+      res = {
+        status: fetchRes.status ?? (fetchRes.ok ? 200 : 502),
+        body: JSON.stringify(json)
+      }
+    } else {
+      res = fetchRes
+    }
+  } else {
+    res = await postJson(url, { headers, body: payload })
   }
 
-  const res = await fetchFn(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    },
-    body: JSON.stringify({
-      message,
-      body_md,
-      context,
-      rules: REDSTONE_RULES
-    })
-  })
-  if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    let detail = text.slice(0, 300)
+  if (res.status < 200 || res.status >= 300) {
+    let detail = res.body.slice(0, 300)
     try {
-      const parsed = JSON.parse(text)
+      const parsed = JSON.parse(res.body)
       detail = parsed?.error?.message || detail
     } catch (_) {
       /* raw text */
     }
     throw new Error(`Assistant édition (${res.status}) : ${detail}`)
   }
-  const json = await res.json()
+  const json = JSON.parse(res.body)
   if (!json || json.proposed_body_md == null) {
     throw new Error('Réponse assistant invalide (proposed_body_md manquant).')
   }
