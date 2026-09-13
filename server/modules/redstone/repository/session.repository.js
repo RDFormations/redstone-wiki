@@ -68,6 +68,29 @@ const createSessionRepository = knex => ({
     return rowToSession(row)
   },
 
+  async findBySlugs(slugs = []) {
+    const normalized = [...new Set((slugs || []).map(s => String(s || '').trim().toLowerCase()).filter(Boolean))]
+    if (!normalized.length) return []
+    const rows = await knex(TABLE).whereIn('slug', normalized)
+    return rows.map(rowToSession)
+  },
+
+  async listByTrainerEmail(email) {
+    const normalized = String(email || '').trim().toLowerCase()
+    if (!normalized) return []
+    const rows = await knex(TABLE).whereRaw(
+      `LOWER(COALESCE(
+        metadata::jsonb->>'trainer_email',
+        metadata::jsonb->>'formateur_email',
+        metadata::jsonb->'monday'->>'formateur_email',
+        metadata::jsonb->'monday'->>'trainer_email',
+        ''
+      )) = ?`,
+      [normalized]
+    )
+    return rows.map(rowToSession)
+  },
+
   async list(filters = {}) {
     const {
       limit = 50,

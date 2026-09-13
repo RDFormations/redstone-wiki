@@ -12,21 +12,21 @@
       v-model='navShown'
       :right='$vuetify.rtl'
       )
-      .rs-drawer-scroll(v-if='isFormationPage && isMobile')
+      .rs-drawer-scroll(v-if='hasFormationSidebar && isMobile')
         formation-nav-sidebar(:slug='formationSlug', @navigate='closeMobileNav')
-      vue-scroll(v-else-if='isFormationPage', :ops='scrollStyle')
+      vue-scroll(v-else-if='hasFormationSidebar', :ops='scrollStyle')
         formation-nav-sidebar(:slug='formationSlug', @navigate='closeMobileNav')
       vue-scroll(v-else, :ops='scrollStyle')
         nav-sidebar(:color='$vuetify.theme.dark ? `grey darken-4-d4` : `primary`', :items='sidebarDecoded', :nav-mode='navMode')
     button.rs-sidebar-collapse#rs-sidebar-collapse(
-      v-if='isFormationPage && isDesktop && !sidebarCollapsed'
+      v-if='hasFormationSidebar && isDesktop && !sidebarCollapsed'
       type='button'
       title='Réduire le menu'
       @click='setSidebarCollapsed(true)'
       )
       span(aria-hidden='true') ‹
     button.rs-sidebar-expand#rs-sidebar-expand(
-      v-if='isFormationPage && isDesktop && sidebarCollapsed'
+      v-if='hasFormationSidebar && isDesktop && sidebarCollapsed'
       type='button'
       title='Ouvrir le menu'
       @click='setSidebarCollapsed(false)'
@@ -379,7 +379,7 @@
                     span {{$t('common:header.delete')}}
               span {{$t('common:page.editPage')}}
             v-alert.mb-5(
-              v-if='!displayPublished && !showFormateurHub && !showStagiaireHub && !showModuleEditPage && !showUnpublishedFriendly'
+              v-if='!displayPublished && !showFormateurHub && !showStagiaireHub && !showModuleEditPage && !showUnpublishedFriendly && !showMesSessionsHub'
               color='red'
               outlined
               icon='mdi-minus-circle'
@@ -411,7 +411,11 @@
               :slug='formationSlug'
               :locale='locale'
               )
-            .contents(ref='container', v-show='!showFormateurHub && !showStagiaireHub && !showModuleEditPage && !showUnpublishedFriendly')
+            formation-mes-sessions(
+              v-if='showMesSessionsHub'
+              :locale='locale'
+              )
+            .contents(ref='container', v-show='!showFormateurHub && !showStagiaireHub && !showModuleEditPage && !showUnpublishedFriendly && !showMesSessionsHub')
               slot(name='contents')
             .comments-container#discussion(v-if='commentsEnabled && commentsPerms.read && !printView')
               .comments-header
@@ -451,6 +455,7 @@ import FormationFormateurHub from '../../../components/formation/formation-forma
 import FormationStagiaireHub from '../../../components/formation/formation-stagiaire-hub.vue'
 import FormationUnpublishedFriendly from '../../../components/formation/formation-unpublished-friendly.vue'
 import FormationModuleEditPage from '../../../components/formation/formation-module-edit-page.vue'
+import FormationMesSessions from '../../../components/formation/formation-mes-sessions.vue'
 import Prism from 'prismjs'
 import { get, sync } from 'vuex-pathify'
 import _ from 'lodash'
@@ -548,6 +553,7 @@ export default {
     FormationStagiaireHub,
     FormationUnpublishedFriendly,
     FormationModuleEditPage,
+    FormationMesSessions,
     StatusIndicator
   },
   props: {
@@ -674,9 +680,16 @@ export default {
   },
   computed: {
     isFormationPage () {
-      return /^formations\/[^/]+/.test(this.path)
+      return /^formations\//.test(String(this.path || ''))
+    },
+    isMesSessionsPath () {
+      return /^formations\/mes-sessions$/i.test(String(this.path || ''))
+    },
+    hasFormationSidebar () {
+      return this.isFormationPage && !this.isMesSessionsPath
     },
     formationSlug () {
+      if (this.isMesSessionsPath) return ''
       const m = this.path.match(/^formations\/([^/]+)/)
       return m ? m[1] : ''
     },
@@ -691,6 +704,7 @@ export default {
     /** Masque le bandeau Wiki (titre slug) — le H1 du MD fait office de titre. */
     hideFormationPageHeader () {
       if (!this.isFormationPage) return false
+      if (this.showMesSessionsHub) return true
       if (this.showFormateurHub || this.showStagiaireHub || this.showModuleEditPage) return false
       if (this.showUnpublishedFriendly) return false
       return (
@@ -722,8 +736,13 @@ export default {
     appRootClasses () {
       const classes = [this.$vuetify.rtl ? 'is-rtl' : 'is-ltr']
       if (this.isFormationPage) {
-        classes.push('rs-formation-page', 'rs-has-sidebar')
-        if (this.isDesktop && this.sidebarCollapsed) classes.push('rs-sidebar-collapsed')
+        classes.push('rs-formation-page')
+        if (this.hasFormationSidebar) {
+          classes.push('rs-has-sidebar')
+          if (this.isDesktop && this.sidebarCollapsed) classes.push('rs-sidebar-collapsed')
+        } else if (this.isMesSessionsPath) {
+          classes.push('rs-mes-sessions-page')
+        }
       }
       return classes.join(' ')
     },
@@ -770,6 +789,9 @@ export default {
     },
     showModuleEditPage () {
       return this.isFormationPage && this.isModuleEditPath && this.canSeeFormateur
+    },
+    showMesSessionsHub () {
+      return this.isMesSessionsPath && this.isAuthenticated
     },
     showUnpublishedFriendly () {
       if (coerceBool(this.formationUnpublishedFriendly)) return true

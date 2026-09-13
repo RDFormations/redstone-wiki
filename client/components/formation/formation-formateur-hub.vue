@@ -44,6 +44,9 @@
             strong {{ data.participants }}
             span participant(s)
         .rs-formateur-hero-actions
+          a.rs-formateur-link(:href='localeHref(`/formations/mes-sessions`)')
+            v-icon.mr-2(small) mdi-view-dashboard-outline
+            | Mes sessions
           button.rs-formateur-copy(type='button', @click='copyConvocationMessage')
             v-icon.mr-2(small) mdi-email-outline
             | Copier message convocation

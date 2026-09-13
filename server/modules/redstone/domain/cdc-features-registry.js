@@ -93,6 +93,11 @@ const CDC_VALIDATED_FEATURES = [
   feature('T04', 'Publication granulaire', [
     'server/modules/redstone/services/publish.service.js'
   ], ['publish.service.test.js']),
+  feature('T06', 'Dashboard Mes sessions', [
+    'client/components/formation/formation-mes-sessions.vue',
+    'server/modules/redstone/domain/formateur-sessions.js',
+    'server/modules/redstone/services/trainer-sessions.service.js'
+  ], ['formateur-sessions.test.js', 'trainer-sessions.service.test.js', 'mes-sessions.e2e.test.js']),
   feature("T10'", 'Indicateurs session', [
     'server/modules/redstone/domain/session-readiness.js'
   ], ['session-readiness.test.js']),

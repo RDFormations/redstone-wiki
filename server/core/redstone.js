@@ -49,6 +49,7 @@ module.exports = {
     const { createExportGitService } = require(path.join(base, 'services/export-git.service'))
     const { createLegalPagesService } = require(path.join(base, 'services/legal-pages.service'))
     const { createPortalService } = require(path.join(base, 'services/portal.service'))
+    const { createTrainerSessionsService } = require(path.join(base, 'services/trainer-sessions.service'))
     const { fetchMissionItem } = require(path.join(base, 'infrastructure/monday-client'))
 
     validateLmsConfig().forEach(msg => WIKI.logger.warn(`(REDSTONE/LMS) ${msg}`))
@@ -87,6 +88,18 @@ module.exports = {
       navService: nav,
       labsService: labs,
       getSiteHost: () => WIKI.config?.host || process.env.WIKI_SITE_HOST || 'https://formation.redstoneformations.fr',
+      logger: WIKI.logger
+    })
+    const checkFormationAccess = (user, slug, locale = 'fr') =>
+      WIKI.auth.checkAccess(user, ['read:pages', 'write:pages', 'manage:pages'], {
+        path: `formations/${slug}`,
+        locale
+      })
+    const trainerSessions = createTrainerSessionsService({
+      sessionRepo,
+      contentRepo,
+      knex,
+      checkFormationAccess,
       logger: WIKI.logger
     })
     const adminSessions = createAdminSessionsService({ sessionRepo, contentRepo, healthRepo })
@@ -158,6 +171,7 @@ module.exports = {
       guestAccess,
       trainerAccess,
       portal,
+      trainerSessions,
       adminSessions,
       contentVersions,
       contentEdit,
@@ -186,8 +200,8 @@ module.exports = {
       })
       legalPages.ensureSiteLegalPages(['fr']).then(() => {
         return guestAccess.ensureGuestLegalPagesAccess()
-      }).catch(err => {
-        WIKI.logger.warn(`(REDSTONE/LMS) Pages légales: ${err.message}`)
+      }).then(() => trainerSessions.ensureMesSessionsPage(['fr'])).catch(err => {
+        WIKI.logger.warn(`(REDSTONE/LMS) Pages légales / mes-sessions: ${err.message}`)
       })
     })
 

@@ -25,6 +25,21 @@ const canPublishFormation = (req, slug) =>
 const deny = (res, status, message) =>
   res.status(status).json({ ok: false, error: { code: status === 401 ? 'unauthorized' : 'forbidden', message } })
 
+router.get('/mes-sessions', async (req, res) => {
+  if (!isAuthenticated(req)) return deny(res, 401, 'Connexion requise.')
+  if (!WIKI.redstone?.trainerSessions) {
+    return res.status(503).json({ ok: false, error: { message: 'LMS indisponible.' } })
+  }
+
+  const result = await WIKI.redstone.trainerSessions.listForUser(req.user, {
+    locale: req.locale?.code || 'fr'
+  })
+  if (!result.ok) {
+    return res.status(result.status).json({ ok: false, error: result.error })
+  }
+  return res.status(200).json(result.dashboard)
+})
+
 router.get('/:slug/formateur', async (req, res) => {
   if (!isAuthenticated(req)) return deny(res, 401, 'Connexion requise.')
   const slug = String(req.params.slug || '').trim().toLowerCase()
