@@ -1,0 +1,135 @@
+{
+  "slug": "fr-github-copilot",
+  "lang": "fr",
+  "base_slug": "github-copilot",
+  "title": "Développer avec GitHub Copilot",
+  "wiki_path": "/formations/fr-github-copilot",
+  "items": [
+    {
+      "path": "formations/fr-github-copilot",
+      "href": "/formations/fr-github-copilot",
+      "title": "Introduction — Développer avec GitHub Copilot",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-github-copilot/formateur",
+      "href": "/formations/fr-github-copilot/formateur",
+      "title": "Espace formateur",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/stagiaire",
+      "href": "/formations/fr-github-copilot/stagiaire",
+      "title": "Espace stagiaires — Développer avec GitHub Copilot",
+      "isPublished": true
+    },
+    {
+      "path": "formations/fr-github-copilot/module-01-introduction",
+      "href": "/formations/fr-github-copilot/module-01-introduction",
+      "title": "Module 1 — Introduction à GitHub Copilot",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/exercice-01-introduction",
+      "href": "/formations/fr-github-copilot/exercice-01-introduction",
+      "title": "Exercices — Introduction à GitHub Copilot",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/correction-01-introduction",
+      "href": "/formations/fr-github-copilot/correction-01-introduction",
+      "title": "Correction — Introduction à GitHub Copilot",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/module-02-completions-inline",
+      "href": "/formations/fr-github-copilot/module-02-completions-inline",
+      "title": "Module 2 — Completions inline et contexte",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/exercice-02-completions-inline",
+      "href": "/formations/fr-github-copilot/exercice-02-completions-inline",
+      "title": "Exercices — Completions inline et contexte",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/correction-02-completions-inline",
+      "href": "/formations/fr-github-copilot/correction-02-completions-inline",
+      "title": "Correction — Completions inline et contexte",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/module-03-chat-modes",
+      "href": "/formations/fr-github-copilot/module-03-chat-modes",
+      "title": "Module 3 — Chat et modes d'interaction",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/exercice-03-chat-modes",
+      "href": "/formations/fr-github-copilot/exercice-03-chat-modes",
+      "title": "Exercices — Chat et modes d'interaction",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/correction-03-chat-modes",
+      "href": "/formations/fr-github-copilot/correction-03-chat-modes",
+      "title": "Correction — Chat et modes d'interaction",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/module-04-agent-skills",
+      "href": "/formations/fr-github-copilot/module-04-agent-skills",
+      "title": "Module 4 — Agent, Skills et Instructions",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/exercice-04-agent-skills",
+      "href": "/formations/fr-github-copilot/exercice-04-agent-skills",
+      "title": "Exercices — Agent, Skills et Instructions",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/correction-04-agent-skills",
+      "href": "/formations/fr-github-copilot/correction-04-agent-skills",
+      "title": "Correction — Agent, Skills et Instructions",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/module-05-path-specific-review",
+      "href": "/formations/fr-github-copilot/module-05-path-specific-review",
+      "title": "Module 5 — Instructions path-specific, commit et revue",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/exercice-05-path-specific-review",
+      "href": "/formations/fr-github-copilot/exercice-05-path-specific-review",
+      "title": "Exercices — Path-specific et revue",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/correction-05-path-specific-review",
+      "href": "/formations/fr-github-copilot/correction-05-path-specific-review",
+      "title": "Correction — Path-specific et revue",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/module-06-bonnes-pratiques",
+      "href": "/formations/fr-github-copilot/module-06-bonnes-pratiques",
+      "title": "Module 6 — Bonnes pratiques et productivité",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/exercice-06-bonnes-pratiques",
+      "href": "/formations/fr-github-copilot/exercice-06-bonnes-pratiques",
+      "title": "Exercices — Bonnes pratiques",
+      "isPublished": false
+    },
+    {
+      "path": "formations/fr-github-copilot/correction-06-bonnes-pratiques",
+      "href": "/formations/fr-github-copilot/correction-06-bonnes-pratiques",
+      "title": "Correction — Bonnes pratiques",
+      "isPublished": false
+    }
+  ]
+}

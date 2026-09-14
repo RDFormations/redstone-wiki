@@ -57,7 +57,7 @@ const graphQLLink = ApolloLink.from([
     if (graphQLErrors) {
       let isAuthError = false
       graphQLErrors.map(({ message, locations, path }) => {
-        if (message === `Forbidden`) {
+        if (message === `Forbidden` || /not authorized/i.test(String(message || ''))) {
           isAuthError = true
         }
         console.error(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)

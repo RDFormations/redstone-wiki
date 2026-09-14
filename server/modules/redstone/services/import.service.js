@@ -2,7 +2,8 @@ const crypto = require('crypto')
 const {
   pageKind,
   agentMaySetPublished,
-  defaultPublishedStagiaire
+  defaultPublishedStagiaire,
+  isRestrictedStem
 } = require('../domain/publish-policy')
 const { normalizeModuleInput } = require('../domain/import-normalize')
 const { isLmsOwnedHubStem } = require('../domain/hub-shell')
@@ -87,7 +88,9 @@ const createImportService = ({
         title: mod.title,
         body_md: mod.body_md,
         frontmatter: mod.frontmatter,
-        published_stagiaire: isAgent ? false : published,
+        published_stagiaire: isAgent
+          ? (isRestrictedStem(stem) ? false : defaultPublishedStagiaire(stem, mod.frontmatter))
+          : published,
         content_hash: contentHash,
         current_version: version,
         page_id: existing?.page_id || null,
